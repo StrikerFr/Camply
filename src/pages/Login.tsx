@@ -1,18 +1,25 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Mail, Lock, ArrowRight, Sparkles, Users, Trophy, Zap, TrendingUp } from "lucide-react";
+import { Mail, Lock, ArrowRight, Sparkles, Users, Trophy, Zap, TrendingUp, Rocket, Award, Calendar } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import logo from "@/assets/logo.png";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 
 const stats = [
   { number: "50K+", label: "Active Users", icon: Users },
   { number: "10K+", label: "Opportunities", icon: Trophy },
   { number: "500+", label: "Colleges", icon: Zap },
+];
+
+const trendingNews = [
+  { icon: TrendingUp, title: "Trending Now", text: "3,247 students joined hackathons this week" },
+  { icon: Rocket, title: "New Launch", text: "Google Summer of Code applications open!" },
+  { icon: Award, title: "Achievement", text: "1,500+ badges earned by students today" },
+  { icon: Calendar, title: "Upcoming", text: "Tech Summit 2025 registrations closing soon" },
 ];
 
 const Login = () => {
@@ -21,6 +28,15 @@ const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [currentNewsIndex, setCurrentNewsIndex] = useState(0);
+
+  // Rotate trending news every 4 seconds
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentNewsIndex((prev) => (prev + 1) % trendingNews.length);
+    }, 4000);
+    return () => clearInterval(interval);
+  }, []);
 
   useEffect(() => {
     if (!loading && user) {
@@ -157,22 +173,57 @@ const Login = () => {
             ))}
           </motion.div>
 
-          {/* Floating Achievement Card */}
+          {/* Trending News Card - Rotating */}
           <motion.div
-            initial={{ opacity: 0, x: 50 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8, delay: 0.6 }}
-            className="absolute bottom-8 right-12 glass rounded-2xl p-5 border border-primary/50 max-w-xs shadow-[0_0_20px_rgba(220,38,38,0.25),0_0_40px_rgba(220,38,38,0.1)]"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.5 }}
+            className="mt-8 glass rounded-2xl p-5 border border-primary/60 max-w-sm relative overflow-hidden"
+            style={{
+              boxShadow: '0 0 0 1px hsl(var(--primary) / 0.4), inset 0 0 20px hsl(var(--primary) / 0.05)',
+            }}
           >
-            <div className="flex items-center gap-3 mb-3">
-              <div className="p-2 rounded-full bg-primary/20">
-                <TrendingUp className="h-5 w-5 text-primary" />
-              </div>
-              <span className="text-sm font-semibold text-foreground">Trending Now</span>
+            {/* Animated border glow */}
+            <div className="absolute inset-0 rounded-2xl border border-primary/40 animate-pulse" />
+            
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={currentNewsIndex}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.3 }}
+              >
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="p-2 rounded-full bg-primary/20">
+                    {(() => {
+                      const IconComponent = trendingNews[currentNewsIndex].icon;
+                      return <IconComponent className="h-5 w-5 text-primary" />;
+                    })()}
+                  </div>
+                  <span className="text-sm font-semibold text-foreground">
+                    {trendingNews[currentNewsIndex].title}
+                  </span>
+                </div>
+                <p className="text-sm text-muted-foreground">
+                  {trendingNews[currentNewsIndex].text}
+                </p>
+              </motion.div>
+            </AnimatePresence>
+            
+            {/* Progress dots */}
+            <div className="flex gap-1.5 mt-4">
+              {trendingNews.map((_, index) => (
+                <div
+                  key={index}
+                  className={`h-1 rounded-full transition-all duration-300 ${
+                    index === currentNewsIndex 
+                      ? 'w-4 bg-primary' 
+                      : 'w-1.5 bg-muted-foreground/30'
+                  }`}
+                />
+              ))}
             </div>
-            <p className="text-sm text-muted-foreground">
-              3,247 students joined hackathons this week
-            </p>
           </motion.div>
         </div>
       </div>
