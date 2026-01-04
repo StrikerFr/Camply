@@ -7,13 +7,15 @@ import {
   Users, 
   TrendingUp, 
   ArrowRight, 
-  Sparkles,
   Clock,
   MapPin,
   Zap,
   Target,
   ArrowUp,
-  Check
+  Check,
+  ChevronRight,
+  Star,
+  Award
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link, useNavigate } from "react-router-dom";
@@ -53,7 +55,9 @@ const FAKE_OPPORTUNITIES = [
 const FAKE_LEADERBOARD_INITIAL = [
   { rank: 1, name: "Arjun Sharma", points: 4520, avatar: "A" },
   { rank: 2, name: "Priya Patel", points: 3890, avatar: "P" },
-  { rank: 3, name: "Rahul Kumar", points: 3450, avatar: "R" }
+  { rank: 3, name: "Rahul Kumar", points: 3450, avatar: "R" },
+  { rank: 4, name: "Maya Singh", points: 3120, avatar: "M" },
+  { rank: 5, name: "You", points: 2450, avatar: "Y", isUser: true }
 ];
 
 const FAKE_ACHIEVEMENTS = [
@@ -63,7 +67,6 @@ const FAKE_ACHIEVEMENTS = [
   { id: "4", name: "Champion", icon: "🏆", unlocked: false }
 ];
 
-// Animated number component
 function AnimatedNumber({ value, className }: { value: number; className?: string }) {
   const [displayValue, setDisplayValue] = useState(value);
   const [isAnimating, setIsAnimating] = useState(false);
@@ -97,8 +100,8 @@ function AnimatedNumber({ value, className }: { value: number; className?: strin
   
   return (
     <motion.span
-      className={cn(className, isAnimating && "text-green-500")}
-      animate={isAnimating ? { scale: [1, 1.1, 1] } : {}}
+      className={cn(className, isAnimating && "text-emerald-400")}
+      animate={isAnimating ? { scale: [1, 1.05, 1] } : {}}
       transition={{ duration: 0.3 }}
     >
       {displayValue.toLocaleString()}
@@ -111,7 +114,6 @@ const Dashboard = () => {
   const firstName = "Alex";
   const [registeredEvents, setRegisteredEvents] = useState<string[]>([]);
   
-  // Live updating stats
   const [liveStats, setLiveStats] = useState({
     totalPoints: 2450,
     weeklyPoints: 180,
@@ -123,13 +125,11 @@ const Dashboard = () => {
   const [leaderboard, setLeaderboard] = useState(FAKE_LEADERBOARD_INITIAL);
   const [recentChange, setRecentChange] = useState<{ stat: string; amount: number } | null>(null);
   
-  // Periodically update stats to simulate live data
   useEffect(() => {
     const interval = setInterval(() => {
       const rand = Math.random();
       
       if (rand < 0.4) {
-        // Increase points (40% chance)
         const increase = Math.floor(Math.random() * 50) + 10;
         setLiveStats(prev => ({
           ...prev,
@@ -138,35 +138,30 @@ const Dashboard = () => {
         }));
         setRecentChange({ stat: "points", amount: increase });
       } else if (rand < 0.55) {
-        // Increase events (15% chance)
         setLiveStats(prev => ({
           ...prev,
           eventsCount: prev.eventsCount + 1
         }));
         setRecentChange({ stat: "events", amount: 1 });
       } else if (rand < 0.65) {
-        // Increase team members (10% chance)
         setLiveStats(prev => ({
           ...prev,
           teamsCount: prev.teamsCount + 1
         }));
         setRecentChange({ stat: "teams", amount: 1 });
       } else if (rand < 0.75) {
-        // Improve rank (10% chance, if not already #1)
         setLiveStats(prev => ({
           ...prev,
           rank: Math.max(1, prev.rank - 1)
         }));
         setRecentChange({ stat: "rank", amount: -1 });
       } else {
-        // Update leaderboard points
         setLeaderboard(prev => prev.map(user => ({
           ...user,
           points: user.points + Math.floor(Math.random() * 100)
         })));
       }
       
-      // Clear change indicator after 2 seconds
       setTimeout(() => setRecentChange(null), 2000);
     }, 3000 + Math.random() * 2000);
     
@@ -175,74 +170,68 @@ const Dashboard = () => {
 
   const stats = [
     { 
-      label: "Points Earned", 
+      label: "Total Points", 
       value: liveStats.totalPoints,
-      displayValue: liveStats.totalPoints.toLocaleString(), 
       icon: Trophy, 
-      change: `+${liveStats.weeklyPoints} this week`, 
-      color: "text-amber-500",
+      change: `+${liveStats.weeklyPoints} this week`,
       isChanging: recentChange?.stat === "points"
     },
     { 
-      label: "Events Joined", 
+      label: "Events", 
       value: liveStats.eventsCount,
-      displayValue: liveStats.eventsCount.toString(), 
       icon: Calendar, 
-      change: "View all", 
-      color: "text-primary",
+      change: "Joined", 
       isChanging: recentChange?.stat === "events"
     },
     { 
-      label: "Team Members", 
+      label: "Teams", 
       value: liveStats.teamsCount,
-      displayValue: liveStats.teamsCount.toString(), 
       icon: Users, 
-      change: "Find teammates", 
-      color: "text-emerald-500",
+      change: "Active", 
       isChanging: recentChange?.stat === "teams"
     },
     { 
       label: "Rank", 
       value: liveStats.rank,
-      displayValue: `#${liveStats.rank}`, 
       icon: TrendingUp, 
-      change: "View leaderboard", 
-      color: "text-primary",
+      change: "Global", 
+      isRank: true,
       isChanging: recentChange?.stat === "rank"
     },
   ];
 
   return (
     <DashboardLayout>
-      <div className="max-w-7xl mx-auto space-y-6">
-        {/* Welcome Section */}
+      <div className="max-w-7xl mx-auto space-y-8">
+        {/* Welcome Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="relative overflow-hidden rounded-xl bg-card border border-border p-5 lg:p-6"
+          className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4"
         >
-          <div className="absolute top-0 right-0 w-48 h-48 bg-primary/5 rounded-full blur-[60px]" />
-          <div className="relative z-10">
-            <div className="flex items-center gap-1.5 text-primary mb-1.5">
-              <Sparkles className="h-4 w-4" />
-              <span className="text-xs font-medium">Welcome back</span>
-            </div>
-            <h1 className="text-2xl lg:text-3xl font-display font-bold text-foreground mb-1.5">
-              Hey, {firstName}! 👋
+          <div>
+            <h1 className="text-3xl lg:text-4xl font-display font-bold text-foreground tracking-tight">
+              Welcome back, {firstName}
             </h1>
-            <p className="text-sm text-muted-foreground max-w-xl">
-              You're on fire! You've earned {liveStats.weeklyPoints} points this week.
+            <p className="text-muted-foreground mt-1">
+              Here's what's happening with your campus journey
             </p>
           </div>
+          <Link to="/opportunities">
+            <Button className="bg-primary hover:bg-primary/90 text-primary-foreground">
+              Browse Opportunities
+              <ChevronRight className="h-4 w-4 ml-1" />
+            </Button>
+          </Link>
         </motion.div>
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           {stats.map((stat, index) => {
             const statRoutes: Record<string, string> = {
-              "Points Earned": "/leaderboard",
-              "Events Joined": "/opportunities",
-              "Team Members": "/teams",
+              "Total Points": "/leaderboard",
+              "Events": "/opportunities",
+              "Teams": "/teams",
               "Rank": "/leaderboard"
             };
             
@@ -254,95 +243,90 @@ const Dashboard = () => {
                 transition={{ delay: index * 0.1 }}
                 onClick={() => navigate(statRoutes[stat.label] || "/dashboard")}
                 className={cn(
-                  "bg-card border rounded-lg p-4 hover:border-primary/30 hover:shadow-md transition-all group relative overflow-hidden cursor-pointer",
-                  stat.isChanging ? "border-green-500/50" : "border-border"
+                  "relative bg-card border rounded-lg p-5 cursor-pointer group overflow-hidden transition-all duration-300",
+                  stat.isChanging ? "border-emerald-500/50" : "border-border hover:border-border/80"
                 )}
-                whileHover={{ scale: 1.02 }}
+                whileHover={{ y: -2 }}
                 whileTap={{ scale: 0.98 }}
               >
-                {/* Flash overlay when changing */}
                 <AnimatePresence>
                   {stat.isChanging && (
                     <motion.div
-                      initial={{ opacity: 0.5 }}
+                      initial={{ opacity: 0.3 }}
                       animate={{ opacity: 0 }}
                       exit={{ opacity: 0 }}
                       transition={{ duration: 1 }}
-                      className="absolute inset-0 bg-green-500/20 pointer-events-none"
+                      className="absolute inset-0 bg-emerald-500/10 pointer-events-none"
                     />
                   )}
                 </AnimatePresence>
                 
-                <div className="flex items-center justify-between mb-2">
-                  <motion.div 
-                    className={cn("p-1.5 rounded-md bg-secondary/50", stat.color)}
-                    animate={stat.isChanging ? { scale: [1, 1.2, 1] } : {}}
-                    transition={{ duration: 0.3 }}
-                  >
-                    <stat.icon className="h-4 w-4" />
-                  </motion.div>
+                <div className="flex items-center justify-between mb-3">
+                  <div className={cn(
+                    "p-2 rounded-lg transition-colors",
+                    "bg-muted group-hover:bg-accent"
+                  )}>
+                    <stat.icon className="h-4 w-4 text-muted-foreground" />
+                  </div>
                   <AnimatePresence>
                     {stat.isChanging && recentChange && (
                       <motion.div
                         initial={{ opacity: 0, y: 10, scale: 0.5 }}
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, y: -10 }}
-                        className="flex items-center gap-0.5 text-green-500 text-xs font-bold"
+                        className="flex items-center gap-0.5 text-emerald-400 text-xs font-semibold"
                       >
-                        <ArrowUp className="h-2.5 w-2.5" />
+                        <ArrowUp className="h-3 w-3" />
                         +{stat.label === "Rank" ? "1" : recentChange.amount}
                       </motion.div>
                     )}
                   </AnimatePresence>
                 </div>
-                <motion.div 
-                  className={cn(
-                    "text-xl lg:text-2xl font-display font-bold mb-0.5",
-                    stat.isChanging ? "text-green-500" : "text-foreground"
-                  )}
-                  animate={stat.isChanging ? { scale: [1, 1.1, 1] } : {}}
-                  transition={{ duration: 0.3 }}
-                >
-                  {stat.label === "Rank" ? stat.displayValue : (
+                
+                <div className={cn(
+                  "text-2xl lg:text-3xl font-display font-bold tracking-tight",
+                  stat.isChanging ? "text-emerald-400" : "text-foreground"
+                )}>
+                  {stat.isRank ? `#${stat.value}` : (
                     <AnimatedNumber value={stat.value} />
                   )}
-                </motion.div>
-                <div className="text-xs text-muted-foreground">{stat.label}</div>
-                <div className="text-[10px] text-primary mt-1.5 group-hover:underline">
-                  {stat.label === "Points Earned" ? `+${liveStats.weeklyPoints} this week` : stat.change}
+                </div>
+                <div className="flex items-center justify-between mt-1">
+                  <span className="text-sm text-muted-foreground">{stat.label}</span>
+                  <span className="text-xs text-muted-foreground/70">{stat.change}</span>
                 </div>
               </motion.div>
             );
           })}
         </div>
 
-        <div className="grid lg:grid-cols-3 gap-4">
-          {/* Recommended Opportunities */}
+        <div className="grid lg:grid-cols-3 gap-6">
+          {/* Featured Opportunities */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="lg:col-span-2 bg-card border border-border rounded-xl overflow-hidden"
+            className="lg:col-span-2"
           >
-            <div className="flex items-center justify-between p-4 border-b border-border">
-              <div className="flex items-center gap-2.5">
-                <div className="p-1.5 rounded-md bg-primary/10">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-lg bg-primary/10">
                   <Target className="h-4 w-4 text-primary" />
                 </div>
                 <div>
-                  <h2 className="font-semibold text-sm text-foreground">Featured Opportunities</h2>
-                  <p className="text-xs text-muted-foreground">Don't miss out on these</p>
+                  <h2 className="font-semibold text-foreground">Featured Opportunities</h2>
+                  <p className="text-xs text-muted-foreground">Don't miss out</p>
                 </div>
               </div>
               <Link to="/opportunities">
-                <Button variant="ghost" size="sm" className="text-primary h-7 text-xs">
+                <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
                   View All
-                  <ArrowRight className="h-3.5 w-3.5 ml-1" />
+                  <ArrowRight className="h-4 w-4 ml-1" />
                 </Button>
               </Link>
             </div>
 
-            <div className="divide-y divide-border">
+            <div className="space-y-3">
               {FAKE_OPPORTUNITIES.map((opp) => {
                 const isRegistered = registeredEvents.includes(opp.id);
                 
@@ -367,26 +351,27 @@ const Dashboard = () => {
                 return (
                   <motion.div
                     key={opp.id}
-                    className="p-4 hover:bg-muted/50 transition-colors cursor-pointer group"
+                    className="bg-card border border-border rounded-lg p-4 hover:border-border/80 transition-all cursor-pointer group"
                     onClick={() => navigate("/opportunities")}
                     whileHover={{ x: 4 }}
                   >
-                    <div className="flex items-start justify-between gap-3">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-1.5 mb-1.5">
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-2">
                           {opp.is_featured && (
-                            <span className="px-1.5 py-0.5 text-[10px] font-semibold bg-primary text-primary-foreground rounded">
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-medium bg-primary/10 text-primary rounded">
+                              <Star className="h-3 w-3" />
                               Featured
                             </span>
                           )}
-                          <span className="px-1.5 py-0.5 text-[10px] font-medium bg-secondary text-secondary-foreground border border-border rounded">
+                          <span className="px-2 py-0.5 text-[10px] font-medium bg-muted text-muted-foreground rounded">
                             {opp.category}
                           </span>
                         </div>
-                        <h3 className="font-semibold text-sm text-foreground group-hover:text-primary transition-colors">
+                        <h3 className="font-semibold text-foreground group-hover:text-foreground/80 transition-colors truncate">
                           {opp.title}
                         </h3>
-                        <div className="flex items-center gap-3 mt-1.5 text-xs text-muted-foreground">
+                        <div className="flex items-center gap-4 mt-2 text-xs text-muted-foreground">
                           <span className="flex items-center gap-1">
                             <Clock className="h-3 w-3" />
                             {opp.registration_deadline}
@@ -397,18 +382,18 @@ const Dashboard = () => {
                           </span>
                         </div>
                       </div>
-                      <div className="text-right flex flex-col items-end">
-                        <div className="flex items-center gap-1 text-primary font-medium text-sm">
-                          <Zap className="h-3.5 w-3.5" />
+                      <div className="flex flex-col items-end gap-2">
+                        <div className="flex items-center gap-1 text-sm font-medium text-foreground">
+                          <Zap className="h-3.5 w-3.5 text-primary" />
                           {opp.points} pts
                         </div>
                         <Button 
                           size="sm" 
                           className={cn(
-                            "mt-2 h-7 px-3 text-xs transition-all duration-200 hover:scale-105 active:scale-95",
+                            "h-8 px-4 text-xs transition-all",
                             isRegistered 
-                              ? "bg-green-600 hover:bg-green-700 text-white" 
-                              : "bg-primary text-primary-foreground hover:bg-primary/90 hover:shadow-lg hover:shadow-primary/20"
+                              ? "bg-emerald-600 hover:bg-emerald-700 text-white" 
+                              : "bg-foreground text-background hover:bg-foreground/90"
                           )}
                           onClick={handleRegister}
                         >
@@ -434,169 +419,116 @@ const Dashboard = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
-            className="space-y-4"
+            className="space-y-6"
           >
-            {/* Quick Actions */}
-            <div className="bg-card border border-border rounded-xl p-4">
-              <h3 className="font-semibold text-sm text-foreground mb-3">Quick Actions</h3>
-              <div className="space-y-1.5">
-                <Link to="/opportunities">
-                  <Button 
-                    variant="outline" 
-                    size="sm"
-                    className="w-full justify-start h-8 text-xs border-border hover:bg-secondary hover:border-primary/50 text-foreground transition-all duration-200"
-                  >
-                    <Calendar className="h-3.5 w-3.5 mr-2 text-primary" />
-                    Browse Opportunities
-                  </Button>
-                </Link>
-                <Link to="/teams">
-                  <Button 
-                    variant="outline" 
-                    size="sm"
-                    className="w-full justify-start h-8 text-xs border-border hover:bg-secondary hover:border-primary/50 text-foreground transition-all duration-200"
-                  >
-                    <Users className="h-3.5 w-3.5 mr-2 text-emerald-500" />
-                    Find Teammates
-                  </Button>
-                </Link>
+            {/* Leaderboard Preview */}
+            <div className="bg-card border border-border rounded-lg overflow-hidden">
+              <div className="flex items-center justify-between p-4 border-b border-border">
+                <div className="flex items-center gap-2">
+                  <Trophy className="h-4 w-4 text-primary" />
+                  <span className="font-semibold text-sm text-foreground">Leaderboard</span>
+                </div>
                 <Link to="/leaderboard">
-                  <Button 
-                    variant="outline" 
-                    size="sm"
-                    className="w-full justify-start h-8 text-xs border-border hover:bg-secondary hover:border-primary/50 text-foreground transition-all duration-200"
-                  >
-                    <Trophy className="h-3.5 w-3.5 mr-2 text-amber-500" />
-                    View Rankings
+                  <Button variant="ghost" size="sm" className="h-7 text-xs text-muted-foreground hover:text-foreground">
+                    View All
                   </Button>
                 </Link>
               </div>
-            </div>
-
-            {/* External Resources */}
-            <div className="bg-card border border-border rounded-xl p-4">
-              <h3 className="font-semibold text-sm text-foreground mb-3">External Resources</h3>
-              <div className="space-y-1.5">
-                <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer">
-                  <Button 
-                    variant="outline" 
-                    size="sm"
-                    className="w-full justify-start h-8 text-xs border-border hover:bg-secondary hover:border-primary/50 text-foreground transition-all duration-200"
+              <div className="divide-y divide-border">
+                {leaderboard.slice(0, 5).map((user, index) => (
+                  <div 
+                    key={index}
+                    className={cn(
+                      "flex items-center gap-3 p-3 transition-colors",
+                      user.isUser && "bg-primary/5"
+                    )}
                   >
-                    <span className="mr-2 font-bold text-blue-600">in</span>
-                    LinkedIn Jobs
-                  </Button>
-                </a>
-                <a href="https://unstop.com" target="_blank" rel="noopener noreferrer">
-                  <Button 
-                    variant="outline" 
-                    size="sm"
-                    className="w-full justify-start h-8 text-xs border-border hover:bg-secondary hover:border-primary/50 text-foreground transition-all duration-200"
-                  >
-                    <span className="mr-2">🚀</span>
-                    Unstop
-                  </Button>
-                </a>
-                <a href="https://internshala.com" target="_blank" rel="noopener noreferrer">
-                  <Button 
-                    variant="outline" 
-                    size="sm"
-                    className="w-full justify-start h-8 text-xs border-border hover:bg-secondary hover:border-primary/50 text-foreground transition-all duration-200"
-                  >
-                    <span className="mr-2">💼</span>
-                    Internshala
-                  </Button>
-                </a>
+                    <div className={cn(
+                      "w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold",
+                      user.rank === 1 ? "bg-amber-500/20 text-amber-500" :
+                      user.rank === 2 ? "bg-zinc-400/20 text-zinc-400" :
+                      user.rank === 3 ? "bg-amber-700/20 text-amber-700" :
+                      "bg-muted text-muted-foreground"
+                    )}>
+                      {user.rank}
+                    </div>
+                    <div className={cn(
+                      "w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold",
+                      user.isUser ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"
+                    )}>
+                      {user.avatar}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className={cn(
+                        "text-sm font-medium truncate",
+                        user.isUser ? "text-primary" : "text-foreground"
+                      )}>
+                        {user.name}
+                      </p>
+                    </div>
+                    <span className="text-sm font-semibold text-muted-foreground">
+                      {user.points.toLocaleString()}
+                    </span>
+                  </div>
+                ))}
               </div>
             </div>
 
             {/* Achievements */}
-            <div className="bg-card border border-border rounded-xl p-4">
-              <div className="flex items-center justify-between mb-3">
-                <h3 className="font-semibold text-sm text-foreground">Achievements</h3>
-                <Link to="/profile" className="text-xs text-primary hover:underline transition-colors">
-                  View All
-                </Link>
+            <div className="bg-card border border-border rounded-lg p-4">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2">
+                  <Award className="h-4 w-4 text-primary" />
+                  <span className="font-semibold text-sm text-foreground">Achievements</span>
+                </div>
+                <span className="text-xs text-muted-foreground">
+                  {FAKE_ACHIEVEMENTS.filter(a => a.unlocked).length}/{FAKE_ACHIEVEMENTS.length}
+                </span>
               </div>
-              <div className="grid grid-cols-4 gap-1.5">
-                {FAKE_ACHIEVEMENTS.map((ach) => (
-                  <motion.div
-                    key={ach.id}
+              <div className="grid grid-cols-4 gap-2">
+                {FAKE_ACHIEVEMENTS.map((achievement) => (
+                  <div
+                    key={achievement.id}
                     className={cn(
-                      "aspect-square rounded-lg flex items-center justify-center text-lg cursor-pointer transition-all",
-                      ach.unlocked
-                        ? "bg-primary/10 border border-primary/30 hover:bg-primary/20 hover:border-primary/50"
-                        : "bg-secondary/50 opacity-40 hover:opacity-60"
+                      "aspect-square rounded-lg flex items-center justify-center text-xl transition-all",
+                      achievement.unlocked 
+                        ? "bg-muted" 
+                        : "bg-muted/50 opacity-40 grayscale"
                     )}
-                    title={ach.name}
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.95 }}
-                    onClick={() => {
-                      if (ach.unlocked) {
-                        toast.success(`${ach.name} Achievement`, {
-                          description: "You've unlocked this achievement!",
-                        });
-                      } else {
-                        toast.info(`${ach.name} - Locked`, {
-                          description: "Keep participating to unlock this!",
-                        });
-                      }
-                    }}
+                    title={achievement.name}
                   >
-                    {ach.icon}
-                  </motion.div>
+                    {achievement.icon}
+                  </div>
                 ))}
               </div>
             </div>
 
-            {/* Leaderboard Preview */}
-            <div className="bg-card border border-border rounded-xl p-4">
-              <div className="flex items-center justify-between mb-3">
-                <h3 className="font-semibold text-sm text-foreground">Top Performers</h3>
-                <Link to="/leaderboard" className="text-xs text-primary hover:underline transition-colors">
-                  Full Ranking
+            {/* Quick Actions */}
+            <div className="bg-card border border-border rounded-lg p-4">
+              <h3 className="font-semibold text-sm text-foreground mb-3">Quick Actions</h3>
+              <div className="space-y-2">
+                <Link to="/teams" className="block">
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    className="w-full justify-start h-9 text-sm border-border hover:bg-muted text-foreground"
+                  >
+                    <Users className="h-4 w-4 mr-2 text-muted-foreground" />
+                    Find Teammates
+                  </Button>
+                </Link>
+                <Link to="/profile" className="block">
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    className="w-full justify-start h-9 text-sm border-border hover:bg-muted text-foreground"
+                  >
+                    <Award className="h-4 w-4 mr-2 text-muted-foreground" />
+                    View Profile
+                  </Button>
                 </Link>
               </div>
-              <div className="space-y-2">
-                {leaderboard.map((user) => (
-                  <motion.div 
-                    key={user.rank} 
-                    className="flex items-center gap-2.5 p-1.5 -mx-1.5 rounded-lg hover:bg-secondary/50 cursor-pointer transition-colors"
-                    layout
-                    whileHover={{ x: 4 }}
-                    onClick={() => {
-                      toast.info(`${user.name}`, {
-                        description: `Rank #${user.rank} with ${user.points.toLocaleString()} points`,
-                      });
-                    }}
-                  >
-                    <span className={cn(
-                      "w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold",
-                      user.rank === 1 ? "bg-yellow-500/20 text-yellow-500" :
-                      user.rank === 2 ? "bg-gray-400/20 text-gray-400" :
-                      "bg-orange-500/20 text-orange-500"
-                    )}>
-                      {user.rank}
-                    </span>
-                    <div className="w-6 h-6 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center text-[10px] font-bold text-primary-foreground">
-                      {user.avatar}
-                    </div>
-                    <div className="flex-1">
-                      <p className="text-xs font-medium text-foreground">{user.name}</p>
-                    </div>
-                    <motion.span 
-                      key={user.points}
-                      initial={{ scale: 1.2 }}
-                      animate={{ scale: 1 }}
-                      className="text-xs font-medium text-muted-foreground"
-                    >
-                      {user.points.toLocaleString()}
-                    </motion.span>
-                  </motion.div>
-                ))}
-              </div>
             </div>
-
           </motion.div>
         </div>
       </div>
