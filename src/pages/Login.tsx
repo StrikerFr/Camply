@@ -220,23 +220,6 @@ const Login = () => {
                   </p>
                 </motion.div>
               </AnimatePresence>
-              
-              {/* Progress dots */}
-              <div className="flex gap-2 mt-4">
-                {trendingNews.map((_, index) => (
-                  <motion.div
-                    key={index}
-                    className="h-1.5 rounded-full"
-                    animate={{
-                      width: index === currentNewsIndex ? 20 : 6,
-                      backgroundColor: index === currentNewsIndex 
-                        ? 'hsl(var(--primary))' 
-                        : 'hsl(var(--muted-foreground) / 0.25)'
-                    }}
-                    transition={{ duration: 0.3, ease: "easeInOut" }}
-                  />
-                ))}
-              </div>
             </div>
           </motion.div>
         </div>
