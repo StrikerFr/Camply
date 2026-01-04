@@ -65,9 +65,7 @@ export const DashboardLayout = ({ children }: DashboardLayoutProps) => {
           {/* Left: Logo + Nav */}
           <div className="flex items-center gap-8">
             <Link to="/dashboard" className="flex items-center gap-2.5">
-              <div className="h-9 w-9 rounded-lg bg-foreground flex items-center justify-center">
-                <img src={logo} alt="Camply" className="h-5 w-5 brightness-0 invert" />
-              </div>
+              <img src={logo} alt="Camply" className="h-9 w-9 rounded-xl" />
               <span className="hidden sm:block text-lg font-display font-bold text-foreground tracking-tight">Camply</span>
             </Link>
 
