@@ -60,19 +60,19 @@ export const DashboardLayout = ({ children }: DashboardLayoutProps) => {
   return (
     <div className="min-h-screen bg-background">
       {/* Top Navigation Bar */}
-      <header className="sticky top-0 z-50 w-full border-b border-border bg-card/95 backdrop-blur-md">
-        <div className="container flex h-14 items-center justify-between px-4">
+      <header className="sticky top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur-md">
+        <div className="container flex h-16 items-center justify-between px-4">
           {/* Left: Logo + Nav */}
-          <div className="flex items-center gap-6">
-            <Link to="/dashboard" className="flex items-center gap-2">
-              <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center">
+          <div className="flex items-center gap-8">
+            <Link to="/dashboard" className="flex items-center gap-2.5">
+              <div className="h-9 w-9 rounded-lg bg-foreground flex items-center justify-center">
                 <img src={logo} alt="Camply" className="h-5 w-5 brightness-0 invert" />
               </div>
-              <span className="hidden sm:block text-lg font-display font-bold text-foreground">Camply</span>
+              <span className="hidden sm:block text-lg font-display font-bold text-foreground tracking-tight">Camply</span>
             </Link>
 
             {/* Desktop Navigation */}
-            <nav className="hidden lg:flex items-center gap-0.5">
+            <nav className="hidden lg:flex items-center gap-1">
               {navItems.map((item) => {
                 const isActive = location.pathname === item.href || 
                   (item.href.includes('?') && location.pathname === '/opportunities');
@@ -81,13 +81,13 @@ export const DashboardLayout = ({ children }: DashboardLayoutProps) => {
                     key={item.href}
                     to={item.href}
                     className={cn(
-                      "flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-all duration-200",
+                      "flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-all duration-200",
                       isActive
-                        ? "bg-primary/10 text-primary"
-                        : "text-muted-foreground hover:text-foreground hover:bg-secondary/50"
+                        ? "bg-muted text-foreground"
+                        : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
                     )}
                   >
-                    <item.icon className="h-3.5 w-3.5" />
+                    <item.icon className="h-4 w-4" />
                     {item.label}
                   </Link>
                 );
@@ -95,23 +95,23 @@ export const DashboardLayout = ({ children }: DashboardLayoutProps) => {
               
               {/* External Links Dropdown */}
               <div className="relative ml-1 group">
-                <button className="flex items-center gap-1 px-3 py-1.5 rounded-md text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-secondary/50 transition-all">
-                  <ExternalLink className="h-3.5 w-3.5" />
+                <button className="flex items-center gap-1.5 px-3 py-2 rounded-md text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-all">
+                  <ExternalLink className="h-4 w-4" />
                   More
-                  <ChevronDown className="h-3 w-3" />
+                  <ChevronDown className="h-3.5 w-3.5" />
                 </button>
-                <div className="absolute top-full left-0 mt-1 w-40 bg-card border border-border rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                <div className="absolute top-full left-0 mt-1 w-44 bg-card border border-border rounded-lg shadow-elevated opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
                   {externalLinks.map((link) => (
                     <a
                       key={link.label}
                       href={link.href}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center gap-2 px-3 py-2 text-xs text-muted-foreground hover:text-foreground hover:bg-secondary/50 transition-colors first:rounded-t-lg last:rounded-b-lg"
+                      className="flex items-center gap-2 px-3 py-2.5 text-sm text-muted-foreground hover:text-foreground hover:bg-muted transition-colors first:rounded-t-lg last:rounded-b-lg"
                     >
-                      <span className="text-sm">{link.icon}</span>
+                      <span>{link.icon}</span>
                       {link.label}
-                      <ExternalLink className="h-3 w-3 ml-auto opacity-50" />
+                      <ExternalLink className="h-3.5 w-3.5 ml-auto opacity-50" />
                     </a>
                   ))}
                 </div>
@@ -120,33 +120,33 @@ export const DashboardLayout = ({ children }: DashboardLayoutProps) => {
           </div>
 
           {/* Center: Search */}
-          <div className="hidden md:flex flex-1 max-w-sm mx-4">
+          <div className="hidden md:flex flex-1 max-w-md mx-6">
             <div className="relative w-full">
-              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
                 placeholder="Search opportunities..."
-                className="pl-8 h-8 text-xs bg-secondary/50 border-border/50 focus-visible:ring-1 focus-visible:ring-primary rounded-lg"
+                className="pl-10 h-10 bg-muted border-0 focus-visible:ring-1 focus-visible:ring-border rounded-lg text-sm"
               />
             </div>
           </div>
 
           {/* Right: Actions */}
-          <div className="flex items-center gap-1">
-            <Button variant="ghost" size="sm" className="relative h-8 w-8 p-0">
-              <Bell className="h-4 w-4" />
-              <span className="absolute top-1 right-1 w-1.5 h-1.5 bg-primary rounded-full" />
+          <div className="flex items-center gap-2">
+            <Button variant="ghost" size="sm" className="relative h-10 w-10 p-0 hover:bg-muted">
+              <Bell className="h-5 w-5" />
+              <span className="absolute top-2 right-2 w-2 h-2 bg-primary rounded-full" />
             </Button>
 
             {/* Profile Dropdown */}
             <div className="relative">
               <button
                 onClick={() => setProfileMenuOpen(!profileMenuOpen)}
-                className="flex items-center gap-1.5 p-1 rounded-lg hover:bg-secondary/50 transition-colors"
+                className="flex items-center gap-2 p-1.5 rounded-lg hover:bg-muted transition-colors"
               >
-                <div className="w-7 h-7 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center text-xs font-bold text-primary-foreground">
+                <div className="w-8 h-8 rounded-full bg-foreground flex items-center justify-center text-sm font-semibold text-background">
                   {profile?.full_name?.charAt(0) || user?.email?.charAt(0) || "U"}
                 </div>
-                <ChevronDown className="hidden sm:block h-3 w-3 text-muted-foreground" />
+                <ChevronDown className="hidden sm:block h-4 w-4 text-muted-foreground" />
               </button>
 
               <AnimatePresence>
@@ -155,34 +155,34 @@ export const DashboardLayout = ({ children }: DashboardLayoutProps) => {
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: 10 }}
-                    className="absolute right-0 mt-2 w-48 bg-card border border-border rounded-lg shadow-xl overflow-hidden z-50"
+                    className="absolute right-0 mt-2 w-52 bg-card border border-border rounded-lg shadow-elevated overflow-hidden z-50"
                   >
-                    <div className="p-3 border-b border-border">
-                      <p className="font-medium text-sm text-foreground">{profile?.full_name || "User"}</p>
-                      <p className="text-xs text-muted-foreground truncate">{user?.email}</p>
+                    <div className="p-4 border-b border-border">
+                      <p className="font-semibold text-sm text-foreground">{profile?.full_name || "User"}</p>
+                      <p className="text-xs text-muted-foreground truncate mt-0.5">{user?.email}</p>
                     </div>
-                    <div className="p-1.5">
+                    <div className="p-2">
                       <Link
                         to="/profile"
                         onClick={() => setProfileMenuOpen(false)}
-                        className="flex items-center gap-2 px-2.5 py-1.5 rounded-md text-xs text-foreground hover:bg-secondary transition-colors"
+                        className="flex items-center gap-2.5 px-3 py-2 rounded-md text-sm text-foreground hover:bg-muted transition-colors"
                       >
-                        <User className="h-3.5 w-3.5 text-muted-foreground" />
+                        <User className="h-4 w-4 text-muted-foreground" />
                         View Profile
                       </Link>
                       <Link
                         to="/settings"
                         onClick={() => setProfileMenuOpen(false)}
-                        className="flex items-center gap-2 px-2.5 py-1.5 rounded-md text-xs text-foreground hover:bg-secondary transition-colors"
+                        className="flex items-center gap-2.5 px-3 py-2 rounded-md text-sm text-foreground hover:bg-muted transition-colors"
                       >
-                        <Settings className="h-3.5 w-3.5 text-muted-foreground" />
+                        <Settings className="h-4 w-4 text-muted-foreground" />
                         Settings
                       </Link>
                       <button
                         onClick={handleSignOut}
-                        className="flex w-full items-center gap-2 px-2.5 py-1.5 rounded-md text-xs text-destructive hover:bg-destructive/10 transition-colors"
+                        className="flex w-full items-center gap-2.5 px-3 py-2 rounded-md text-sm text-primary hover:bg-primary/10 transition-colors"
                       >
-                        <LogOut className="h-3.5 w-3.5" />
+                        <LogOut className="h-4 w-4" />
                         Sign Out
                       </button>
                     </div>
