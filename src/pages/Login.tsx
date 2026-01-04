@@ -162,7 +162,7 @@ const Login = () => {
             initial={{ opacity: 0, x: 50 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8, delay: 0.6 }}
-            className="absolute bottom-20 right-12 glass rounded-2xl p-5 border border-primary/30 max-w-xs"
+            className="absolute bottom-8 right-12 glass rounded-2xl p-5 border border-primary/50 max-w-xs shadow-[0_0_20px_rgba(220,38,38,0.25),0_0_40px_rgba(220,38,38,0.1)]"
           >
             <div className="flex items-center gap-3 mb-3">
               <div className="p-2 rounded-full bg-primary/20">
