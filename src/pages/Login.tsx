@@ -178,51 +178,65 @@ const Login = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.5 }}
-            className="mt-8 glass rounded-2xl p-5 border border-primary/60 max-w-sm relative overflow-hidden"
-            style={{
-              boxShadow: '0 0 0 1px hsl(var(--primary) / 0.4), inset 0 0 20px hsl(var(--primary) / 0.05)',
-            }}
+            className="mt-8 max-w-sm relative"
           >
-            {/* Animated border glow */}
-            <div className="absolute inset-0 rounded-2xl border border-primary/40 animate-pulse" />
+            {/* Outer glow layer */}
+            <div 
+              className="absolute -inset-[1px] rounded-2xl opacity-75"
+              style={{
+                background: 'linear-gradient(135deg, hsl(var(--primary) / 0.6), hsl(var(--primary) / 0.2), hsl(var(--primary) / 0.6))',
+                filter: 'blur(8px)',
+              }}
+            />
             
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={currentNewsIndex}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                transition={{ duration: 0.3 }}
-              >
-                <div className="flex items-center gap-3 mb-3">
-                  <div className="p-2 rounded-full bg-primary/20">
-                    {(() => {
-                      const IconComponent = trendingNews[currentNewsIndex].icon;
-                      return <IconComponent className="h-5 w-5 text-primary" />;
-                    })()}
+            {/* Card container */}
+            <div 
+              className="relative glass rounded-2xl p-5 border border-primary/50"
+              style={{
+                background: 'linear-gradient(135deg, hsl(var(--background)) 0%, hsl(var(--card)) 100%)',
+              }}
+            >
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={currentNewsIndex}
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 1.05 }}
+                  transition={{ duration: 0.25, ease: "easeOut" }}
+                >
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="p-2.5 rounded-full bg-primary/15 border border-primary/30">
+                      {(() => {
+                        const IconComponent = trendingNews[currentNewsIndex].icon;
+                        return <IconComponent className="h-5 w-5 text-primary" />;
+                      })()}
+                    </div>
+                    <span className="text-sm font-semibold text-foreground tracking-tight">
+                      {trendingNews[currentNewsIndex].title}
+                    </span>
                   </div>
-                  <span className="text-sm font-semibold text-foreground">
-                    {trendingNews[currentNewsIndex].title}
-                  </span>
-                </div>
-                <p className="text-sm text-muted-foreground">
-                  {trendingNews[currentNewsIndex].text}
-                </p>
-              </motion.div>
-            </AnimatePresence>
-            
-            {/* Progress dots */}
-            <div className="flex gap-1.5 mt-4">
-              {trendingNews.map((_, index) => (
-                <div
-                  key={index}
-                  className={`h-1 rounded-full transition-all duration-300 ${
-                    index === currentNewsIndex 
-                      ? 'w-4 bg-primary' 
-                      : 'w-1.5 bg-muted-foreground/30'
-                  }`}
-                />
-              ))}
+                  <p className="text-sm text-muted-foreground leading-relaxed">
+                    {trendingNews[currentNewsIndex].text}
+                  </p>
+                </motion.div>
+              </AnimatePresence>
+              
+              {/* Progress dots */}
+              <div className="flex gap-2 mt-4">
+                {trendingNews.map((_, index) => (
+                  <motion.div
+                    key={index}
+                    className="h-1.5 rounded-full"
+                    animate={{
+                      width: index === currentNewsIndex ? 20 : 6,
+                      backgroundColor: index === currentNewsIndex 
+                        ? 'hsl(var(--primary))' 
+                        : 'hsl(var(--muted-foreground) / 0.25)'
+                    }}
+                    transition={{ duration: 0.3, ease: "easeInOut" }}
+                  />
+                ))}
+              </div>
             </div>
           </motion.div>
         </div>
