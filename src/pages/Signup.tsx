@@ -313,13 +313,18 @@ const Signup = () => {
             className="mt-10 flex items-center gap-4"
           >
             <div className="flex -space-x-3">
-              {[1, 2, 3, 4].map((i) => (
-                <div 
-                  key={i} 
-                  className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-accent border-2 border-background flex items-center justify-center text-xs font-bold text-primary-foreground"
-                >
-                  {String.fromCharCode(64 + i)}
-                </div>
+              {[
+                "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop&crop=face",
+                "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face",
+                "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=100&h=100&fit=crop&crop=face",
+                "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=100&h=100&fit=crop&crop=face",
+              ].map((src, i) => (
+                <img 
+                  key={i}
+                  src={src}
+                  alt={`Student ${i + 1}`}
+                  className="w-10 h-10 rounded-full border-2 border-background object-cover"
+                />
               ))}
             </div>
             <div>
