@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
 import { 
   Trophy, 
@@ -15,12 +15,17 @@ import {
   Check,
   ChevronRight,
   Star,
-  Award
+  Award,
+  Code,
+  Palette,
+  Briefcase,
+  Sparkles
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const FAKE_OPPORTUNITIES = [
   {
@@ -67,15 +72,59 @@ const FAKE_ACHIEVEMENTS = [
   { id: "4", name: "Champion", icon: "🏆", unlocked: false }
 ];
 
-function AnimatedNumber({ value, className }: { value: number; className?: string }) {
-  const [displayValue, setDisplayValue] = useState(value);
-  const [isAnimating, setIsAnimating] = useState(false);
+const categoryIcons: Record<string, React.ReactNode> = {
+  Tech: <Code className="h-3 w-3" />,
+  Cultural: <Palette className="h-3 w-3" />,
+  Management: <Briefcase className="h-3 w-3" />,
+};
+
+// Animated count-up on mount
+function CountUpNumber({ 
+  value, 
+  prefix = "", 
+  className,
+  isAnimating = false 
+}: { 
+  value: number; 
+  prefix?: string;
+  className?: string;
+  isAnimating?: boolean;
+}) {
+  const [displayValue, setDisplayValue] = useState(0);
+  const hasAnimated = useRef(false);
   
+  // Initial count-up animation on mount
   useEffect(() => {
-    if (value !== displayValue) {
-      setIsAnimating(true);
-      const duration = 500;
-      const steps = 20;
+    if (!hasAnimated.current) {
+      hasAnimated.current = true;
+      const duration = 1200;
+      const steps = 40;
+      const stepValue = value / steps;
+      const stepDuration = duration / steps;
+      
+      let current = 0;
+      let step = 0;
+      
+      const interval = setInterval(() => {
+        step++;
+        current += stepValue;
+        setDisplayValue(Math.round(current));
+        
+        if (step >= steps) {
+          clearInterval(interval);
+          setDisplayValue(value);
+        }
+      }, stepDuration);
+      
+      return () => clearInterval(interval);
+    }
+  }, []);
+  
+  // Update when value changes after initial animation
+  useEffect(() => {
+    if (hasAnimated.current && value !== displayValue) {
+      const duration = 400;
+      const steps = 15;
       const stepValue = (value - displayValue) / steps;
       const stepDuration = duration / steps;
       
@@ -90,22 +139,59 @@ function AnimatedNumber({ value, className }: { value: number; className?: strin
         if (step >= steps) {
           clearInterval(interval);
           setDisplayValue(value);
-          setTimeout(() => setIsAnimating(false), 300);
         }
       }, stepDuration);
       
       return () => clearInterval(interval);
     }
-  }, [value, displayValue]);
+  }, [value]);
   
   return (
     <motion.span
       className={cn(className, isAnimating && "text-emerald-400")}
-      animate={isAnimating ? { scale: [1, 1.05, 1] } : {}}
-      transition={{ duration: 0.3 }}
+      animate={isAnimating ? { scale: [1, 1.03, 1] } : {}}
+      transition={{ duration: 0.25 }}
     >
-      {displayValue.toLocaleString()}
+      {prefix}{displayValue.toLocaleString()}
     </motion.span>
+  );
+}
+
+// Loading skeleton for stats
+function StatCardSkeleton() {
+  return (
+    <div className="bg-card border border-border rounded-xl p-5">
+      <div className="flex items-center justify-between mb-4">
+        <Skeleton className="h-10 w-10 rounded-lg" />
+      </div>
+      <Skeleton className="h-8 w-20 mb-2" />
+      <Skeleton className="h-4 w-24" />
+    </div>
+  );
+}
+
+// Loading skeleton for opportunities
+function OpportunityCardSkeleton() {
+  return (
+    <div className="bg-card border border-border rounded-xl p-5">
+      <div className="flex items-start justify-between gap-4">
+        <div className="flex-1">
+          <div className="flex gap-2 mb-3">
+            <Skeleton className="h-5 w-16 rounded" />
+            <Skeleton className="h-5 w-12 rounded" />
+          </div>
+          <Skeleton className="h-5 w-3/4 mb-3" />
+          <div className="flex gap-4">
+            <Skeleton className="h-4 w-24" />
+            <Skeleton className="h-4 w-28" />
+          </div>
+        </div>
+        <div className="flex flex-col items-end gap-3">
+          <Skeleton className="h-5 w-16" />
+          <Skeleton className="h-9 w-24 rounded-lg" />
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -113,10 +199,11 @@ const Dashboard = () => {
   const navigate = useNavigate();
   const firstName = "Alex";
   const [registeredEvents, setRegisteredEvents] = useState<string[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   
   const [liveStats, setLiveStats] = useState({
     totalPoints: 2450,
-    weeklyPoints: 180,
+    weeklyPoints: 198,
     eventsCount: 12,
     teamsCount: 3,
     rank: 5
@@ -124,6 +211,12 @@ const Dashboard = () => {
   
   const [leaderboard, setLeaderboard] = useState(FAKE_LEADERBOARD_INITIAL);
   const [recentChange, setRecentChange] = useState<{ stat: string; amount: number } | null>(null);
+  
+  // Simulate loading state
+  useEffect(() => {
+    const timer = setTimeout(() => setIsLoading(false), 800);
+    return () => clearTimeout(timer);
+  }, []);
   
   useEffect(() => {
     const interval = setInterval(() => {
@@ -163,7 +256,7 @@ const Dashboard = () => {
       }
       
       setTimeout(() => setRecentChange(null), 2000);
-    }, 3000 + Math.random() * 2000);
+    }, 4000 + Math.random() * 2000);
     
     return () => clearInterval(interval);
   }, []);
@@ -174,7 +267,8 @@ const Dashboard = () => {
       value: liveStats.totalPoints,
       icon: Trophy, 
       change: `+${liveStats.weeklyPoints} this week`,
-      isChanging: recentChange?.stat === "points"
+      isChanging: recentChange?.stat === "points",
+      accent: true
     },
     { 
       label: "Events", 
@@ -202,215 +296,267 @@ const Dashboard = () => {
 
   return (
     <DashboardLayout>
-      <div className="max-w-7xl mx-auto space-y-8">
+      <div className="max-w-7xl mx-auto space-y-10">
         {/* Welcome Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, ease: "easeOut" }}
           className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4"
         >
           <div>
-            <h1 className="text-3xl lg:text-4xl font-display font-bold text-foreground tracking-tight">
+            <h1 className="text-3xl lg:text-4xl font-display font-bold text-foreground tracking-tight leading-tight">
               Welcome back, {firstName}
             </h1>
-            <p className="text-muted-foreground mt-1">
+            <p className="text-muted-foreground mt-1.5 text-base leading-relaxed">
               Here's what's happening with your campus journey
             </p>
           </div>
           <Link to="/opportunities">
-            <Button className="bg-primary hover:bg-primary/90 text-primary-foreground">
-              Browse Opportunities
-              <ChevronRight className="h-4 w-4 ml-1" />
-            </Button>
+            <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+              <Button className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 transition-all duration-300">
+                Browse Opportunities
+                <ChevronRight className="h-4 w-4 ml-1" />
+              </Button>
+            </motion.div>
           </Link>
         </motion.div>
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          {stats.map((stat, index) => {
-            const statRoutes: Record<string, string> = {
-              "Total Points": "/leaderboard",
-              "Events": "/opportunities",
-              "Teams": "/teams",
-              "Rank": "/leaderboard"
-            };
-            
-            return (
-              <motion.div
-                key={stat.label}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
-                onClick={() => navigate(statRoutes[stat.label] || "/dashboard")}
-                className={cn(
-                  "relative bg-card border rounded-lg p-5 cursor-pointer group overflow-hidden transition-all duration-300",
-                  stat.isChanging ? "border-emerald-500/50" : "border-border hover:border-border/80"
-                )}
-                whileHover={{ y: -2 }}
-                whileTap={{ scale: 0.98 }}
-              >
-                <AnimatePresence>
-                  {stat.isChanging && (
-                    <motion.div
-                      initial={{ opacity: 0.3 }}
-                      animate={{ opacity: 0 }}
-                      exit={{ opacity: 0 }}
-                      transition={{ duration: 1 }}
-                      className="absolute inset-0 bg-emerald-500/10 pointer-events-none"
-                    />
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-5">
+          {isLoading ? (
+            <>
+              <StatCardSkeleton />
+              <StatCardSkeleton />
+              <StatCardSkeleton />
+              <StatCardSkeleton />
+            </>
+          ) : (
+            stats.map((stat, index) => {
+              const statRoutes: Record<string, string> = {
+                "Total Points": "/leaderboard",
+                "Events": "/opportunities",
+                "Teams": "/teams",
+                "Rank": "/leaderboard"
+              };
+              
+              return (
+                <motion.div
+                  key={stat.label}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.08, duration: 0.4, ease: "easeOut" }}
+                  onClick={() => navigate(statRoutes[stat.label] || "/dashboard")}
+                  className={cn(
+                    "relative bg-card border rounded-xl p-5 cursor-pointer group overflow-hidden transition-all duration-300",
+                    stat.isChanging 
+                      ? "border-emerald-500/40 shadow-lg shadow-emerald-500/10" 
+                      : "border-border hover:border-border/60 hover:shadow-lg hover:shadow-black/20",
+                    stat.accent && "border-primary/20 hover:border-primary/30"
                   )}
-                </AnimatePresence>
-                
-                <div className="flex items-center justify-between mb-3">
-                  <div className={cn(
-                    "p-2 rounded-lg transition-colors",
-                    "bg-muted group-hover:bg-accent"
-                  )}>
-                    <stat.icon className="h-4 w-4 text-muted-foreground" />
-                  </div>
+                  whileHover={{ y: -3, transition: { duration: 0.2 } }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  {/* Subtle glow on hover for accent card */}
+                  {stat.accent && (
+                    <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                  )}
+                  
                   <AnimatePresence>
-                    {stat.isChanging && recentChange && (
+                    {stat.isChanging && (
                       <motion.div
-                        initial={{ opacity: 0, y: 10, scale: 0.5 }}
-                        animate={{ opacity: 1, y: 0, scale: 1 }}
-                        exit={{ opacity: 0, y: -10 }}
-                        className="flex items-center gap-0.5 text-emerald-400 text-xs font-semibold"
-                      >
-                        <ArrowUp className="h-3 w-3" />
-                        +{stat.label === "Rank" ? "1" : recentChange.amount}
-                      </motion.div>
+                        initial={{ opacity: 0.4 }}
+                        animate={{ opacity: 0 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 1.2 }}
+                        className="absolute inset-0 bg-emerald-500/10 pointer-events-none"
+                      />
                     )}
                   </AnimatePresence>
-                </div>
-                
-                <div className={cn(
-                  "text-2xl lg:text-3xl font-display font-bold tracking-tight",
-                  stat.isChanging ? "text-emerald-400" : "text-foreground"
-                )}>
-                  {stat.isRank ? `#${stat.value}` : (
-                    <AnimatedNumber value={stat.value} />
-                  )}
-                </div>
-                <div className="flex items-center justify-between mt-1">
-                  <span className="text-sm text-muted-foreground">{stat.label}</span>
-                  <span className="text-xs text-muted-foreground/70">{stat.change}</span>
-                </div>
-              </motion.div>
-            );
-          })}
+                  
+                  <div className="relative z-10">
+                    <div className="flex items-center justify-between mb-4">
+                      <div className={cn(
+                        "p-2.5 rounded-lg transition-all duration-300",
+                        stat.accent 
+                          ? "bg-primary/10 group-hover:bg-primary/15" 
+                          : "bg-muted group-hover:bg-accent"
+                      )}>
+                        <stat.icon className={cn(
+                          "h-4 w-4 transition-colors duration-300",
+                          stat.accent ? "text-primary" : "text-muted-foreground group-hover:text-foreground"
+                        )} />
+                      </div>
+                      <AnimatePresence>
+                        {stat.isChanging && recentChange && (
+                          <motion.div
+                            initial={{ opacity: 0, y: 8, scale: 0.8 }}
+                            animate={{ opacity: 1, y: 0, scale: 1 }}
+                            exit={{ opacity: 0, y: -8, scale: 0.8 }}
+                            className="flex items-center gap-0.5 text-emerald-400 text-xs font-semibold bg-emerald-500/10 px-2 py-1 rounded-full"
+                          >
+                            <ArrowUp className="h-3 w-3" />
+                            +{stat.label === "Rank" ? "1" : recentChange.amount}
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </div>
+                    
+                    <div className={cn(
+                      "text-2xl lg:text-3xl font-display font-bold tracking-tight",
+                      stat.isChanging ? "text-emerald-400" : stat.accent ? "text-primary" : "text-foreground"
+                    )}>
+                      {stat.isRank ? (
+                        <CountUpNumber value={stat.value} prefix="#" isAnimating={stat.isChanging} />
+                      ) : (
+                        <CountUpNumber value={stat.value} isAnimating={stat.isChanging} />
+                      )}
+                    </div>
+                    <div className="flex items-center justify-between mt-2">
+                      <span className="text-sm text-muted-foreground font-medium">{stat.label}</span>
+                      <span className={cn(
+                        "text-xs font-medium",
+                        stat.accent ? "text-primary/70" : "text-muted-foreground/60"
+                      )}>
+                        {stat.change}
+                      </span>
+                    </div>
+                  </div>
+                </motion.div>
+              );
+            })
+          )}
         </div>
 
-        <div className="grid lg:grid-cols-3 gap-6">
+        <div className="grid lg:grid-cols-3 gap-6 lg:gap-8">
           {/* Featured Opportunities */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
+            transition={{ delay: 0.25, duration: 0.5 }}
             className="lg:col-span-2"
           >
-            <div className="flex items-center justify-between mb-4">
+            {/* Section Header */}
+            <div className="flex items-center justify-between mb-5">
               <div className="flex items-center gap-3">
-                <div className="p-2 rounded-lg bg-primary/10">
+                <div className="p-2.5 rounded-lg bg-primary/10">
                   <Target className="h-4 w-4 text-primary" />
                 </div>
                 <div>
-                  <h2 className="font-semibold text-foreground">Featured Opportunities</h2>
-                  <p className="text-xs text-muted-foreground">Don't miss out</p>
+                  <h2 className="font-semibold text-foreground text-lg tracking-tight">Featured Opportunities</h2>
+                  <p className="text-sm text-muted-foreground">Don't miss out</p>
                 </div>
               </div>
               <Link to="/opportunities">
-                <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
-                  View All
-                  <ArrowRight className="h-4 w-4 ml-1" />
-                </Button>
+                <motion.div whileHover={{ x: 3 }} transition={{ duration: 0.2 }}>
+                  <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground group">
+                    View All
+                    <ArrowRight className="h-4 w-4 ml-1 transition-transform group-hover:translate-x-0.5" />
+                  </Button>
+                </motion.div>
               </Link>
             </div>
 
-            <div className="space-y-3">
-              {FAKE_OPPORTUNITIES.map((opp) => {
-                const isRegistered = registeredEvents.includes(opp.id);
-                
-                const handleRegister = (e: React.MouseEvent) => {
-                  e.stopPropagation();
-                  if (isRegistered) {
-                    setRegisteredEvents(prev => prev.filter(id => id !== opp.id));
-                    toast.info(`Unregistered from ${opp.title}`);
-                  } else {
-                    setRegisteredEvents(prev => [...prev, opp.id]);
-                    setLiveStats(prev => ({
-                      ...prev,
-                      eventsCount: prev.eventsCount + 1,
-                      totalPoints: prev.totalPoints + opp.points
-                    }));
-                    toast.success(`Registered for ${opp.title}!`, {
-                      description: `You earned ${opp.points} points!`,
-                    });
-                  }
-                };
-                
-                return (
-                  <motion.div
-                    key={opp.id}
-                    className="bg-card border border-border rounded-lg p-4 hover:border-border/80 transition-all cursor-pointer group"
-                    onClick={() => navigate("/opportunities")}
-                    whileHover={{ x: 4 }}
-                  >
-                    <div className="flex items-start justify-between gap-4">
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-2">
-                          {opp.is_featured && (
-                            <span className="inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-medium bg-primary/10 text-primary rounded">
-                              <Star className="h-3 w-3" />
-                              Featured
+            <div className="space-y-4">
+              {isLoading ? (
+                <>
+                  <OpportunityCardSkeleton />
+                  <OpportunityCardSkeleton />
+                  <OpportunityCardSkeleton />
+                </>
+              ) : (
+                FAKE_OPPORTUNITIES.map((opp, index) => {
+                  const isRegistered = registeredEvents.includes(opp.id);
+                  
+                  const handleRegister = (e: React.MouseEvent) => {
+                    e.stopPropagation();
+                    if (isRegistered) {
+                      setRegisteredEvents(prev => prev.filter(id => id !== opp.id));
+                      toast.info(`Unregistered from ${opp.title}`);
+                    } else {
+                      setRegisteredEvents(prev => [...prev, opp.id]);
+                      setLiveStats(prev => ({
+                        ...prev,
+                        eventsCount: prev.eventsCount + 1,
+                        totalPoints: prev.totalPoints + opp.points
+                      }));
+                      toast.success(`Registered for ${opp.title}!`, {
+                        description: `You earned ${opp.points} points!`,
+                      });
+                    }
+                  };
+                  
+                  return (
+                    <motion.div
+                      key={opp.id}
+                      initial={{ opacity: 0, y: 15 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.3 + index * 0.08, duration: 0.4 }}
+                      className="bg-card border border-border rounded-xl p-5 hover:border-border/60 hover:shadow-lg hover:shadow-black/10 transition-all duration-300 cursor-pointer group"
+                      onClick={() => navigate("/opportunities")}
+                      whileHover={{ x: 4, transition: { duration: 0.2 } }}
+                    >
+                      <div className="flex items-start justify-between gap-4">
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 mb-3">
+                            {opp.is_featured && (
+                              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-semibold bg-primary/10 text-primary rounded-md">
+                                <Star className="h-3 w-3" />
+                                Featured
+                              </span>
+                            )}
+                            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-medium bg-muted text-muted-foreground rounded-md">
+                              {categoryIcons[opp.category]}
+                              {opp.category}
                             </span>
-                          )}
-                          <span className="px-2 py-0.5 text-[10px] font-medium bg-muted text-muted-foreground rounded">
-                            {opp.category}
-                          </span>
+                          </div>
+                          <h3 className="font-semibold text-foreground text-base group-hover:text-foreground/80 transition-colors truncate leading-snug">
+                            {opp.title}
+                          </h3>
+                          <div className="flex items-center gap-4 mt-3 text-sm text-muted-foreground">
+                            <span className="flex items-center gap-1.5">
+                              <Clock className="h-3.5 w-3.5" />
+                              {opp.registration_deadline}
+                            </span>
+                            <span className="flex items-center gap-1.5">
+                              <MapPin className="h-3.5 w-3.5" />
+                              {opp.location}
+                            </span>
+                          </div>
                         </div>
-                        <h3 className="font-semibold text-foreground group-hover:text-foreground/80 transition-colors truncate">
-                          {opp.title}
-                        </h3>
-                        <div className="flex items-center gap-4 mt-2 text-xs text-muted-foreground">
-                          <span className="flex items-center gap-1">
-                            <Clock className="h-3 w-3" />
-                            {opp.registration_deadline}
-                          </span>
-                          <span className="flex items-center gap-1">
-                            <MapPin className="h-3 w-3" />
-                            {opp.location}
-                          </span>
+                        <div className="flex flex-col items-end gap-3">
+                          <div className="flex items-center gap-1.5 text-sm font-semibold">
+                            <Zap className="h-4 w-4 text-amber-500" />
+                            <span className="text-foreground">{opp.points}</span>
+                            <span className="text-muted-foreground font-normal">pts</span>
+                          </div>
+                          <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
+                            <Button 
+                              size="sm" 
+                              className={cn(
+                                "h-9 px-5 text-sm font-medium transition-all duration-300",
+                                isRegistered 
+                                  ? "bg-emerald-600 hover:bg-emerald-700 text-white shadow-md shadow-emerald-600/20" 
+                                  : "bg-foreground text-background hover:bg-foreground/90 shadow-md hover:shadow-lg"
+                              )}
+                              onClick={handleRegister}
+                            >
+                              {isRegistered ? (
+                                <>
+                                  <Check className="h-3.5 w-3.5 mr-1.5" />
+                                  Registered
+                                </>
+                              ) : (
+                                "Register"
+                              )}
+                            </Button>
+                          </motion.div>
                         </div>
                       </div>
-                      <div className="flex flex-col items-end gap-2">
-                        <div className="flex items-center gap-1 text-sm font-medium text-foreground">
-                          <Zap className="h-3.5 w-3.5 text-primary" />
-                          {opp.points} pts
-                        </div>
-                        <Button 
-                          size="sm" 
-                          className={cn(
-                            "h-8 px-4 text-xs transition-all",
-                            isRegistered 
-                              ? "bg-emerald-600 hover:bg-emerald-700 text-white" 
-                              : "bg-foreground text-background hover:bg-foreground/90"
-                          )}
-                          onClick={handleRegister}
-                        >
-                          {isRegistered ? (
-                            <>
-                              <Check className="h-3 w-3 mr-1" />
-                              Registered
-                            </>
-                          ) : (
-                            "Register"
-                          )}
-                        </Button>
-                      </div>
-                    </div>
-                  </motion.div>
-                );
-              })}
+                    </motion.div>
+                  );
+                })
+              )}
             </div>
           </motion.div>
 
@@ -418,15 +564,15 @@ const Dashboard = () => {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
+            transition={{ delay: 0.35, duration: 0.5 }}
             className="space-y-6"
           >
             {/* Leaderboard Preview */}
-            <div className="bg-card border border-border rounded-lg overflow-hidden">
-              <div className="flex items-center justify-between p-4 border-b border-border">
-                <div className="flex items-center gap-2">
+            <div className="bg-card border border-border rounded-xl overflow-hidden">
+              <div className="flex items-center justify-between px-5 py-4 border-b border-border">
+                <div className="flex items-center gap-2.5">
                   <Trophy className="h-4 w-4 text-primary" />
-                  <span className="font-semibold text-sm text-foreground">Leaderboard</span>
+                  <span className="font-semibold text-foreground">Leaderboard</span>
                 </div>
                 <Link to="/leaderboard">
                   <Button variant="ghost" size="sm" className="h-7 text-xs text-muted-foreground hover:text-foreground">
@@ -434,30 +580,40 @@ const Dashboard = () => {
                   </Button>
                 </Link>
               </div>
-              <div className="divide-y divide-border">
+              <div className="divide-y divide-border/60">
                 {leaderboard.slice(0, 5).map((user, index) => (
-                  <div 
+                  <motion.div 
                     key={index}
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.4 + index * 0.05 }}
                     className={cn(
-                      "flex items-center gap-3 p-3 transition-colors",
-                      user.isUser && "bg-primary/5"
+                      "flex items-center gap-3 px-5 py-3.5 transition-all duration-200",
+                      user.isUser && "bg-primary/5 border-l-2 border-l-primary"
                     )}
                   >
+                    {/* Rank Badge */}
                     <div className={cn(
-                      "w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold",
-                      user.rank === 1 ? "bg-amber-500/20 text-amber-500" :
-                      user.rank === 2 ? "bg-zinc-400/20 text-zinc-400" :
-                      user.rank === 3 ? "bg-amber-700/20 text-amber-700" :
-                      "bg-muted text-muted-foreground"
+                      "w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold transition-all",
+                      user.rank === 1 && "bg-gradient-to-br from-amber-400 to-amber-600 text-black shadow-md shadow-amber-500/30",
+                      user.rank === 2 && "bg-gradient-to-br from-zinc-300 to-zinc-500 text-black shadow-md shadow-zinc-400/30",
+                      user.rank === 3 && "bg-gradient-to-br from-amber-600 to-amber-800 text-white shadow-md shadow-amber-700/30",
+                      user.rank > 3 && "bg-muted text-muted-foreground"
                     )}>
                       {user.rank}
                     </div>
+                    
+                    {/* Avatar */}
                     <div className={cn(
-                      "w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold",
-                      user.isUser ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"
+                      "w-9 h-9 rounded-full flex items-center justify-center text-sm font-semibold transition-all",
+                      user.isUser 
+                        ? "bg-primary text-primary-foreground ring-2 ring-primary/30" 
+                        : "bg-muted text-muted-foreground"
                     )}>
                       {user.avatar}
                     </div>
+                    
+                    {/* Name */}
                     <div className="flex-1 min-w-0">
                       <p className={cn(
                         "text-sm font-medium truncate",
@@ -466,66 +622,82 @@ const Dashboard = () => {
                         {user.name}
                       </p>
                     </div>
-                    <span className="text-sm font-semibold text-muted-foreground">
+                    
+                    {/* Points */}
+                    <span className={cn(
+                      "text-sm font-semibold tabular-nums",
+                      user.isUser ? "text-primary" : "text-muted-foreground"
+                    )}>
                       {user.points.toLocaleString()}
                     </span>
-                  </div>
+                  </motion.div>
                 ))}
               </div>
             </div>
 
             {/* Achievements */}
-            <div className="bg-card border border-border rounded-lg p-4">
+            <div className="bg-card border border-border rounded-xl p-5">
               <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2.5">
                   <Award className="h-4 w-4 text-primary" />
-                  <span className="font-semibold text-sm text-foreground">Achievements</span>
+                  <span className="font-semibold text-foreground">Achievements</span>
                 </div>
-                <span className="text-xs text-muted-foreground">
+                <span className="text-xs text-muted-foreground font-medium bg-muted px-2 py-0.5 rounded-full">
                   {FAKE_ACHIEVEMENTS.filter(a => a.unlocked).length}/{FAKE_ACHIEVEMENTS.length}
                 </span>
               </div>
-              <div className="grid grid-cols-4 gap-2">
-                {FAKE_ACHIEVEMENTS.map((achievement) => (
-                  <div
+              <div className="grid grid-cols-4 gap-3">
+                {FAKE_ACHIEVEMENTS.map((achievement, index) => (
+                  <motion.div
                     key={achievement.id}
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: 0.5 + index * 0.05 }}
+                    whileHover={achievement.unlocked ? { scale: 1.08, y: -2 } : {}}
                     className={cn(
-                      "aspect-square rounded-lg flex items-center justify-center text-xl transition-all",
+                      "aspect-square rounded-xl flex items-center justify-center text-2xl transition-all duration-200 cursor-default",
                       achievement.unlocked 
-                        ? "bg-muted" 
-                        : "bg-muted/50 opacity-40 grayscale"
+                        ? "bg-muted hover:bg-accent hover:shadow-md" 
+                        : "bg-muted/40 opacity-40 grayscale"
                     )}
                     title={achievement.name}
                   >
                     {achievement.icon}
-                  </div>
+                  </motion.div>
                 ))}
               </div>
             </div>
 
             {/* Quick Actions */}
-            <div className="bg-card border border-border rounded-lg p-4">
-              <h3 className="font-semibold text-sm text-foreground mb-3">Quick Actions</h3>
-              <div className="space-y-2">
+            <div className="bg-card border border-border rounded-xl p-5">
+              <div className="flex items-center gap-2.5 mb-4">
+                <Sparkles className="h-4 w-4 text-primary" />
+                <h3 className="font-semibold text-foreground">Quick Actions</h3>
+              </div>
+              <div className="space-y-2.5">
                 <Link to="/teams" className="block">
-                  <Button 
-                    variant="outline" 
-                    size="sm"
-                    className="w-full justify-start h-9 text-sm border-border hover:bg-muted text-foreground"
-                  >
-                    <Users className="h-4 w-4 mr-2 text-muted-foreground" />
-                    Find Teammates
-                  </Button>
+                  <motion.div whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.99 }}>
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      className="w-full justify-start h-10 text-sm border-border hover:bg-muted hover:border-border/60 text-foreground transition-all duration-200"
+                    >
+                      <Users className="h-4 w-4 mr-2.5 text-muted-foreground" />
+                      Find Teammates
+                    </Button>
+                  </motion.div>
                 </Link>
                 <Link to="/profile" className="block">
-                  <Button 
-                    variant="outline" 
-                    size="sm"
-                    className="w-full justify-start h-9 text-sm border-border hover:bg-muted text-foreground"
-                  >
-                    <Award className="h-4 w-4 mr-2 text-muted-foreground" />
-                    View Profile
-                  </Button>
+                  <motion.div whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.99 }}>
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      className="w-full justify-start h-10 text-sm border-border hover:bg-muted hover:border-border/60 text-foreground transition-all duration-200"
+                    >
+                      <Award className="h-4 w-4 mr-2.5 text-muted-foreground" />
+                      View Profile
+                    </Button>
+                  </motion.div>
                 </Link>
               </div>
             </div>
