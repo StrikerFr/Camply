@@ -25,6 +25,7 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useAuth } from "@/contexts/AuthContext";
+import { ToggleTheme } from "@/components/ui/toggle-theme";
 import logo from "@/assets/logo.png";
 
 interface DashboardLayoutProps {
@@ -130,6 +131,10 @@ export const DashboardLayout = ({ children }: DashboardLayoutProps) => {
 
           {/* Right: Actions */}
           <div className="flex items-center gap-2">
+            <div className="hidden sm:block">
+              <ToggleTheme />
+            </div>
+            
             <Button variant="ghost" size="sm" className="relative h-10 w-10 p-0 hover:bg-muted">
               <Bell className="h-5 w-5" />
               <span className="absolute top-2 right-2 w-2 h-2 bg-primary rounded-full" />
