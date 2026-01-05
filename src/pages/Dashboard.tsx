@@ -22,7 +22,6 @@ interface ChatMessage {
   image?: string;
   timestamp: Date;
 }
-
 const FAKE_OPPORTUNITIES = [{
   id: "1",
   title: "Hackathon 2026 - Code for Change",
@@ -298,9 +297,7 @@ function OpportunityCardSkeleton() {
       </div>
     </div>;
 }
-
 const CHAT_STORAGE_KEY = 'alpha-ai-chat-history';
-
 const Dashboard = () => {
   const navigate = useNavigate();
   const firstName = "Alex";
@@ -319,7 +316,7 @@ const Dashboard = () => {
     stat: string;
     amount: number;
   } | null>(null);
-  
+
   // AI Chat states
   const [chatInput, setChatInput] = useState("");
   const [isListening, setIsListening] = useState(false);
@@ -366,45 +363,37 @@ const Dashboard = () => {
       toast.error("Speech recognition is not supported in your browser");
       return;
     }
-
     const SpeechRecognition = (window as any).webkitSpeechRecognition || (window as any).SpeechRecognition;
     recognitionRef.current = new SpeechRecognition();
     recognitionRef.current.continuous = false;
     recognitionRef.current.interimResults = true;
     recognitionRef.current.lang = 'en-US';
-
     recognitionRef.current.onstart = () => {
       setIsListening(true);
-      toast.info("Listening...", { duration: 2000 });
+      toast.info("Listening...", {
+        duration: 2000
+      });
     };
-
     recognitionRef.current.onresult = (event: any) => {
-      const transcript = Array.from(event.results)
-        .map((result: any) => result[0].transcript)
-        .join('');
+      const transcript = Array.from(event.results).map((result: any) => result[0].transcript).join('');
       setChatInput(transcript);
     };
-
     recognitionRef.current.onerror = (event: any) => {
       console.error('Speech recognition error:', event.error);
       setIsListening(false);
       toast.error("Failed to recognize speech");
     };
-
     recognitionRef.current.onend = () => {
       setIsListening(false);
     };
-
     recognitionRef.current.start();
   };
-
   const stopListening = () => {
     if (recognitionRef.current) {
       recognitionRef.current.stop();
       setIsListening(false);
     }
   };
-
   const handleMicClick = () => {
     if (isListening) {
       stopListening();
@@ -412,7 +401,6 @@ const Dashboard = () => {
       startListening();
     }
   };
-
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
@@ -421,25 +409,23 @@ const Dashboard = () => {
         return;
       }
       const reader = new FileReader();
-      reader.onload = (e) => {
+      reader.onload = e => {
         setUploadedImage(e.target?.result as string);
         toast.success("Image uploaded successfully!");
       };
       reader.readAsDataURL(file);
     }
   };
-
   const handleTalkToAlpha = () => {
-    toast.info("Talk to Alpha - Coming Soon! 🚀", { 
+    toast.info("Talk to Alpha - Coming Soon! 🚀", {
       description: "Voice conversation feature is under development",
-      duration: 3000 
+      duration: 3000
     });
   };
 
   // Send message to AI
   const handleSendMessage = async () => {
     if (!chatInput.trim() && !uploadedImage) return;
-
     const userMessage: ChatMessage = {
       id: Date.now().toString(),
       role: "user",
@@ -447,12 +433,10 @@ const Dashboard = () => {
       image: uploadedImage || undefined,
       timestamp: new Date()
     };
-
     setMessages(prev => [...prev, userMessage]);
     setChatInput("");
     setUploadedImage(null);
     setIsAiLoading(true);
-
     try {
       // Prepare messages for API
       const apiMessages = messages.map(msg => ({
@@ -465,26 +449,25 @@ const Dashboard = () => {
         content: chatInput,
         image: uploadedImage || undefined
       });
-
-      const { data, error } = await supabase.functions.invoke('alpha-ai-chat', {
+      const {
+        data,
+        error
+      } = await supabase.functions.invoke('alpha-ai-chat', {
         body: {
           messages: apiMessages,
           genZMode,
           enhancePrompt: false
         }
       });
-
       if (error) {
         throw error;
       }
-
       const assistantMessage: ChatMessage = {
         id: (Date.now() + 1).toString(),
         role: "assistant",
         content: data.response || "Sorry, I couldn't process that request.",
         timestamp: new Date()
       };
-
       setMessages(prev => [...prev, assistantMessage]);
     } catch (error) {
       console.error('Error sending message:', error);
@@ -500,19 +483,22 @@ const Dashboard = () => {
       toast.error("Please enter a prompt to enhance");
       return;
     }
-
     setIsAiLoading(true);
     try {
-      const { data, error } = await supabase.functions.invoke('alpha-ai-chat', {
+      const {
+        data,
+        error
+      } = await supabase.functions.invoke('alpha-ai-chat', {
         body: {
-          messages: [{ role: "user", content: chatInput }],
+          messages: [{
+            role: "user",
+            content: chatInput
+          }],
           genZMode: false,
           enhancePrompt: true
         }
       });
-
       if (error) throw error;
-      
       setChatInput(data.response || chatInput);
       toast.success("Prompt enhanced! ✨");
     } catch (error) {
@@ -643,86 +629,19 @@ const Dashboard = () => {
         </motion.div>
 
         {/* Stats Cards */}
-        <motion.div 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1, duration: 0.5 }}
-          className="grid grid-cols-2 lg:grid-cols-4 gap-4"
-        >
-          {/* Total Points Card - Featured */}
-          {isLoading ? <StatCardSkeleton /> : (
-            <motion.div 
-              whileHover={{ scale: 1.02 }}
-              className="col-span-2 lg:col-span-1 bg-gradient-to-br from-primary/20 via-primary/10 to-card border border-primary/20 rounded-xl p-5 relative overflow-hidden"
-            >
-              <div className="absolute top-0 right-0 w-24 h-24 bg-primary/10 rounded-full -mr-8 -mt-8 blur-xl" />
-              <div className="relative">
-                <div className="flex items-center justify-between mb-4">
-                  <div className="p-2.5 rounded-lg bg-primary/20">
-                    <Trophy className="h-5 w-5 text-primary" />
-                  </div>
-                  {recentChange?.stat === "points" && (
-                    <motion.div 
-                      initial={{ opacity: 0, y: -10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      className="flex items-center gap-1 text-xs font-medium text-emerald-400"
-                    >
-                      <ArrowUp className="h-3 w-3" />
-                      +{recentChange.amount}
-                    </motion.div>
-                  )}
-                </div>
-                <CountUpNumber 
-                  value={liveStats.totalPoints} 
-                  className="text-3xl font-bold text-foreground block"
-                  isAnimating={recentChange?.stat === "points"}
-                />
-                <p className="text-sm text-muted-foreground mt-1">Total Points</p>
-              </div>
-            </motion.div>
-          )}
-          
-          {/* Other Stats */}
-          {stats.map((stat, index) => (
-            isLoading ? <StatCardSkeleton key={index} /> : (
-              <motion.div 
-                key={stat.label}
-                whileHover={{ scale: 1.02 }}
-                className="bg-card border border-border rounded-xl p-5 relative"
-              >
-                <div className="flex items-center justify-between mb-4">
-                  <div className="p-2.5 rounded-lg bg-muted">
-                    <stat.icon className="h-5 w-5 text-muted-foreground" />
-                  </div>
-                  {stat.isChanging && (
-                    <motion.div 
-                      initial={{ opacity: 0, y: -10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      className="flex items-center gap-1 text-xs font-medium text-emerald-400"
-                    >
-                      {stat.isRank ? <ArrowUp className="h-3 w-3" /> : <Check className="h-3 w-3" />}
-                      {stat.isRank ? "↑" : "+1"}
-                    </motion.div>
-                  )}
-                </div>
-                <CountUpNumber 
-                  value={stat.value} 
-                  prefix={stat.isRank ? "#" : ""}
-                  className="text-2xl font-bold text-foreground block"
-                  isAnimating={stat.isChanging}
-                />
-                <p className="text-sm text-muted-foreground mt-1">{stat.label} {stat.change}</p>
-              </motion.div>
-            )
-          ))}
-        </motion.div>
+        
 
         {/* Suggested Opportunities Carousel */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.15, duration: 0.5 }}
-        >
+        <motion.div initial={{
+        opacity: 0,
+        y: 20
+      }} animate={{
+        opacity: 1,
+        y: 0
+      }} transition={{
+        delay: 0.15,
+        duration: 0.5
+      }}>
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3">
               <div className="p-2.5 rounded-lg bg-primary/10">
@@ -744,90 +663,76 @@ const Dashboard = () => {
             {/* Right fade gradient */}
             <div className="absolute right-0 top-0 bottom-0 w-16 bg-gradient-to-l from-background to-transparent z-10 pointer-events-none" />
             
-            <Carousel
-              opts={{
-                align: "start",
-                loop: true,
-                dragFree: true,
-                skipSnaps: true,
-                containScroll: false,
-                duration: 40,
-              }}
-              plugins={[
-                Autoplay({
-                  delay: 2000,
-                  stopOnInteraction: false,
-                  stopOnMouseEnter: true,
-                  playOnInit: true,
-                }),
-              ]}
-              className="w-full cursor-grab active:cursor-grabbing select-none"
-            >
+            <Carousel opts={{
+            align: "start",
+            loop: true,
+            dragFree: true,
+            skipSnaps: true,
+            containScroll: false,
+            duration: 40
+          }} plugins={[Autoplay({
+            delay: 2000,
+            stopOnInteraction: false,
+            stopOnMouseEnter: true,
+            playOnInit: true
+          })]} className="w-full cursor-grab active:cursor-grabbing select-none">
             <CarouselContent className="-ml-4">
-              {[...FAKE_OPPORTUNITIES, ...FAKE_OPPORTUNITIES].map((opp, index) => (
-                <CarouselItem key={`${opp.id}-${index}`} className="pl-4 basis-[80%] sm:basis-[45%] lg:basis-[32%]">
-                  <motion.div
-                    initial={{ opacity: 0, y: 30, scale: 0.95 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    transition={{ 
-                      delay: 0.05 + (index % FAKE_OPPORTUNITIES.length) * 0.08,
-                      duration: 0.6,
-                      ease: [0.16, 1, 0.3, 1]
-                    }}
-                    whileHover={{ 
-                      y: -12, 
-                      scale: 1.03,
-                      transition: { 
-                        type: "spring",
-                        stiffness: 400,
-                        damping: 25
-                      }
-                    }}
-                    className="group bg-card/60 backdrop-blur-md border border-border/40 rounded-2xl p-5 cursor-pointer h-full select-none relative overflow-hidden"
-                    onClick={() => navigate("/opportunities")}
-                  >
+              {[...FAKE_OPPORTUNITIES, ...FAKE_OPPORTUNITIES].map((opp, index) => <CarouselItem key={`${opp.id}-${index}`} className="pl-4 basis-[80%] sm:basis-[45%] lg:basis-[32%]">
+                  <motion.div initial={{
+                  opacity: 0,
+                  y: 30,
+                  scale: 0.95
+                }} animate={{
+                  opacity: 1,
+                  y: 0,
+                  scale: 1
+                }} transition={{
+                  delay: 0.05 + index % FAKE_OPPORTUNITIES.length * 0.08,
+                  duration: 0.6,
+                  ease: [0.16, 1, 0.3, 1]
+                }} whileHover={{
+                  y: -12,
+                  scale: 1.03,
+                  transition: {
+                    type: "spring",
+                    stiffness: 400,
+                    damping: 25
+                  }
+                }} className="group bg-card/60 backdrop-blur-md border border-border/40 rounded-2xl p-5 cursor-pointer h-full select-none relative overflow-hidden" onClick={() => navigate("/opportunities")}>
                     {/* Animated border glow */}
-                    <motion.div 
-                      className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 pointer-events-none"
-                      initial={false}
-                      transition={{ duration: 0.4, ease: "easeOut" }}
-                      style={{
-                        background: "linear-gradient(135deg, hsl(var(--primary) / 0.15), transparent 50%, hsl(var(--primary) / 0.1))",
-                        boxShadow: "inset 0 0 0 1px hsl(var(--primary) / 0.3), 0 0 30px -5px hsl(var(--primary) / 0.25)"
-                      }}
-                    />
+                    <motion.div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 pointer-events-none" initial={false} transition={{
+                    duration: 0.4,
+                    ease: "easeOut"
+                  }} style={{
+                    background: "linear-gradient(135deg, hsl(var(--primary) / 0.15), transparent 50%, hsl(var(--primary) / 0.1))",
+                    boxShadow: "inset 0 0 0 1px hsl(var(--primary) / 0.3), 0 0 30px -5px hsl(var(--primary) / 0.25)"
+                  }} />
                     
                     {/* Inner glow effect */}
                     <div className="absolute -inset-px rounded-2xl opacity-0 group-hover:opacity-100 transition-all duration-500 bg-gradient-to-br from-primary/20 via-transparent to-primary/10 blur-sm pointer-events-none" />
                     
                     {/* Category Badge & Featured */}
                     <div className="relative flex items-center justify-between mb-4">
-                      <motion.div 
-                        whileHover={{ scale: 1.08 }}
-                        transition={{ type: "spring", stiffness: 500, damping: 20 }}
-                        className={cn(
-                          "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium backdrop-blur-sm transition-all duration-300 border",
-                          opp.category === "Tech" && "bg-blue-500/15 text-blue-400 border-blue-500/20 group-hover:bg-blue-500/25 group-hover:border-blue-400/40 group-hover:shadow-[0_0_20px_-5px] group-hover:shadow-blue-500/30",
-                          opp.category === "Cultural" && "bg-purple-500/15 text-purple-400 border-purple-500/20 group-hover:bg-purple-500/25 group-hover:border-purple-400/40 group-hover:shadow-[0_0_20px_-5px] group-hover:shadow-purple-500/30",
-                          opp.category === "Management" && "bg-amber-500/15 text-amber-400 border-amber-500/20 group-hover:bg-amber-500/25 group-hover:border-amber-400/40 group-hover:shadow-[0_0_20px_-5px] group-hover:shadow-amber-500/30",
-                          opp.category === "Design" && "bg-pink-500/15 text-pink-400 border-pink-500/20 group-hover:bg-pink-500/25 group-hover:border-pink-400/40 group-hover:shadow-[0_0_20px_-5px] group-hover:shadow-pink-500/30",
-                          opp.category === "Sports" && "bg-green-500/15 text-green-400 border-green-500/20 group-hover:bg-green-500/25 group-hover:border-green-400/40 group-hover:shadow-[0_0_20px_-5px] group-hover:shadow-green-500/30",
-                          opp.category === "Research" && "bg-cyan-500/15 text-cyan-400 border-cyan-500/20 group-hover:bg-cyan-500/25 group-hover:border-cyan-400/40 group-hover:shadow-[0_0_20px_-5px] group-hover:shadow-cyan-500/30"
-                        )}
-                      >
+                      <motion.div whileHover={{
+                      scale: 1.08
+                    }} transition={{
+                      type: "spring",
+                      stiffness: 500,
+                      damping: 20
+                    }} className={cn("flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium backdrop-blur-sm transition-all duration-300 border", opp.category === "Tech" && "bg-blue-500/15 text-blue-400 border-blue-500/20 group-hover:bg-blue-500/25 group-hover:border-blue-400/40 group-hover:shadow-[0_0_20px_-5px] group-hover:shadow-blue-500/30", opp.category === "Cultural" && "bg-purple-500/15 text-purple-400 border-purple-500/20 group-hover:bg-purple-500/25 group-hover:border-purple-400/40 group-hover:shadow-[0_0_20px_-5px] group-hover:shadow-purple-500/30", opp.category === "Management" && "bg-amber-500/15 text-amber-400 border-amber-500/20 group-hover:bg-amber-500/25 group-hover:border-amber-400/40 group-hover:shadow-[0_0_20px_-5px] group-hover:shadow-amber-500/30", opp.category === "Design" && "bg-pink-500/15 text-pink-400 border-pink-500/20 group-hover:bg-pink-500/25 group-hover:border-pink-400/40 group-hover:shadow-[0_0_20px_-5px] group-hover:shadow-pink-500/30", opp.category === "Sports" && "bg-green-500/15 text-green-400 border-green-500/20 group-hover:bg-green-500/25 group-hover:border-green-400/40 group-hover:shadow-[0_0_20px_-5px] group-hover:shadow-green-500/30", opp.category === "Research" && "bg-cyan-500/15 text-cyan-400 border-cyan-500/20 group-hover:bg-cyan-500/25 group-hover:border-cyan-400/40 group-hover:shadow-[0_0_20px_-5px] group-hover:shadow-cyan-500/30")}>
                         {categoryIcons[opp.category]}
                         {opp.category}
                       </motion.div>
-                      {opp.is_featured && (
-                        <motion.div 
-                          whileHover={{ scale: 1.1 }}
-                          transition={{ type: "spring", stiffness: 500, damping: 20 }}
-                          className="flex items-center gap-1 text-primary text-xs font-medium"
-                        >
+                      {opp.is_featured && <motion.div whileHover={{
+                      scale: 1.1
+                    }} transition={{
+                      type: "spring",
+                      stiffness: 500,
+                      damping: 20
+                    }} className="flex items-center gap-1 text-primary text-xs font-medium">
                           <Star className="h-3.5 w-3.5 fill-primary drop-shadow-[0_0_6px_hsl(var(--primary)/0.6)]" />
                           Featured
-                        </motion.div>
-                      )}
+                        </motion.div>}
                     </div>
 
                     {/* Title */}
@@ -850,34 +755,26 @@ const Dashboard = () => {
                     {/* Points & CTA */}
                     <div className="relative flex items-center justify-between pt-3 border-t border-border/30 group-hover:border-primary/25 transition-all duration-400">
                       <div className="flex items-center gap-1.5">
-                        <motion.div
-                          animate={{ 
-                            scale: [1, 1.15, 1],
-                            rotate: [0, 5, -5, 0]
-                          }}
-                          transition={{ 
-                            duration: 2,
-                            repeat: Infinity,
-                            repeatDelay: 3
-                          }}
-                        >
+                        <motion.div animate={{
+                        scale: [1, 1.15, 1],
+                        rotate: [0, 5, -5, 0]
+                      }} transition={{
+                        duration: 2,
+                        repeat: Infinity,
+                        repeatDelay: 3
+                      }}>
                           <Zap className="h-4 w-4 text-primary drop-shadow-[0_0_4px_hsl(var(--primary)/0.5)]" />
                         </motion.div>
                         <span className="font-bold text-foreground">{opp.points}</span>
                         <span className="text-muted-foreground text-xs">pts</span>
                       </div>
-                      <Button 
-                        size="sm" 
-                        variant="ghost"
-                        className="h-8 px-3 text-xs font-medium text-primary hover:bg-primary/10 hover:text-primary group-hover:bg-primary group-hover:text-primary-foreground group-hover:shadow-lg group-hover:shadow-primary/20 transition-all duration-400"
-                      >
+                      <Button size="sm" variant="ghost" className="h-8 px-3 text-xs font-medium text-primary hover:bg-primary/10 hover:text-primary group-hover:bg-primary group-hover:text-primary-foreground group-hover:shadow-lg group-hover:shadow-primary/20 transition-all duration-400">
                         Join
                         <ArrowRight className="h-3 w-3 ml-1 group-hover:translate-x-1 transition-transform duration-300" />
                       </Button>
                     </div>
                   </motion.div>
-                </CarouselItem>
-              ))}
+                </CarouselItem>)}
             </CarouselContent>
             <div className="hidden sm:flex items-center justify-end gap-2 mt-4">
               <CarouselPrevious className="static translate-y-0 h-9 w-9 bg-card/80 backdrop-blur border-border/60 hover:bg-primary hover:text-primary-foreground hover:border-primary hover:shadow-lg hover:shadow-primary/20 transition-all duration-300" />
@@ -913,22 +810,12 @@ const Dashboard = () => {
               
               {/* Save, Gen Z Mode & Settings */}
               <div className="flex items-center gap-3">
-                <Button 
-                  variant="ghost" 
-                  size="icon" 
-                  className="h-8 w-8 text-muted-foreground hover:text-foreground hover:bg-muted/50"
-                  onClick={handleSaveChat}
-                  title="Save chat history"
-                >
+                <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-foreground hover:bg-muted/50" onClick={handleSaveChat} title="Save chat history">
                   <Save className="h-4 w-4" />
                 </Button>
                 <div className="flex items-center gap-2">
                   <span className="text-xs font-medium text-muted-foreground">gen z mode</span>
-                  <Switch 
-                    checked={genZMode}
-                    onCheckedChange={setGenZMode}
-                    className="data-[state=checked]:bg-primary" 
-                  />
+                  <Switch checked={genZMode} onCheckedChange={setGenZMode} className="data-[state=checked]:bg-primary" />
                 </div>
                 <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-foreground hover:bg-muted/50">
                   <SlidersHorizontal className="h-4 w-4" />
@@ -937,158 +824,106 @@ const Dashboard = () => {
             </div>
 
             {/* AI Chat Area - Match height with My Projects section */}
-            <div className="bg-card border border-border rounded-xl flex flex-col" style={{ height: 'calc(100% - 60px)', minHeight: '520px' }}>
+            <div className="bg-card border border-border rounded-xl flex flex-col" style={{
+            height: 'calc(100% - 60px)',
+            minHeight: '520px'
+          }}>
               {/* Chat Messages Area */}
               <div ref={chatContainerRef} className="flex-1 p-4 overflow-y-auto space-y-3">
                 {/* Welcome message */}
-                {messages.length === 0 && (
-                  <div className="flex gap-3">
+                {messages.length === 0 && <div className="flex gap-3">
                     <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0 overflow-hidden">
                       <img src={logo} alt="Alpha AI" className="h-5 w-5 object-contain" />
                     </div>
                     <div className="bg-muted/50 rounded-lg rounded-tl-none p-3 max-w-[80%]">
                       <p className="text-sm text-foreground">
-                        {genZMode 
-                          ? "Yo! I'm Alpha AI, your campus bestie fr fr! 🔥 Ask me anything about events, opportunities, or how to get those points no cap! ✨"
-                          : "Hey! I'm Alpha AI, your campus assistant. Ask me anything about events, opportunities, or how to earn more points!"}
+                        {genZMode ? "Yo! I'm Alpha AI, your campus bestie fr fr! 🔥 Ask me anything about events, opportunities, or how to get those points no cap! ✨" : "Hey! I'm Alpha AI, your campus assistant. Ask me anything about events, opportunities, or how to earn more points!"}
                       </p>
                     </div>
-                  </div>
-                )}
+                  </div>}
                 
                 {/* Chat messages */}
-                {messages.map((message) => (
-                  <div key={message.id} className={cn("flex gap-3", message.role === "user" && "justify-end")}>
-                    {message.role === "assistant" && (
-                      <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0 overflow-hidden">
+                {messages.map(message => <div key={message.id} className={cn("flex gap-3", message.role === "user" && "justify-end")}>
+                    {message.role === "assistant" && <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0 overflow-hidden">
                         <img src={logo} alt="Alpha AI" className="h-5 w-5 object-contain" />
-                      </div>
-                    )}
-                    <div className={cn(
-                      "rounded-lg p-3 max-w-[80%]",
-                      message.role === "user" 
-                        ? "bg-primary/10 rounded-tr-none" 
-                        : "bg-muted/50 rounded-tl-none"
-                    )}>
-                      {message.image && (
-                        <img src={message.image} alt="Uploaded" className="rounded-md max-h-40 object-contain mb-2" />
-                      )}
+                      </div>}
+                    <div className={cn("rounded-lg p-3 max-w-[80%]", message.role === "user" ? "bg-primary/10 rounded-tr-none" : "bg-muted/50 rounded-tl-none")}>
+                      {message.image && <img src={message.image} alt="Uploaded" className="rounded-md max-h-40 object-contain mb-2" />}
                       <p className="text-sm text-foreground whitespace-pre-wrap">{message.content}</p>
                     </div>
-                    {message.role === "user" && (
-                      <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center flex-shrink-0 text-primary-foreground text-xs font-semibold">
+                    {message.role === "user" && <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center flex-shrink-0 text-primary-foreground text-xs font-semibold">
                         A
-                      </div>
-                    )}
-                  </div>
-                ))}
+                      </div>}
+                  </div>)}
                 
                 {/* AI Loading indicator */}
-                {isAiLoading && (
-                  <div className="flex gap-3">
+                {isAiLoading && <div className="flex gap-3">
                     <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0 overflow-hidden">
                       <img src={logo} alt="Alpha AI" className="h-5 w-5 object-contain" />
                     </div>
                     <div className="bg-muted/50 rounded-lg rounded-tl-none p-3">
                       <div className="flex gap-1">
-                        <motion.div animate={{ opacity: [0.4, 1, 0.4] }} transition={{ duration: 1, repeat: Infinity }} className="w-2 h-2 bg-primary rounded-full" />
-                        <motion.div animate={{ opacity: [0.4, 1, 0.4] }} transition={{ duration: 1, repeat: Infinity, delay: 0.2 }} className="w-2 h-2 bg-primary rounded-full" />
-                        <motion.div animate={{ opacity: [0.4, 1, 0.4] }} transition={{ duration: 1, repeat: Infinity, delay: 0.4 }} className="w-2 h-2 bg-primary rounded-full" />
+                        <motion.div animate={{
+                      opacity: [0.4, 1, 0.4]
+                    }} transition={{
+                      duration: 1,
+                      repeat: Infinity
+                    }} className="w-2 h-2 bg-primary rounded-full" />
+                        <motion.div animate={{
+                      opacity: [0.4, 1, 0.4]
+                    }} transition={{
+                      duration: 1,
+                      repeat: Infinity,
+                      delay: 0.2
+                    }} className="w-2 h-2 bg-primary rounded-full" />
+                        <motion.div animate={{
+                      opacity: [0.4, 1, 0.4]
+                    }} transition={{
+                      duration: 1,
+                      repeat: Infinity,
+                      delay: 0.4
+                    }} className="w-2 h-2 bg-primary rounded-full" />
                       </div>
                     </div>
-                  </div>
-                )}
+                  </div>}
                 
                 {/* Show uploaded image preview */}
-                {uploadedImage && (
-                  <div className="flex gap-3 justify-end">
+                {uploadedImage && <div className="flex gap-3 justify-end">
                     <div className="bg-primary/10 rounded-lg rounded-tr-none p-2 max-w-[60%]">
                       <div className="relative">
                         <img src={uploadedImage} alt="Uploaded" className="rounded-md max-h-40 object-contain" />
-                        <Button 
-                          variant="ghost" 
-                          size="icon" 
-                          className="absolute -top-2 -right-2 h-6 w-6 bg-destructive text-destructive-foreground rounded-full hover:bg-destructive/90"
-                          onClick={() => setUploadedImage(null)}
-                        >
+                        <Button variant="ghost" size="icon" className="absolute -top-2 -right-2 h-6 w-6 bg-destructive text-destructive-foreground rounded-full hover:bg-destructive/90" onClick={() => setUploadedImage(null)}>
                           ×
                         </Button>
                       </div>
                       <p className="text-xs text-muted-foreground mt-1">Image ready to send</p>
                     </div>
-                  </div>
-                )}
+                  </div>}
               </div>
               
               {/* Chat Input */}
               <div className="p-4 border-t border-border">
-                <input 
-                  type="text" 
-                  placeholder="Ask Alpha AI..." 
-                  value={chatInput}
-                  onChange={(e) => setChatInput(e.target.value)}
-                  onKeyDown={handleKeyPress}
-                  disabled={isAiLoading}
-                  className="w-full bg-transparent border-none text-sm text-foreground placeholder:text-muted-foreground focus:outline-none mb-3" 
-                />
+                <input type="text" placeholder="Ask Alpha AI..." value={chatInput} onChange={e => setChatInput(e.target.value)} onKeyDown={handleKeyPress} disabled={isAiLoading} className="w-full bg-transparent border-none text-sm text-foreground placeholder:text-muted-foreground focus:outline-none mb-3" />
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
-                      className="h-8 gap-1.5 text-xs font-medium border-border hover:bg-muted/50"
-                      onClick={handleTalkToAlpha}
-                    >
+                    <Button variant="outline" size="sm" className="h-8 gap-1.5 text-xs font-medium border-border hover:bg-muted/50" onClick={handleTalkToAlpha}>
                       <Mic className="h-3.5 w-3.5" />
                       Talk to Alpha
                     </Button>
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
-                      className="h-8 gap-1.5 text-xs font-medium border-border hover:bg-muted/50"
-                      onClick={() => fileInputRef.current?.click()}
-                    >
+                    <Button variant="outline" size="sm" className="h-8 gap-1.5 text-xs font-medium border-border hover:bg-muted/50" onClick={() => fileInputRef.current?.click()}>
                       <Upload className="h-3.5 w-3.5" />
                       Upload Image
                     </Button>
-                    <input 
-                      ref={fileInputRef}
-                      type="file" 
-                      accept="image/*" 
-                      onChange={handleImageUpload}
-                      className="hidden" 
-                    />
+                    <input ref={fileInputRef} type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
                   </div>
                   <div className="flex items-center gap-2">
-                    <Button 
-                      variant="ghost" 
-                      size="icon" 
-                      className={cn(
-                        "h-8 w-8 transition-all",
-                        isListening 
-                          ? "text-red-500 hover:text-red-400 bg-red-500/10 animate-pulse" 
-                          : "text-muted-foreground hover:text-foreground"
-                      )}
-                      onClick={handleMicClick}
-                    >
+                    <Button variant="ghost" size="icon" className={cn("h-8 w-8 transition-all", isListening ? "text-red-500 hover:text-red-400 bg-red-500/10 animate-pulse" : "text-muted-foreground hover:text-foreground")} onClick={handleMicClick}>
                       {isListening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
                     </Button>
-                    <Button 
-                      variant="ghost" 
-                      size="icon" 
-                      className="h-8 w-8 text-amber-500 hover:text-amber-400 hover:bg-amber-500/10"
-                      onClick={handleEnhancePrompt}
-                      disabled={isAiLoading || !chatInput.trim()}
-                      title="Enhance prompt"
-                    >
+                    <Button variant="ghost" size="icon" className="h-8 w-8 text-amber-500 hover:text-amber-400 hover:bg-amber-500/10" onClick={handleEnhancePrompt} disabled={isAiLoading || !chatInput.trim()} title="Enhance prompt">
                       <Sparkles className="h-4 w-4" />
                     </Button>
-                    <Button 
-                      size="icon" 
-                      className="h-8 w-8 bg-gradient-to-r from-cyan-500 to-primary hover:opacity-90"
-                      onClick={handleSendMessage}
-                      disabled={isAiLoading || (!chatInput.trim() && !uploadedImage)}
-                    >
+                    <Button size="icon" className="h-8 w-8 bg-gradient-to-r from-cyan-500 to-primary hover:opacity-90" onClick={handleSendMessage} disabled={isAiLoading || !chatInput.trim() && !uploadedImage}>
                       <Send className="h-4 w-4" />
                     </Button>
                   </div>
@@ -1165,19 +1000,18 @@ const Dashboard = () => {
                 </span>
               </div>
               <div className="space-y-2.5">
-                {FAKE_PROJECTS.map((project, index) => <motion.div 
-                  key={project.id} 
-                  initial={{ opacity: 0, x: -10 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.5 + index * 0.05 }}
-                  whileHover={{ scale: 1.02, x: 2 }}
-                  className={cn(
-                    "flex items-center gap-3 p-2.5 rounded-lg cursor-pointer transition-all duration-200",
-                    project.status === "active" 
-                      ? "bg-muted/50 hover:bg-muted" 
-                      : "bg-muted/30 opacity-60"
-                  )}
-                >
+                {FAKE_PROJECTS.map((project, index) => <motion.div key={project.id} initial={{
+                opacity: 0,
+                x: -10
+              }} animate={{
+                opacity: 1,
+                x: 0
+              }} transition={{
+                delay: 0.5 + index * 0.05
+              }} whileHover={{
+                scale: 1.02,
+                x: 2
+              }} className={cn("flex items-center gap-3 p-2.5 rounded-lg cursor-pointer transition-all duration-200", project.status === "active" ? "bg-muted/50 hover:bg-muted" : "bg-muted/30 opacity-60")}>
                   <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center text-lg">
                     {project.icon}
                   </div>
@@ -1185,10 +1019,9 @@ const Dashboard = () => {
                     <p className="text-sm font-medium text-foreground truncate">{project.name}</p>
                     <div className="flex items-center gap-2 mt-1">
                       <div className="flex-1 h-1.5 bg-muted rounded-full overflow-hidden">
-                        <div 
-                          className="h-full bg-primary rounded-full transition-all duration-300" 
-                          style={{ width: `${project.progress}%` }}
-                        />
+                        <div className="h-full bg-primary rounded-full transition-all duration-300" style={{
+                        width: `${project.progress}%`
+                      }} />
                       </div>
                       <span className="text-xs text-muted-foreground">{project.progress}%</span>
                     </div>
