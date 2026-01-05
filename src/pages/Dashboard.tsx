@@ -1,7 +1,7 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect, useRef } from "react";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
-import { Trophy, Calendar, Users, TrendingUp, ArrowRight, Clock, MapPin, Zap, Target, ArrowUp, Check, ChevronRight, Star, Award, Code, Palette, Briefcase, Sparkles, MessageSquare, Bot, Send, ChevronLeft, SlidersHorizontal, Mic, Upload, MicOff, Image } from "lucide-react";
+import { Trophy, Calendar, Users, TrendingUp, ArrowRight, Clock, MapPin, Zap, Target, ArrowUp, Check, ChevronRight, Star, Award, Code, Palette, Briefcase, Sparkles, MessageSquare, Bot, Send, ChevronLeft, SlidersHorizontal, Mic, Upload, MicOff, Image, Save } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import Autoplay from "embla-carousel-autoplay";
@@ -11,6 +11,18 @@ import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Input } from "@/components/ui/input";
+import { supabase } from "@/integrations/supabase/client";
+import logo from "@/assets/logo.png";
+
+// Chat message type
+interface ChatMessage {
+  id: string;
+  role: "user" | "assistant";
+  content: string;
+  image?: string;
+  timestamp: Date;
+}
+
 const FAKE_OPPORTUNITIES = [{
   id: "1",
   title: "Hackathon 2026 - Code for Change",
@@ -286,6 +298,9 @@ function OpportunityCardSkeleton() {
       </div>
     </div>;
 }
+
+const CHAT_STORAGE_KEY = 'alpha-ai-chat-history';
+
 const Dashboard = () => {
   const navigate = useNavigate();
   const firstName = "Alex";
@@ -309,8 +324,41 @@ const Dashboard = () => {
   const [chatInput, setChatInput] = useState("");
   const [isListening, setIsListening] = useState(false);
   const [uploadedImage, setUploadedImage] = useState<string | null>(null);
+  const [genZMode, setGenZMode] = useState(false);
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [isAiLoading, setIsAiLoading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const recognitionRef = useRef<any>(null);
+  const chatContainerRef = useRef<HTMLDivElement>(null);
+
+  // Load chat history from localStorage on mount
+  useEffect(() => {
+    const savedChat = localStorage.getItem(CHAT_STORAGE_KEY);
+    if (savedChat) {
+      try {
+        const parsed = JSON.parse(savedChat);
+        setMessages(parsed.map((msg: any) => ({
+          ...msg,
+          timestamp: new Date(msg.timestamp)
+        })));
+      } catch (e) {
+        console.error('Failed to parse chat history:', e);
+      }
+    }
+  }, []);
+
+  // Scroll to bottom when new messages arrive
+  useEffect(() => {
+    if (chatContainerRef.current) {
+      chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+    }
+  }, [messages]);
+
+  // Save chat history
+  const handleSaveChat = () => {
+    localStorage.setItem(CHAT_STORAGE_KEY, JSON.stringify(messages));
+    toast.success("Chat history saved! 💾");
+  };
 
   // Web Speech API for voice input
   const startListening = () => {
@@ -386,6 +434,101 @@ const Dashboard = () => {
       description: "Voice conversation feature is under development",
       duration: 3000 
     });
+  };
+
+  // Send message to AI
+  const handleSendMessage = async () => {
+    if (!chatInput.trim() && !uploadedImage) return;
+
+    const userMessage: ChatMessage = {
+      id: Date.now().toString(),
+      role: "user",
+      content: chatInput,
+      image: uploadedImage || undefined,
+      timestamp: new Date()
+    };
+
+    setMessages(prev => [...prev, userMessage]);
+    setChatInput("");
+    setUploadedImage(null);
+    setIsAiLoading(true);
+
+    try {
+      // Prepare messages for API
+      const apiMessages = messages.map(msg => ({
+        role: msg.role,
+        content: msg.content,
+        image: msg.image
+      }));
+      apiMessages.push({
+        role: "user",
+        content: chatInput,
+        image: uploadedImage || undefined
+      });
+
+      const { data, error } = await supabase.functions.invoke('alpha-ai-chat', {
+        body: {
+          messages: apiMessages,
+          genZMode,
+          enhancePrompt: false
+        }
+      });
+
+      if (error) {
+        throw error;
+      }
+
+      const assistantMessage: ChatMessage = {
+        id: (Date.now() + 1).toString(),
+        role: "assistant",
+        content: data.response || "Sorry, I couldn't process that request.",
+        timestamp: new Date()
+      };
+
+      setMessages(prev => [...prev, assistantMessage]);
+    } catch (error) {
+      console.error('Error sending message:', error);
+      toast.error("Failed to get AI response. Please try again.");
+    } finally {
+      setIsAiLoading(false);
+    }
+  };
+
+  // Prompt enhancer
+  const handleEnhancePrompt = async () => {
+    if (!chatInput.trim()) {
+      toast.error("Please enter a prompt to enhance");
+      return;
+    }
+
+    setIsAiLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('alpha-ai-chat', {
+        body: {
+          messages: [{ role: "user", content: chatInput }],
+          genZMode: false,
+          enhancePrompt: true
+        }
+      });
+
+      if (error) throw error;
+      
+      setChatInput(data.response || chatInput);
+      toast.success("Prompt enhanced! ✨");
+    } catch (error) {
+      console.error('Error enhancing prompt:', error);
+      toast.error("Failed to enhance prompt");
+    } finally {
+      setIsAiLoading(false);
+    }
+  };
+
+  // Handle key press
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSendMessage();
+    }
   };
 
   // Simulate loading state
@@ -497,6 +640,81 @@ const Dashboard = () => {
               </Button>
             </motion.div>
           </Link>
+        </motion.div>
+
+        {/* Stats Cards */}
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1, duration: 0.5 }}
+          className="grid grid-cols-2 lg:grid-cols-4 gap-4"
+        >
+          {/* Total Points Card - Featured */}
+          {isLoading ? <StatCardSkeleton /> : (
+            <motion.div 
+              whileHover={{ scale: 1.02 }}
+              className="col-span-2 lg:col-span-1 bg-gradient-to-br from-primary/20 via-primary/10 to-card border border-primary/20 rounded-xl p-5 relative overflow-hidden"
+            >
+              <div className="absolute top-0 right-0 w-24 h-24 bg-primary/10 rounded-full -mr-8 -mt-8 blur-xl" />
+              <div className="relative">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="p-2.5 rounded-lg bg-primary/20">
+                    <Trophy className="h-5 w-5 text-primary" />
+                  </div>
+                  {recentChange?.stat === "points" && (
+                    <motion.div 
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="flex items-center gap-1 text-xs font-medium text-emerald-400"
+                    >
+                      <ArrowUp className="h-3 w-3" />
+                      +{recentChange.amount}
+                    </motion.div>
+                  )}
+                </div>
+                <CountUpNumber 
+                  value={liveStats.totalPoints} 
+                  className="text-3xl font-bold text-foreground block"
+                  isAnimating={recentChange?.stat === "points"}
+                />
+                <p className="text-sm text-muted-foreground mt-1">Total Points</p>
+              </div>
+            </motion.div>
+          )}
+          
+          {/* Other Stats */}
+          {stats.map((stat, index) => (
+            isLoading ? <StatCardSkeleton key={index} /> : (
+              <motion.div 
+                key={stat.label}
+                whileHover={{ scale: 1.02 }}
+                className="bg-card border border-border rounded-xl p-5 relative"
+              >
+                <div className="flex items-center justify-between mb-4">
+                  <div className="p-2.5 rounded-lg bg-muted">
+                    <stat.icon className="h-5 w-5 text-muted-foreground" />
+                  </div>
+                  {stat.isChanging && (
+                    <motion.div 
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="flex items-center gap-1 text-xs font-medium text-emerald-400"
+                    >
+                      {stat.isRank ? <ArrowUp className="h-3 w-3" /> : <Check className="h-3 w-3" />}
+                      {stat.isRank ? "↑" : "+1"}
+                    </motion.div>
+                  )}
+                </div>
+                <CountUpNumber 
+                  value={stat.value} 
+                  prefix={stat.isRank ? "#" : ""}
+                  className="text-2xl font-bold text-foreground block"
+                  isAnimating={stat.isChanging}
+                />
+                <p className="text-sm text-muted-foreground mt-1">{stat.label} {stat.change}</p>
+              </motion.div>
+            )
+          ))}
         </motion.div>
 
         {/* Suggested Opportunities Carousel */}
@@ -670,7 +888,7 @@ const Dashboard = () => {
         </motion.div>
 
         <div className="grid lg:grid-cols-3 gap-6 lg:gap-8">
-          {/* Featured Opportunities */}
+          {/* AI Chat Section - Takes 2 columns */}
           <motion.div initial={{
           opacity: 0,
           y: 20
@@ -684,8 +902,8 @@ const Dashboard = () => {
             {/* AI Chat Section Header */}
             <div className="flex items-center justify-between mb-5">
               <div className="flex items-center gap-3">
-                <div className="p-2.5 rounded-lg bg-primary/10">
-                  <MessageSquare className="h-4 w-4 text-primary" />
+                <div className="p-2 rounded-lg bg-primary/10 overflow-hidden">
+                  <img src={logo} alt="Camply" className="h-6 w-6 object-contain" />
                 </div>
                 <div>
                   <h2 className="font-semibold text-foreground text-lg tracking-tight">Alpha AI</h2>
@@ -693,11 +911,24 @@ const Dashboard = () => {
                 </div>
               </div>
               
-              {/* Gen Z Mode & Settings */}
+              {/* Save, Gen Z Mode & Settings */}
               <div className="flex items-center gap-3">
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  className="h-8 w-8 text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                  onClick={handleSaveChat}
+                  title="Save chat history"
+                >
+                  <Save className="h-4 w-4" />
+                </Button>
                 <div className="flex items-center gap-2">
                   <span className="text-xs font-medium text-muted-foreground">gen z mode</span>
-                  <Switch className="data-[state=checked]:bg-primary" />
+                  <Switch 
+                    checked={genZMode}
+                    onCheckedChange={setGenZMode}
+                    className="data-[state=checked]:bg-primary" 
+                  />
                 </div>
                 <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-foreground hover:bg-muted/50">
                   <SlidersHorizontal className="h-4 w-4" />
@@ -705,18 +936,68 @@ const Dashboard = () => {
               </div>
             </div>
 
-            {/* AI Chat Area */}
-            <div className="bg-card border border-border rounded-xl h-[480px] flex flex-col">
+            {/* AI Chat Area - Match height with My Projects section */}
+            <div className="bg-card border border-border rounded-xl flex flex-col" style={{ height: 'calc(100% - 60px)', minHeight: '520px' }}>
               {/* Chat Messages Area */}
-              <div className="flex-1 p-4 overflow-y-auto space-y-3">
-                <div className="flex gap-3">
-                  <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0">
-                    <Bot className="h-4 w-4 text-primary" />
+              <div ref={chatContainerRef} className="flex-1 p-4 overflow-y-auto space-y-3">
+                {/* Welcome message */}
+                {messages.length === 0 && (
+                  <div className="flex gap-3">
+                    <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0 overflow-hidden">
+                      <img src={logo} alt="Alpha AI" className="h-5 w-5 object-contain" />
+                    </div>
+                    <div className="bg-muted/50 rounded-lg rounded-tl-none p-3 max-w-[80%]">
+                      <p className="text-sm text-foreground">
+                        {genZMode 
+                          ? "Yo! I'm Alpha AI, your campus bestie fr fr! 🔥 Ask me anything about events, opportunities, or how to get those points no cap! ✨"
+                          : "Hey! I'm Alpha AI, your campus assistant. Ask me anything about events, opportunities, or how to earn more points!"}
+                      </p>
+                    </div>
                   </div>
-                  <div className="bg-muted/50 rounded-lg rounded-tl-none p-3 max-w-[80%]">
-                    <p className="text-sm text-foreground">Hey! I'm Alpha AI, your campus assistant. Ask me anything about events, opportunities, or how to earn more points!</p>
+                )}
+                
+                {/* Chat messages */}
+                {messages.map((message) => (
+                  <div key={message.id} className={cn("flex gap-3", message.role === "user" && "justify-end")}>
+                    {message.role === "assistant" && (
+                      <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0 overflow-hidden">
+                        <img src={logo} alt="Alpha AI" className="h-5 w-5 object-contain" />
+                      </div>
+                    )}
+                    <div className={cn(
+                      "rounded-lg p-3 max-w-[80%]",
+                      message.role === "user" 
+                        ? "bg-primary/10 rounded-tr-none" 
+                        : "bg-muted/50 rounded-tl-none"
+                    )}>
+                      {message.image && (
+                        <img src={message.image} alt="Uploaded" className="rounded-md max-h-40 object-contain mb-2" />
+                      )}
+                      <p className="text-sm text-foreground whitespace-pre-wrap">{message.content}</p>
+                    </div>
+                    {message.role === "user" && (
+                      <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center flex-shrink-0 text-primary-foreground text-xs font-semibold">
+                        A
+                      </div>
+                    )}
                   </div>
-                </div>
+                ))}
+                
+                {/* AI Loading indicator */}
+                {isAiLoading && (
+                  <div className="flex gap-3">
+                    <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0 overflow-hidden">
+                      <img src={logo} alt="Alpha AI" className="h-5 w-5 object-contain" />
+                    </div>
+                    <div className="bg-muted/50 rounded-lg rounded-tl-none p-3">
+                      <div className="flex gap-1">
+                        <motion.div animate={{ opacity: [0.4, 1, 0.4] }} transition={{ duration: 1, repeat: Infinity }} className="w-2 h-2 bg-primary rounded-full" />
+                        <motion.div animate={{ opacity: [0.4, 1, 0.4] }} transition={{ duration: 1, repeat: Infinity, delay: 0.2 }} className="w-2 h-2 bg-primary rounded-full" />
+                        <motion.div animate={{ opacity: [0.4, 1, 0.4] }} transition={{ duration: 1, repeat: Infinity, delay: 0.4 }} className="w-2 h-2 bg-primary rounded-full" />
+                      </div>
+                    </div>
+                  </div>
+                )}
                 
                 {/* Show uploaded image preview */}
                 {uploadedImage && (
@@ -733,6 +1014,7 @@ const Dashboard = () => {
                           ×
                         </Button>
                       </div>
+                      <p className="text-xs text-muted-foreground mt-1">Image ready to send</p>
                     </div>
                   </div>
                 )}
@@ -745,6 +1027,8 @@ const Dashboard = () => {
                   placeholder="Ask Alpha AI..." 
                   value={chatInput}
                   onChange={(e) => setChatInput(e.target.value)}
+                  onKeyDown={handleKeyPress}
+                  disabled={isAiLoading}
                   className="w-full bg-transparent border-none text-sm text-foreground placeholder:text-muted-foreground focus:outline-none mb-3" 
                 />
                 <div className="flex items-center justify-between">
@@ -789,10 +1073,22 @@ const Dashboard = () => {
                     >
                       {isListening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
                     </Button>
-                    <Button variant="ghost" size="icon" className="h-8 w-8 text-amber-500 hover:text-amber-400 hover:bg-amber-500/10">
+                    <Button 
+                      variant="ghost" 
+                      size="icon" 
+                      className="h-8 w-8 text-amber-500 hover:text-amber-400 hover:bg-amber-500/10"
+                      onClick={handleEnhancePrompt}
+                      disabled={isAiLoading || !chatInput.trim()}
+                      title="Enhance prompt"
+                    >
                       <Sparkles className="h-4 w-4" />
                     </Button>
-                    <Button size="icon" className="h-8 w-8 bg-gradient-to-r from-cyan-500 to-primary hover:opacity-90">
+                    <Button 
+                      size="icon" 
+                      className="h-8 w-8 bg-gradient-to-r from-cyan-500 to-primary hover:opacity-90"
+                      onClick={handleSendMessage}
+                      disabled={isAiLoading || (!chatInput.trim() && !uploadedImage)}
+                    >
                       <Send className="h-4 w-4" />
                     </Button>
                   </div>
