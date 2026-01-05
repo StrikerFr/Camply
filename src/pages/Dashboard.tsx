@@ -1,7 +1,7 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect, useRef } from "react";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
-import { Trophy, Calendar, Users, TrendingUp, ArrowRight, Clock, MapPin, Zap, Target, ArrowUp, Check, ChevronRight, Star, Award, Code, Palette, Briefcase, Sparkles } from "lucide-react";
+import { Trophy, Calendar, Users, TrendingUp, ArrowRight, Clock, MapPin, Zap, Target, ArrowUp, Check, ChevronRight, Star, Award, Code, Palette, Briefcase, Sparkles, MessageSquare, Bot, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
@@ -322,15 +322,35 @@ const Dashboard = () => {
               <StatCardSkeleton />
               <StatCardSkeleton />
               <StatCardSkeleton />
-              <StatCardSkeleton />
             </> : stats.map((stat, index) => {
           const statRoutes: Record<string, string> = {
-            "Total Points": "/leaderboard",
             "Events": "/opportunities",
             "Teams": "/teams",
             "Rank": "/leaderboard"
           };
-          return;
+          const Icon = stat.icon;
+          return (
+            <motion.div 
+              key={stat.label}
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 + index * 0.05 }}
+              whileHover={{ scale: 1.02, y: -2 }}
+              onClick={() => navigate(statRoutes[stat.label] || "/dashboard")}
+              className="bg-card border border-border rounded-xl p-5 cursor-pointer hover:border-border/60 hover:shadow-lg transition-all duration-300"
+            >
+              <div className="flex items-center justify-between mb-3">
+                <div className="p-2 rounded-lg bg-primary/10">
+                  <Icon className="h-4 w-4 text-primary" />
+                </div>
+                <span className="text-xs text-muted-foreground font-medium">{stat.change}</span>
+              </div>
+              <p className="text-2xl font-bold text-foreground">
+                {stat.isRank ? "#" : ""}{stat.value}
+              </p>
+              <p className="text-sm text-muted-foreground mt-1">{stat.label}</p>
+            </motion.div>
+          );
         })}
         </div>
 
@@ -346,118 +366,46 @@ const Dashboard = () => {
           delay: 0.25,
           duration: 0.5
         }} className="lg:col-span-2">
-            {/* Section Header */}
+            {/* AI Chat Section Header */}
             <div className="flex items-center justify-between mb-5">
               <div className="flex items-center gap-3">
                 <div className="p-2.5 rounded-lg bg-primary/10">
-                  <Target className="h-4 w-4 text-primary" />
+                  <MessageSquare className="h-4 w-4 text-primary" />
                 </div>
                 <div>
-                  <h2 className="font-semibold text-foreground text-lg tracking-tight">Featured Opportunities</h2>
-                  <p className="text-sm text-muted-foreground">Don't miss out</p>
+                  <h2 className="font-semibold text-foreground text-lg tracking-tight">Alpha AI</h2>
+                  <p className="text-sm text-muted-foreground">by Camply</p>
                 </div>
               </div>
-              <Link to="/opportunities">
-                <motion.div whileHover={{
-                x: 3
-              }} transition={{
-                duration: 0.2
-              }}>
-                  <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground group">
-                    View All
-                    <ArrowRight className="h-4 w-4 ml-1 transition-transform group-hover:translate-x-0.5" />
-                  </Button>
-                </motion.div>
-              </Link>
             </div>
 
-            <div className="space-y-4">
-              {isLoading ? <>
-                  <OpportunityCardSkeleton />
-                  <OpportunityCardSkeleton />
-                  <OpportunityCardSkeleton />
-                </> : FAKE_OPPORTUNITIES.map((opp, index) => {
-              const isRegistered = registeredEvents.includes(opp.id);
-              const handleRegister = (e: React.MouseEvent) => {
-                e.stopPropagation();
-                if (isRegistered) {
-                  setRegisteredEvents(prev => prev.filter(id => id !== opp.id));
-                  toast.info(`Unregistered from ${opp.title}`);
-                } else {
-                  setRegisteredEvents(prev => [...prev, opp.id]);
-                  setLiveStats(prev => ({
-                    ...prev,
-                    eventsCount: prev.eventsCount + 1,
-                    totalPoints: prev.totalPoints + opp.points
-                  }));
-                  toast.success(`Registered for ${opp.title}!`, {
-                    description: `You earned ${opp.points} points!`
-                  });
-                }
-              };
-              return <motion.div key={opp.id} initial={{
-                opacity: 0,
-                y: 15
-              }} animate={{
-                opacity: 1,
-                y: 0
-              }} transition={{
-                delay: 0.3 + index * 0.08,
-                duration: 0.4
-              }} className="bg-card border border-border rounded-xl p-5 hover:border-border/60 hover:shadow-lg hover:shadow-black/10 transition-all duration-300 cursor-pointer group" onClick={() => navigate("/opportunities")} whileHover={{
-                x: 4,
-                transition: {
-                  duration: 0.2
-                }
-              }}>
-                      <div className="flex items-start justify-between gap-4">
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2 mb-3">
-                            {opp.is_featured && <span className="inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-semibold bg-primary/10 text-primary rounded-md">
-                                <Star className="h-3 w-3" />
-                                Featured
-                              </span>}
-                            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-medium bg-muted text-muted-foreground rounded-md">
-                              {categoryIcons[opp.category]}
-                              {opp.category}
-                            </span>
-                          </div>
-                          <h3 className="font-semibold text-foreground text-base group-hover:text-foreground/80 transition-colors truncate leading-snug">
-                            {opp.title}
-                          </h3>
-                          <div className="flex items-center gap-4 mt-3 text-sm text-muted-foreground">
-                            <span className="flex items-center gap-1.5">
-                              <Clock className="h-3.5 w-3.5" />
-                              {opp.registration_deadline}
-                            </span>
-                            <span className="flex items-center gap-1.5">
-                              <MapPin className="h-3.5 w-3.5" />
-                              {opp.location}
-                            </span>
-                          </div>
-                        </div>
-                        <div className="flex flex-col items-end gap-3">
-                          <div className="flex items-center gap-1.5 text-sm font-semibold">
-                            <Zap className="h-4 w-4 text-amber-500" />
-                            <span className="text-foreground">{opp.points}</span>
-                            <span className="text-muted-foreground font-normal">pts</span>
-                          </div>
-                          <motion.div whileHover={{
-                      scale: 1.03
-                    }} whileTap={{
-                      scale: 0.97
-                    }}>
-                            <Button size="sm" className={cn("h-9 px-5 text-sm font-medium transition-all duration-300", isRegistered ? "bg-emerald-600 hover:bg-emerald-700 text-white shadow-md shadow-emerald-600/20" : "bg-foreground text-background hover:bg-foreground/90 shadow-md hover:shadow-lg")} onClick={handleRegister}>
-                              {isRegistered ? <>
-                                  <Check className="h-3.5 w-3.5 mr-1.5" />
-                                  Registered
-                                </> : "Register"}
-                            </Button>
-                          </motion.div>
-                        </div>
-                      </div>
-                    </motion.div>;
-            })}
+            {/* AI Chat Area */}
+            <div className="bg-card border border-border rounded-xl h-[320px] flex flex-col">
+              {/* Chat Messages Area */}
+              <div className="flex-1 p-4 overflow-y-auto space-y-3">
+                <div className="flex gap-3">
+                  <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0">
+                    <Bot className="h-4 w-4 text-primary" />
+                  </div>
+                  <div className="bg-muted/50 rounded-lg rounded-tl-none p-3 max-w-[80%]">
+                    <p className="text-sm text-foreground">Hey! I'm Alpha AI, your campus assistant. Ask me anything about events, opportunities, or how to earn more points!</p>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Chat Input */}
+              <div className="p-4 border-t border-border">
+                <div className="flex items-center gap-2">
+                  <input 
+                    type="text" 
+                    placeholder="Ask Alpha AI..."
+                    className="flex-1 bg-muted/50 border border-border rounded-lg px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/50 transition-all"
+                  />
+                  <Button size="icon" className="h-10 w-10 bg-primary hover:bg-primary/90">
+                    <Send className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
             </div>
           </motion.div>
 
