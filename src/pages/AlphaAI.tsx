@@ -688,26 +688,25 @@ const AlphaAI = () => {
                   onChange={(e) => setChatInput(e.target.value)}
                   onKeyPress={handleKeyPress}
                   placeholder="Ask Alpha AI anything..."
-                  className="w-full px-5 py-3.5 bg-background border border-border rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/50 pr-14 text-base transition-all duration-300"
+                  className="w-full px-5 py-3.5 bg-background border border-border rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/50 text-base transition-all duration-300"
                   disabled={isAiLoading}
                 />
                 <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-primary/20 to-primary/10 opacity-0 group-focus-within:opacity-100 -z-10 blur-xl transition-opacity duration-300" />
-                <motion.div
-                  className="absolute right-3 top-1/2 -translate-y-1/2"
-                  whileHover={{ scale: 1.15, rotate: 15 }}
-                  whileTap={{ scale: 0.9 }}
-                >
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={handleEnhancePrompt}
-                    disabled={isAiLoading || !chatInput.trim()}
-                    className="h-8 px-2.5 bg-gradient-to-r from-amber-500/20 to-orange-500/20 hover:from-amber-500/30 hover:to-orange-500/30 border border-amber-500/30 rounded-lg text-amber-400 hover:text-amber-300 transition-all duration-300"
-                  >
-                    <Sparkles className="h-4 w-4" />
-                  </Button>
-                </motion.div>
               </div>
+              <motion.div 
+                whileHover={{ scale: 1.1, rotate: 10 }} 
+                whileTap={{ scale: 0.9 }}
+              >
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={handleEnhancePrompt}
+                  disabled={isAiLoading || !chatInput.trim()}
+                  className="shrink-0 h-11 w-11 bg-gradient-to-br from-amber-500/20 to-orange-500/20 hover:from-amber-500/30 hover:to-orange-500/30 border border-amber-500/40 rounded-xl text-amber-400 hover:text-amber-300 transition-all duration-300"
+                >
+                  <Sparkles className="h-5 w-5" />
+                </Button>
+              </motion.div>
               <motion.div 
                 whileHover={{ scale: 1.05 }} 
                 whileTap={{ scale: 0.95 }}
