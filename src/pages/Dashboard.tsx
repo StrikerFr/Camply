@@ -440,80 +440,101 @@ const Dashboard = () => {
               align: "start",
               loop: true,
               dragFree: true,
-              skipSnaps: false,
-              containScroll: "trimSnaps",
-              duration: 25,
+              skipSnaps: true,
+              containScroll: false,
+              duration: 40,
             }}
             plugins={[
               Autoplay({
-                delay: 3000,
+                delay: 2000,
                 stopOnInteraction: false,
                 stopOnMouseEnter: true,
+                playOnInit: true,
               }),
             ]}
             className="w-full cursor-grab active:cursor-grabbing select-none"
           >
-            <CarouselContent className="-ml-3">
-              {FAKE_OPPORTUNITIES.map((opp, index) => (
-                <CarouselItem key={opp.id} className="pl-3 basis-[85%] sm:basis-1/2 lg:basis-1/3">
+            <CarouselContent className="-ml-4">
+              {[...FAKE_OPPORTUNITIES, ...FAKE_OPPORTUNITIES].map((opp, index) => (
+                <CarouselItem key={`${opp.id}-${index}`} className="pl-4 basis-[80%] sm:basis-[45%] lg:basis-[32%]">
                   <motion.div
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: 0.1 + index * 0.05 }}
-                    whileHover={{ y: -6, scale: 1.02 }}
-                    className="group bg-card border border-border rounded-xl p-5 cursor-pointer hover:shadow-2xl hover:shadow-primary/20 hover:border-primary/50 transition-all duration-300 h-full select-none relative overflow-hidden before:absolute before:inset-0 before:rounded-xl before:opacity-0 before:transition-opacity before:duration-300 hover:before:opacity-100 before:bg-gradient-to-br before:from-primary/5 before:to-transparent before:pointer-events-none"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ 
+                      delay: 0.1 + (index % FAKE_OPPORTUNITIES.length) * 0.05,
+                      duration: 0.4,
+                      ease: [0.25, 0.46, 0.45, 0.94]
+                    }}
+                    whileHover={{ 
+                      y: -8, 
+                      scale: 1.02,
+                      transition: { duration: 0.3, ease: "easeOut" }
+                    }}
+                    className="group bg-card/80 backdrop-blur-sm border border-border/60 rounded-xl p-5 cursor-pointer transition-all duration-500 h-full select-none relative overflow-hidden hover:border-primary/40 hover:shadow-[0_0_40px_-10px] hover:shadow-primary/30"
                     onClick={() => navigate("/opportunities")}
                   >
+                    {/* Glow effect */}
+                    <div className="absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-gradient-to-br from-primary/10 via-transparent to-primary/5 pointer-events-none" />
+                    
                     {/* Category Badge & Featured */}
-                    <div className="flex items-center justify-between mb-4">
-                      <div className={cn(
-                        "flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium",
-                        opp.category === "Tech" && "bg-blue-500/10 text-blue-400",
-                        opp.category === "Cultural" && "bg-purple-500/10 text-purple-400",
-                        opp.category === "Management" && "bg-amber-500/10 text-amber-400"
-                      )}>
+                    <div className="relative flex items-center justify-between mb-4">
+                      <motion.div 
+                        whileHover={{ scale: 1.05 }}
+                        className={cn(
+                          "flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium transition-all duration-300",
+                          opp.category === "Tech" && "bg-blue-500/10 text-blue-400 group-hover:bg-blue-500/20",
+                          opp.category === "Cultural" && "bg-purple-500/10 text-purple-400 group-hover:bg-purple-500/20",
+                          opp.category === "Management" && "bg-amber-500/10 text-amber-400 group-hover:bg-amber-500/20",
+                          opp.category === "Design" && "bg-pink-500/10 text-pink-400 group-hover:bg-pink-500/20",
+                          opp.category === "Sports" && "bg-green-500/10 text-green-400 group-hover:bg-green-500/20",
+                          opp.category === "Research" && "bg-cyan-500/10 text-cyan-400 group-hover:bg-cyan-500/20"
+                        )}
+                      >
                         {categoryIcons[opp.category]}
                         {opp.category}
-                      </div>
+                      </motion.div>
                       {opp.is_featured && (
-                        <div className="flex items-center gap-1 text-primary text-xs font-medium">
-                          <Star className="h-3 w-3 fill-primary" />
+                        <motion.div 
+                          whileHover={{ scale: 1.1 }}
+                          className="flex items-center gap-1 text-primary text-xs font-medium"
+                        >
+                          <Star className="h-3 w-3 fill-primary animate-pulse" />
                           Featured
-                        </div>
+                        </motion.div>
                       )}
                     </div>
 
                     {/* Title */}
-                    <h3 className="font-semibold text-foreground text-base mb-3 line-clamp-2 group-hover:text-primary transition-colors">
+                    <h3 className="relative font-semibold text-foreground text-base mb-3 line-clamp-2 group-hover:text-primary transition-colors duration-300">
                       {opp.title}
                     </h3>
 
                     {/* Details */}
-                    <div className="space-y-2 mb-4">
-                      <div className="flex items-center gap-2 text-muted-foreground text-xs">
+                    <div className="relative space-y-2 mb-4">
+                      <div className="flex items-center gap-2 text-muted-foreground text-xs group-hover:text-muted-foreground/80 transition-colors">
                         <Clock className="h-3.5 w-3.5" />
                         <span>{opp.registration_deadline}</span>
                       </div>
-                      <div className="flex items-center gap-2 text-muted-foreground text-xs">
+                      <div className="flex items-center gap-2 text-muted-foreground text-xs group-hover:text-muted-foreground/80 transition-colors">
                         <MapPin className="h-3.5 w-3.5" />
                         <span>{opp.location}</span>
                       </div>
                     </div>
 
                     {/* Points & CTA */}
-                    <div className="flex items-center justify-between pt-3 border-t border-border/50">
+                    <div className="relative flex items-center justify-between pt-3 border-t border-border/50 group-hover:border-primary/20 transition-colors duration-300">
                       <div className="flex items-center gap-1.5">
-                        <Zap className="h-4 w-4 text-primary" />
+                        <Zap className="h-4 w-4 text-primary group-hover:animate-pulse" />
                         <span className="font-bold text-foreground">{opp.points}</span>
                         <span className="text-muted-foreground text-xs">pts</span>
                       </div>
                       <Button 
                         size="sm" 
                         variant="ghost"
-                        className="h-8 px-3 text-xs font-medium text-primary hover:bg-primary/10 hover:text-primary group-hover:bg-primary group-hover:text-primary-foreground transition-all"
+                        className="h-8 px-3 text-xs font-medium text-primary hover:bg-primary/10 hover:text-primary group-hover:bg-primary group-hover:text-primary-foreground transition-all duration-300"
                       >
                         Join
-                        <ArrowRight className="h-3 w-3 ml-1" />
+                        <ArrowRight className="h-3 w-3 ml-1 group-hover:translate-x-0.5 transition-transform" />
                       </Button>
                     </div>
                   </motion.div>
@@ -521,8 +542,8 @@ const Dashboard = () => {
               ))}
             </CarouselContent>
             <div className="hidden sm:flex items-center justify-end gap-2 mt-4">
-              <CarouselPrevious className="static translate-y-0 h-9 w-9 bg-card/80 backdrop-blur border-border hover:bg-primary hover:text-primary-foreground hover:border-primary transition-all" />
-              <CarouselNext className="static translate-y-0 h-9 w-9 bg-card/80 backdrop-blur border-border hover:bg-primary hover:text-primary-foreground hover:border-primary transition-all" />
+              <CarouselPrevious className="static translate-y-0 h-9 w-9 bg-card/80 backdrop-blur border-border/60 hover:bg-primary hover:text-primary-foreground hover:border-primary hover:shadow-lg hover:shadow-primary/20 transition-all duration-300" />
+              <CarouselNext className="static translate-y-0 h-9 w-9 bg-card/80 backdrop-blur border-border/60 hover:bg-primary hover:text-primary-foreground hover:border-primary hover:shadow-lg hover:shadow-primary/20 transition-all duration-300" />
             </div>
           </Carousel>
         </motion.div>
