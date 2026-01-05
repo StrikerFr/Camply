@@ -153,34 +153,57 @@ const HACKATHONS: Hackathon[] = [
   }
 ];
 
-const NEWS = [
+interface NewsItem {
+  id: string;
+  title: string;
+  date: string;
+  source: string;
+  category: string;
+  content?: string;
+  author?: string;
+  link?: string;
+}
+
+const NEWS: NewsItem[] = [
   {
     id: "1",
     title: "IIT Patna ranked among top 20 engineering institutes in India",
     date: "2 days ago",
     source: "Times of India",
-    category: "Rankings"
+    category: "Rankings",
+    content: "IIT Patna has secured a spot among the top 20 engineering institutes in India according to the NIRF Rankings 2026. The institute showed significant improvement in research output, faculty quality, and placement records. Director Prof. TN Singh attributed this success to the dedicated efforts of faculty and students.",
+    author: "Education Desk",
+    link: "https://timesofindia.com"
   },
   {
     id: "2",
     title: "New Research Centre for AI and Robotics inaugurated",
     date: "1 week ago",
     source: "IIT Patna News",
-    category: "Campus"
+    category: "Campus",
+    content: "The state-of-the-art AI and Robotics Research Centre was inaugurated by the Hon'ble Education Minister. The centre features advanced computing infrastructure, robotics labs, and collaboration spaces. It aims to foster cutting-edge research and industry partnerships in emerging technologies.",
+    author: "IIT Patna PR Team",
+    link: "https://iitp.ac.in/news"
   },
   {
     id: "3",
     title: "IIT Patna students win Smart India Hackathon 2025",
     date: "2 weeks ago",
     source: "Hindustan Times",
-    category: "Achievements"
+    category: "Achievements",
+    content: "A team of six students from IIT Patna won the Smart India Hackathon 2025 in the Healthcare category. Their innovative solution for remote patient monitoring impressed the judges. The team received a cash prize of ₹1 lakh and mentorship opportunities from leading healthcare companies.",
+    author: "Staff Reporter",
+    link: "https://hindustantimes.com"
   },
   {
     id: "4",
     title: "Placement season 2025: Average package crosses ₹20 LPA",
     date: "3 weeks ago",
     source: "Economic Times",
-    category: "Placements"
+    category: "Placements",
+    content: "IIT Patna recorded its best placement season with an average package of ₹20.5 LPA. Top recruiters included Google, Microsoft, Goldman Sachs, and Flipkart. The highest domestic package stood at ₹65 LPA while international offers reached ₹1.2 Cr. Over 95% of eligible students received offers.",
+    author: "Campus Bureau",
+    link: "https://economictimes.com"
   }
 ];
 
@@ -308,6 +331,7 @@ const MyCollege = () => {
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const [selectedCompetition, setSelectedCompetition] = useState<Competition | null>(null);
   const [selectedHackathon, setSelectedHackathon] = useState<Hackathon | null>(null);
+  const [selectedNews, setSelectedNews] = useState<NewsItem | null>(null);
   return (
     <DashboardLayout>
       <div className="max-w-7xl mx-auto space-y-8">
@@ -482,14 +506,15 @@ const MyCollege = () => {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.1 }}
-                  className="bg-card border border-border rounded-xl p-5 hover:border-primary/50 transition-colors cursor-pointer"
+                  onClick={() => setSelectedNews(news)}
+                  className="bg-card border border-border rounded-xl p-5 hover:border-primary/50 transition-colors cursor-pointer group"
                 >
                   <div className="flex items-start justify-between gap-4">
                     <div>
                       <span className="px-2.5 py-1 text-xs font-medium bg-primary/10 text-primary rounded-full">
                         {news.category}
                       </span>
-                      <h3 className="text-lg font-semibold text-foreground mt-2">{news.title}</h3>
+                      <h3 className="text-lg font-semibold text-foreground mt-2 group-hover:text-primary transition-colors">{news.title}</h3>
                       <div className="flex items-center gap-4 mt-2 text-sm text-muted-foreground">
                         <span className="flex items-center gap-1.5">
                           <Clock className="h-4 w-4" />
@@ -499,7 +524,7 @@ const MyCollege = () => {
                         <span>{news.source}</span>
                       </div>
                     </div>
-                    <ExternalLink className="h-5 w-5 text-muted-foreground shrink-0" />
+                    <ExternalLink className="h-5 w-5 text-muted-foreground shrink-0 group-hover:text-primary transition-colors" />
                   </div>
                 </motion.div>
               ))}
@@ -837,6 +862,55 @@ const MyCollege = () => {
                 <Button className="flex-1" disabled={selectedHackathon?.status !== "Registration Open"}>
                   {selectedHackathon?.status === "Registration Open" ? "Register Now" : "Coming Soon"}
                 </Button>
+                <Button variant="outline" size="icon">
+                  <Share2 className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* News Details Dialog */}
+        <Dialog open={!!selectedNews} onOpenChange={() => setSelectedNews(null)}>
+          <DialogContent className="sm:max-w-lg">
+            <DialogHeader>
+              <div className="flex items-center gap-2 mb-2">
+                <span className="px-2.5 py-1 text-xs font-medium bg-primary/10 text-primary rounded-full">
+                  {selectedNews?.category}
+                </span>
+              </div>
+              <DialogTitle className="text-xl leading-tight">{selectedNews?.title}</DialogTitle>
+            </DialogHeader>
+            
+            <div className="space-y-4">
+              <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                <span className="flex items-center gap-1.5">
+                  <Clock className="h-4 w-4 text-primary" />
+                  {selectedNews?.date}
+                </span>
+                <span>•</span>
+                <span>{selectedNews?.source}</span>
+                {selectedNews?.author && (
+                  <>
+                    <span>•</span>
+                    <span>By {selectedNews.author}</span>
+                  </>
+                )}
+              </div>
+              
+              <p className="text-muted-foreground leading-relaxed">
+                {selectedNews?.content}
+              </p>
+              
+              <div className="flex gap-2 pt-2">
+                {selectedNews?.link && (
+                  <Button className="flex-1" asChild>
+                    <a href={selectedNews.link} target="_blank" rel="noopener noreferrer">
+                      <ExternalLink className="h-4 w-4 mr-2" />
+                      Read Full Article
+                    </a>
+                  </Button>
+                )}
                 <Button variant="outline" size="icon">
                   <Share2 className="h-4 w-4" />
                 </Button>
