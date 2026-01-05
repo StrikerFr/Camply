@@ -348,27 +348,39 @@ const Profile = () => {
                 </div>
               </motion.div>
 
-              {/* Activity Feed */}
+              {/* About Section */}
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.25 }}
                 className="bg-card border border-border rounded-xl p-5"
               >
-                <h3 className="font-semibold text-foreground mb-4">Recent Activity</h3>
-                <div className="space-y-4">
-                  {FAKE_ACTIVITY.map((activity) => (
-                    <div key={activity.id} className="flex items-start gap-4">
-                      <div className="p-2 rounded-lg bg-primary/10 text-primary">
-                        <Award className="h-4 w-4" />
-                      </div>
-                      <div className="flex-1">
-                        <p className="text-sm text-foreground">{activity.source}</p>
-                        <p className="text-xs text-muted-foreground">{formatTimeAgo(activity.created_at)}</p>
-                      </div>
-                      <span className="text-sm font-medium text-primary">+{activity.points}</span>
+                <h3 className="font-semibold text-foreground mb-4">About</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed mb-4">
+                  Passionate computer science student with a focus on machine learning and full-stack development. 
+                  I love building innovative solutions and collaborating with like-minded individuals on challenging projects. 
+                  Currently exploring AI applications in education and healthcare.
+                </p>
+                
+                <div className="space-y-3">
+                  <div>
+                    <h4 className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">Interests</h4>
+                    <div className="flex flex-wrap gap-2">
+                      {["AI/ML", "Web Dev", "Open Source", "Hackathons", "UI Design", "Startups"].map((interest) => (
+                        <span
+                          key={interest}
+                          className="px-2.5 py-1 text-xs bg-secondary text-secondary-foreground rounded-md"
+                        >
+                          {interest}
+                        </span>
+                      ))}
                     </div>
-                  ))}
+                  </div>
+                  
+                  <div>
+                    <h4 className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">Currently Working On</h4>
+                    <p className="text-sm text-foreground">Building an AI-powered study assistant for students 📚</p>
+                  </div>
                 </div>
               </motion.div>
             </div>
