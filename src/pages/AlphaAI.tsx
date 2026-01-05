@@ -412,16 +412,16 @@ const AlphaAI = () => {
             <div className="flex items-center gap-4">
               <div className={`flex items-center gap-3 px-4 py-2 rounded-full border transition-all duration-300 ${
                 genZMode 
-                  ? 'bg-gradient-to-r from-purple-500/20 to-pink-500/20 border-purple-500/50 shadow-lg shadow-purple-500/20' 
-                  : 'bg-muted/50 border-border hover:border-primary/30'
+                  ? 'bg-primary/10 border-white/50' 
+                  : 'bg-muted/50 border-white/20 hover:border-white/40'
               }`}>
-                <span className={`text-sm font-medium transition-colors ${genZMode ? 'text-purple-400' : 'text-muted-foreground'}`}>
-                  🔥 Gen Z Mode
+                <span className={`text-sm font-medium transition-colors ${genZMode ? 'text-white' : 'text-muted-foreground'}`}>
+                  Gen Z Mode
                 </span>
                 <Switch
                   checked={genZMode}
                   onCheckedChange={setGenZMode}
-                  className="data-[state=checked]:bg-gradient-to-r data-[state=checked]:from-purple-500 data-[state=checked]:to-pink-500"
+                  className="data-[state=checked]:bg-primary"
                 />
               </div>
               <div className="flex items-center gap-2">
