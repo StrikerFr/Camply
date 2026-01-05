@@ -77,16 +77,16 @@ export const DashboardLayout = ({ children }: DashboardLayoutProps) => {
                       <Link
                         to={item.href}
                         className={cn(
-                          "flex items-center justify-center w-9 h-9 rounded-lg transition-all duration-200",
+                          "flex items-center justify-center w-9 h-9 rounded-lg transition-all duration-300",
                           isActive
-                            ? "bg-muted text-foreground"
-                            : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                            ? "bg-muted text-primary shadow-[0_0_12px_hsl(var(--primary)/0.4)]"
+                            : "text-muted-foreground hover:text-primary hover:bg-muted/50 hover:shadow-[0_0_12px_hsl(var(--primary)/0.3)]"
                         )}
                       >
-                        <item.icon className="h-4 w-4" />
+                        <item.icon className="h-4 w-4 transition-transform duration-200 hover:scale-110" />
                       </Link>
                     </TooltipTrigger>
-                    <TooltipContent side="bottom" className="text-xs">
+                    <TooltipContent side="bottom" className="text-xs font-medium">
                       {item.label}
                     </TooltipContent>
                   </Tooltip>
