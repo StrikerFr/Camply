@@ -104,48 +104,41 @@ const Profile = () => {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="relative overflow-hidden rounded-2xl bg-card border border-border"
+          className="relative overflow-hidden rounded-2xl bg-card border border-border p-6"
         >
-          {/* Banner */}
-          <div className="h-32 lg:h-40 bg-gradient-to-r from-primary/30 via-accent/20 to-primary/10 relative">
-            <div className="absolute inset-0 bg-[url('data:image/svg+xml,...')] opacity-10" />
-          </div>
-
           {/* Profile Info */}
-          <div className="px-6 pb-6">
-            <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between -mt-16 lg:-mt-12">
-              <div className="flex flex-col lg:flex-row lg:items-end gap-4">
-                <div className="w-28 h-28 lg:w-32 lg:h-32 rounded-2xl bg-gradient-to-br from-primary to-accent flex items-center justify-center text-4xl lg:text-5xl font-bold text-primary-foreground border-4 border-background shadow-xl">
-                  {profile?.full_name?.charAt(0) || "A"}
-                </div>
-                <div className="lg:pb-2">
-                  <h1 className="text-2xl lg:text-3xl font-display font-bold text-foreground">
-                    {profile?.full_name || "Alex Johnson"}
-                  </h1>
-                  <p className="text-muted-foreground">{user?.email || "alex.johnson@university.edu"}</p>
-                  <div className="flex items-center gap-4 mt-2 text-sm text-muted-foreground">
-                    <span className="flex items-center gap-1">
-                      <GraduationCap className="h-4 w-4" />
-                      {profile?.course || "Computer Science"}
-                    </span>
-                    <span className="flex items-center gap-1">
-                      <Calendar className="h-4 w-4" />
-                      {profile?.year || "3rd Year"}
-                    </span>
-                  </div>
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+            <div className="flex flex-col lg:flex-row lg:items-center gap-4">
+              <div className="w-20 h-20 lg:w-24 lg:h-24 rounded-2xl bg-gradient-to-br from-primary to-accent flex items-center justify-center text-3xl lg:text-4xl font-bold text-primary-foreground shadow-xl">
+                {profile?.full_name?.charAt(0) || "A"}
+              </div>
+              <div>
+                <h1 className="text-2xl lg:text-3xl font-display font-bold text-foreground">
+                  {profile?.full_name || "Alex Johnson"}
+                </h1>
+                <p className="text-muted-foreground">{user?.email || "alex.johnson@university.edu"}</p>
+                <div className="flex items-center gap-4 mt-2 text-sm text-muted-foreground">
+                  <span className="flex items-center gap-1">
+                    <GraduationCap className="h-4 w-4" />
+                    {profile?.course || "Computer Science"}
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <Calendar className="h-4 w-4" />
+                    {profile?.year || "3rd Year"}
+                  </span>
                 </div>
               </div>
+            </div>
 
-              <div className="flex gap-2 mt-4 lg:mt-0">
-                <Button variant="outline" size="sm">
-                  <Share2 className="h-4 w-4 mr-2" />
-                  Share
-                </Button>
-                <Button size="sm">
-                  <Edit3 className="h-4 w-4 mr-2" />
-                  Edit Profile
-                </Button>
-              </div>
+            <div className="flex gap-2">
+              <Button variant="outline" size="sm">
+                <Share2 className="h-4 w-4 mr-2" />
+                Share
+              </Button>
+              <Button size="sm">
+                <Edit3 className="h-4 w-4 mr-2" />
+                Edit Profile
+              </Button>
             </div>
           </div>
         </motion.div>
