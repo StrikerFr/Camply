@@ -329,28 +329,7 @@ const Dashboard = () => {
             "Rank": "/leaderboard"
           };
           const Icon = stat.icon;
-          return (
-            <motion.div 
-              key={stat.label}
-              initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1 + index * 0.05 }}
-              whileHover={{ scale: 1.02, y: -2 }}
-              onClick={() => navigate(statRoutes[stat.label] || "/dashboard")}
-              className="bg-card border border-border rounded-xl p-5 cursor-pointer hover:border-border/60 hover:shadow-lg transition-all duration-300"
-            >
-              <div className="flex items-center justify-between mb-3">
-                <div className="p-2 rounded-lg bg-primary/10">
-                  <Icon className="h-4 w-4 text-primary" />
-                </div>
-                <span className="text-xs text-muted-foreground font-medium">{stat.change}</span>
-              </div>
-              <p className="text-2xl font-bold text-foreground">
-                {stat.isRank ? "#" : ""}{stat.value}
-              </p>
-              <p className="text-sm text-muted-foreground mt-1">{stat.label}</p>
-            </motion.div>
-          );
+          return;
         })}
         </div>
 
@@ -396,11 +375,7 @@ const Dashboard = () => {
               {/* Chat Input */}
               <div className="p-4 border-t border-border">
                 <div className="flex items-center gap-2">
-                  <input 
-                    type="text" 
-                    placeholder="Ask Alpha AI..."
-                    className="flex-1 bg-muted/50 border border-border rounded-lg px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/50 transition-all"
-                  />
+                  <input type="text" placeholder="Ask Alpha AI..." className="flex-1 bg-muted/50 border border-border rounded-lg px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/50 transition-all" />
                   <Button size="icon" className="h-10 w-10 bg-primary hover:bg-primary/90">
                     <Send className="h-4 w-4" />
                   </Button>
