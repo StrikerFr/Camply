@@ -97,7 +97,21 @@ const EVENTS: Event[] = [
   }
 ];
 
-const HACKATHONS = [
+interface Hackathon {
+  id: string;
+  title: string;
+  date: string;
+  prize: string;
+  participants: number;
+  status: string;
+  themes: string[];
+  description?: string;
+  venue?: string;
+  teamSize?: string;
+  timeline?: string[];
+}
+
+const HACKATHONS: Hackathon[] = [
   {
     id: "1",
     title: "HackIITP 2026",
@@ -105,7 +119,11 @@ const HACKATHONS = [
     prize: "₹5,00,000",
     participants: 500,
     status: "Registration Open",
-    themes: ["AI/ML", "Blockchain", "IoT", "FinTech"]
+    themes: ["AI/ML", "Blockchain", "IoT", "FinTech"],
+    description: "The flagship hackathon of IIT Patna. 48 hours of intense coding, mentorship from industry experts, and amazing prizes.",
+    venue: "Innovation Centre, Main Campus",
+    teamSize: "2-4 members",
+    timeline: ["Day 1: Inauguration & Problem Statements", "Day 1-2: Hacking Phase (48 hrs)", "Day 3: Presentations & Judging", "Day 3: Prize Distribution"]
   },
   {
     id: "2",
@@ -114,7 +132,11 @@ const HACKATHONS = [
     prize: "₹1,00,000",
     participants: 200,
     status: "Coming Soon",
-    themes: ["Government", "Healthcare", "Education"]
+    themes: ["Government", "Healthcare", "Education"],
+    description: "Internal selection round for Smart India Hackathon. Top teams will represent IIT Patna at the national level.",
+    venue: "Computer Science Block",
+    teamSize: "6 members (mandatory)",
+    timeline: ["Problem statement release: Jan 15", "Idea submission deadline: Jan 25", "Hackathon: Jan 30", "Results: Jan 31"]
   },
   {
     id: "3",
@@ -123,7 +145,11 @@ const HACKATHONS = [
     prize: "₹2,50,000",
     participants: 300,
     status: "Registration Open",
-    themes: ["Social Impact", "Agriculture", "Smart City"]
+    themes: ["Social Impact", "Agriculture", "Smart City"],
+    description: "Build solutions for Bihar's challenges. Focus on social impact, agriculture tech, and smart city innovations.",
+    venue: "Hybrid (Online + Campus)",
+    teamSize: "2-5 members",
+    timeline: ["Registration opens: Feb 1", "Mentorship sessions: Feb 20-28", "Hackathon: March 5-6", "Demo Day: March 7"]
   }
 ];
 
@@ -281,6 +307,7 @@ const MyCollege = () => {
   const [activeTab, setActiveTab] = useState("events");
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const [selectedCompetition, setSelectedCompetition] = useState<Competition | null>(null);
+  const [selectedHackathon, setSelectedHackathon] = useState<Hackathon | null>(null);
   return (
     <DashboardLayout>
       <div className="max-w-7xl mx-auto space-y-8">
@@ -428,13 +455,20 @@ const MyCollege = () => {
                     <Trophy className="h-4 w-4 text-primary" />
                     <span className="font-semibold text-primary">{hackathon.prize}</span>
                   </div>
-                  <div className="flex flex-wrap gap-2">
+                  <div className="flex flex-wrap gap-2 mb-4">
                     {hackathon.themes.map((theme) => (
                       <span key={theme} className="px-2 py-1 text-xs bg-muted rounded-md text-muted-foreground">
                         {theme}
                       </span>
                     ))}
                   </div>
+                  <Button 
+                    className="w-full" 
+                    variant="outline"
+                    onClick={() => setSelectedHackathon(hackathon)}
+                  >
+                    View Details
+                  </Button>
                 </motion.div>
               ))}
             </div>
@@ -718,6 +752,90 @@ const MyCollege = () => {
               <div className="flex gap-2 pt-2">
                 <Button className="flex-1">
                   Register Now
+                </Button>
+                <Button variant="outline" size="icon">
+                  <Share2 className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* Hackathon Details Dialog */}
+        <Dialog open={!!selectedHackathon} onOpenChange={() => setSelectedHackathon(null)}>
+          <DialogContent className="sm:max-w-lg">
+            <DialogHeader>
+              <div className="flex items-center gap-2 mb-2">
+                <span className={cn(
+                  "px-2.5 py-1 text-xs font-medium rounded-full",
+                  selectedHackathon?.status === "Registration Open" 
+                    ? "bg-emerald-500/10 text-emerald-500"
+                    : "bg-muted text-muted-foreground"
+                )}>
+                  {selectedHackathon?.status}
+                </span>
+                <span className="px-2.5 py-1 text-xs font-medium bg-primary/10 text-primary rounded-full flex items-center gap-1">
+                  <Trophy className="h-3 w-3" />
+                  {selectedHackathon?.prize}
+                </span>
+              </div>
+              <DialogTitle className="text-xl">{selectedHackathon?.title}</DialogTitle>
+            </DialogHeader>
+            
+            <div className="space-y-4">
+              <p className="text-muted-foreground">{selectedHackathon?.description}</p>
+              
+              <div className="grid grid-cols-2 gap-3 text-sm">
+                <div className="flex items-center gap-2 text-muted-foreground">
+                  <Calendar className="h-4 w-4 text-primary" />
+                  <span>{selectedHackathon?.date}</span>
+                </div>
+                <div className="flex items-center gap-2 text-muted-foreground">
+                  <Users className="h-4 w-4 text-primary" />
+                  <span>{selectedHackathon?.participants}+ participants</span>
+                </div>
+                {selectedHackathon?.teamSize && (
+                  <div className="flex items-center gap-2 text-muted-foreground">
+                    <Users className="h-4 w-4 text-primary" />
+                    <span>{selectedHackathon.teamSize}</span>
+                  </div>
+                )}
+                {selectedHackathon?.venue && (
+                  <div className="flex items-center gap-2 text-muted-foreground">
+                    <MapPin className="h-4 w-4 text-primary" />
+                    <span>{selectedHackathon.venue}</span>
+                  </div>
+                )}
+              </div>
+              
+              <div>
+                <h4 className="font-semibold text-foreground mb-2">Themes</h4>
+                <div className="flex flex-wrap gap-2">
+                  {selectedHackathon?.themes.map((theme) => (
+                    <span key={theme} className="px-2.5 py-1 text-xs bg-primary/10 text-primary rounded-full">
+                      {theme}
+                    </span>
+                  ))}
+                </div>
+              </div>
+              
+              {selectedHackathon?.timeline && (
+                <div>
+                  <h4 className="font-semibold text-foreground mb-2">Timeline</h4>
+                  <ul className="space-y-1.5">
+                    {selectedHackathon.timeline.map((item, idx) => (
+                      <li key={idx} className="flex items-center gap-2 text-sm text-muted-foreground">
+                        <Clock className="h-3.5 w-3.5 text-primary" />
+                        {item}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+              
+              <div className="flex gap-2 pt-2">
+                <Button className="flex-1" disabled={selectedHackathon?.status !== "Registration Open"}>
+                  {selectedHackathon?.status === "Registration Open" ? "Register Now" : "Coming Soon"}
                 </Button>
                 <Button variant="outline" size="icon">
                   <Share2 className="h-4 w-4" />
