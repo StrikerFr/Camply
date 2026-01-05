@@ -86,6 +86,24 @@ const categoryIcons: Record<string, React.ReactNode> = {
   Management: <Briefcase className="h-3 w-3" />
 };
 
+const TRENDING_NEWS = {
+  today: [
+    { icon: <Zap className="h-4 w-4 text-primary" />, title: "Hackathon 2026 registrations now open!", time: "2 hours ago" },
+    { icon: <Trophy className="h-4 w-4 text-primary" />, title: "New leaderboard rewards announced", time: "4 hours ago" },
+    { icon: <Users className="h-4 w-4 text-primary" />, title: "Team formation deadline extended", time: "6 hours ago" },
+  ],
+  week: [
+    { icon: <Star className="h-4 w-4 text-primary" />, title: "Campus Fest week kicks off Monday", time: "2 days ago" },
+    { icon: <Target className="h-4 w-4 text-primary" />, title: "New achievement badges released", time: "3 days ago" },
+    { icon: <Calendar className="h-4 w-4 text-primary" />, title: "Spring events calendar published", time: "5 days ago" },
+  ],
+  month: [
+    { icon: <Award className="h-4 w-4 text-primary" />, title: "Annual awards ceremony date set", time: "2 weeks ago" },
+    { icon: <Code className="h-4 w-4 text-primary" />, title: "Tech club launches new program", time: "3 weeks ago" },
+    { icon: <Sparkles className="h-4 w-4 text-primary" />, title: "Alpha AI now available for all users", time: "4 weeks ago" },
+  ],
+};
+
 // Animated count-up on mount
 function CountUpNumber({
   value,
@@ -192,6 +210,7 @@ const Dashboard = () => {
   const firstName = "Alex";
   const [registeredEvents, setRegisteredEvents] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [newsFilter, setNewsFilter] = useState<"today" | "week" | "month">("today");
   const [liveStats, setLiveStats] = useState({
     totalPoints: 2450,
     weeklyPoints: 198,
@@ -318,19 +337,63 @@ const Dashboard = () => {
 
         {/* Stats Grid */}
         <div className="grid grid-cols-3 gap-4 lg:gap-5">
-          {isLoading ? <>
+          {isLoading ? (
+            <>
               <StatCardSkeleton />
               <StatCardSkeleton />
               <StatCardSkeleton />
-            </> : stats.map((stat, index) => {
-          const statRoutes: Record<string, string> = {
-            "Events": "/opportunities",
-            "Teams": "/teams",
-            "Rank": "/leaderboard"
-          };
-          const Icon = stat.icon;
-          return;
-        })}
+            </>
+          ) : (
+            stats.map((stat, index) => {
+              const statRoutes: Record<string, string> = {
+                "Events": "/opportunities",
+                "Teams": "/teams",
+                "Rank": "/leaderboard"
+              };
+              const Icon = stat.icon;
+              return (
+                <motion.div
+                  key={stat.label}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.1 + index * 0.05, duration: 0.5 }}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={() => navigate(statRoutes[stat.label])}
+                  className="bg-card border border-border rounded-xl p-5 cursor-pointer hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5 transition-all duration-300"
+                >
+                  <div className="flex items-center justify-between mb-4">
+                    <div className={cn(
+                      "p-2.5 rounded-lg transition-all",
+                      stat.isChanging ? "bg-emerald-500/20" : "bg-muted"
+                    )}>
+                      <Icon className={cn(
+                        "h-5 w-5 transition-colors",
+                        stat.isChanging ? "text-emerald-400" : "text-muted-foreground"
+                      )} />
+                    </div>
+                    {stat.isChanging && (
+                      <motion.div
+                        initial={{ opacity: 0, scale: 0.8 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        className="flex items-center gap-1 text-emerald-400 text-xs font-medium"
+                      >
+                        <ArrowUp className="h-3 w-3" />
+                        +{recentChange?.amount}
+                      </motion.div>
+                    )}
+                  </div>
+                  <CountUpNumber
+                    value={stat.value}
+                    prefix={stat.isRank ? "#" : ""}
+                    className="text-2xl lg:text-3xl font-bold text-foreground block"
+                    isAnimating={stat.isChanging}
+                  />
+                  <p className="text-sm text-muted-foreground mt-1">{stat.change} {stat.label}</p>
+                </motion.div>
+              );
+            })
+          )}
         </div>
 
         <div className="grid lg:grid-cols-3 gap-6 lg:gap-8">
@@ -395,51 +458,57 @@ const Dashboard = () => {
           delay: 0.35,
           duration: 0.5
         }} className="space-y-6">
-            {/* Leaderboard Preview */}
+            {/* Trending News */}
             <div className="bg-card border border-border rounded-xl overflow-hidden">
               <div className="flex items-center justify-between px-5 py-4 border-b border-border">
                 <div className="flex items-center gap-2.5">
-                  <Trophy className="h-4 w-4 text-primary" />
-                  <span className="font-semibold text-foreground">Leaderboard</span>
+                  <TrendingUp className="h-4 w-4 text-primary" />
+                  <span className="font-semibold text-foreground">Trending News</span>
                 </div>
-                <Link to="/leaderboard">
-                  <Button variant="ghost" size="sm" className="h-7 text-xs text-muted-foreground hover:text-foreground">
-                    View All
-                  </Button>
-                </Link>
               </div>
+              
+              {/* Time Filter Tabs */}
+              <div className="flex border-b border-border">
+                {(["today", "week", "month"] as const).map((filter) => (
+                  <button
+                    key={filter}
+                    onClick={() => setNewsFilter(filter)}
+                    className={cn(
+                      "flex-1 py-2.5 text-xs font-medium transition-all",
+                      newsFilter === filter
+                        ? "text-primary border-b-2 border-primary bg-primary/5"
+                        : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                    )}
+                  >
+                    {filter === "today" ? "Today" : filter === "week" ? "This Week" : "This Month"}
+                  </button>
+                ))}
+              </div>
+              
+              {/* News Items */}
               <div className="divide-y divide-border/60">
-                {leaderboard.slice(0, 5).map((user, index) => <motion.div key={index} initial={{
-                opacity: 0,
-                x: -10
-              }} animate={{
-                opacity: 1,
-                x: 0
-              }} transition={{
-                delay: 0.4 + index * 0.05
-              }} className={cn("flex items-center gap-3 px-5 py-3.5 transition-all duration-200", user.isUser && "bg-primary/5 border-l-2 border-l-primary")}>
-                    {/* Rank Badge */}
-                    <div className={cn("w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold transition-all", user.rank === 1 && "bg-gradient-to-br from-amber-400 to-amber-600 text-black shadow-md shadow-amber-500/30", user.rank === 2 && "bg-gradient-to-br from-zinc-300 to-zinc-500 text-black shadow-md shadow-zinc-400/30", user.rank === 3 && "bg-gradient-to-br from-amber-600 to-amber-800 text-white shadow-md shadow-amber-700/30", user.rank > 3 && "bg-muted text-muted-foreground")}>
-                      {user.rank}
-                    </div>
-                    
-                    {/* Avatar */}
-                    <div className={cn("w-9 h-9 rounded-full flex items-center justify-center text-sm font-semibold transition-all", user.isUser ? "bg-primary text-primary-foreground ring-2 ring-primary/30" : "bg-muted text-muted-foreground")}>
-                      {user.avatar}
-                    </div>
-                    
-                    {/* Name */}
-                    <div className="flex-1 min-w-0">
-                      <p className={cn("text-sm font-medium truncate", user.isUser ? "text-primary" : "text-foreground")}>
-                        {user.name}
-                      </p>
-                    </div>
-                    
-                    {/* Points */}
-                    <span className={cn("text-sm font-semibold tabular-nums", user.isUser ? "text-primary" : "text-muted-foreground")}>
-                      {user.points.toLocaleString()}
-                    </span>
-                  </motion.div>)}
+                <AnimatePresence mode="wait">
+                  {TRENDING_NEWS[newsFilter].map((news, index) => (
+                    <motion.div
+                      key={`${newsFilter}-${index}`}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      transition={{ delay: index * 0.05 }}
+                      className="px-5 py-3.5 hover:bg-muted/30 transition-colors cursor-pointer"
+                    >
+                      <div className="flex items-start gap-3">
+                        <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+                          {news.icon}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium text-foreground line-clamp-1">{news.title}</p>
+                          <p className="text-xs text-muted-foreground mt-0.5">{news.time}</p>
+                        </div>
+                      </div>
+                    </motion.div>
+                  ))}
+                </AnimatePresence>
               </div>
             </div>
 
