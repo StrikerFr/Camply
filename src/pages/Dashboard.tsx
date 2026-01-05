@@ -3,6 +3,7 @@ import { useState, useEffect, useRef } from "react";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
 import { Trophy, Calendar, Users, TrendingUp, ArrowRight, Clock, MapPin, Zap, Target, ArrowUp, Check, ChevronRight, Star, Award, Code, Palette, Briefcase, Sparkles, MessageSquare, Bot, Send, ChevronLeft } from "lucide-react";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
+import Autoplay from "embla-carousel-autoplay";
 import { Button } from "@/components/ui/button";
 import { Link, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
@@ -443,6 +444,13 @@ const Dashboard = () => {
               containScroll: "trimSnaps",
               duration: 25,
             }}
+            plugins={[
+              Autoplay({
+                delay: 3000,
+                stopOnInteraction: false,
+                stopOnMouseEnter: true,
+              }),
+            ]}
             className="w-full cursor-grab active:cursor-grabbing select-none"
           >
             <CarouselContent className="-ml-3">
@@ -452,8 +460,8 @@ const Dashboard = () => {
                     initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ delay: 0.1 + index * 0.05 }}
-                    whileHover={{ y: -4 }}
-                    className="group bg-card border border-border rounded-xl p-5 cursor-pointer hover:shadow-xl hover:shadow-primary/10 hover:border-primary/30 transition-all duration-300 h-full select-none"
+                    whileHover={{ y: -6, scale: 1.02 }}
+                    className="group bg-card border border-border rounded-xl p-5 cursor-pointer hover:shadow-2xl hover:shadow-primary/20 hover:border-primary/50 transition-all duration-300 h-full select-none relative overflow-hidden before:absolute before:inset-0 before:rounded-xl before:opacity-0 before:transition-opacity before:duration-300 hover:before:opacity-100 before:bg-gradient-to-br before:from-primary/5 before:to-transparent before:pointer-events-none"
                     onClick={() => navigate("/opportunities")}
                   >
                     {/* Category Badge & Featured */}
