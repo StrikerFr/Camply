@@ -56,38 +56,78 @@ serve(async (req) => {
 
     console.log('Sending request to OpenRouter with messages:', JSON.stringify(apiMessages.slice(-3)));
 
-    const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${openRouterApiKey}`,
-        'Content-Type': 'application/json',
-        'HTTP-Referer': 'https://camply.lovable.app',
-        'X-Title': 'Camply Alpha AI',
-      },
-      body: JSON.stringify({
-        model: 'google/gemini-2.0-flash-exp:free',
-        messages: apiMessages,
-      }),
-    });
+    // Try with multiple models in case of rate limiting
+    const models = [
+      'google/gemini-2.0-flash-exp:free',
+      'google/gemini-flash-1.5-8b', // Fallback model
+      'meta-llama/llama-3.2-3b-instruct:free', // Another free fallback
+    ];
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error('OpenRouter API error:', response.status, errorText);
-      throw new Error(`OpenRouter API error: ${response.status}`);
+    let lastError = null;
+    
+    for (const model of models) {
+      try {
+        console.log(`Trying model: ${model}`);
+        
+        const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${openRouterApiKey}`,
+            'Content-Type': 'application/json',
+            'HTTP-Referer': 'https://camply.lovable.app',
+            'X-Title': 'Camply Alpha AI',
+          },
+          body: JSON.stringify({
+            model: model,
+            messages: apiMessages,
+          }),
+        });
+
+        if (response.status === 429) {
+          const errorText = await response.text();
+          console.warn(`Rate limited on ${model}:`, errorText);
+          lastError = `Rate limited on ${model}`;
+          continue; // Try next model
+        }
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error(`API error on ${model}:`, response.status, errorText);
+          lastError = `API error: ${response.status}`;
+          continue; // Try next model
+        }
+
+        const data = await response.json();
+        console.log('OpenRouter response:', JSON.stringify(data));
+        
+        const generatedText = data.choices?.[0]?.message?.content || 'Sorry, I could not generate a response.';
+
+        return new Response(JSON.stringify({ response: generatedText }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      } catch (modelError) {
+        console.error(`Error with model ${model}:`, modelError);
+        lastError = modelError;
+        continue;
+      }
     }
 
-    const data = await response.json();
-    console.log('OpenRouter response:', JSON.stringify(data));
-    
-    const generatedText = data.choices?.[0]?.message?.content || 'Sorry, I could not generate a response.';
-
-    return new Response(JSON.stringify({ response: generatedText }), {
+    // All models failed
+    return new Response(JSON.stringify({ 
+      error: 'AI is temporarily busy. Please try again in a few seconds.',
+      response: genZMode 
+        ? "Ayo sorry fam! 😅 AI servers are lowkey overwhelmed rn. Try again in a sec, no cap! 🔥"
+        : "I apologize, but I'm experiencing high traffic right now. Please try again in a moment."
+    }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   } catch (error) {
     console.error('Error in alpha-ai-chat function:', error);
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    return new Response(JSON.stringify({ error: errorMessage }), {
+    return new Response(JSON.stringify({ 
+      error: errorMessage,
+      response: "Sorry, something went wrong. Please try again."
+    }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });

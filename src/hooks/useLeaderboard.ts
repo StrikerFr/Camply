@@ -1,5 +1,4 @@
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 
 export interface LeaderboardEntry {
@@ -11,45 +10,24 @@ export interface LeaderboardEntry {
   rank: number;
 }
 
+// Mock data until database tables are created
+const MOCK_LEADERBOARD: LeaderboardEntry[] = [
+  { user_id: "1", full_name: "Arjun Sharma", avatar_url: null, college_id: "UNIV001", total_points: 4520, rank: 1 },
+  { user_id: "2", full_name: "Priya Patel", avatar_url: null, college_id: "UNIV001", total_points: 3890, rank: 2 },
+  { user_id: "3", full_name: "Rahul Kumar", avatar_url: null, college_id: "UNIV002", total_points: 3450, rank: 3 },
+  { user_id: "4", full_name: "Maya Singh", avatar_url: null, college_id: "UNIV001", total_points: 3120, rank: 4 },
+  { user_id: "5", full_name: "Vikram Reddy", avatar_url: null, college_id: "UNIV003", total_points: 2890, rank: 5 },
+  { user_id: "6", full_name: "Ananya Gupta", avatar_url: null, college_id: "UNIV002", total_points: 2650, rank: 6 },
+  { user_id: "7", full_name: "Karthik Iyer", avatar_url: null, college_id: "UNIV001", total_points: 2400, rank: 7 },
+  { user_id: "8", full_name: "Sneha Nair", avatar_url: null, college_id: "UNIV003", total_points: 2150, rank: 8 },
+];
+
 export function useLeaderboard(limit: number = 20) {
   return useQuery({
     queryKey: ["leaderboard", limit],
     queryFn: async () => {
-      // Get all profiles (include those who registered, not just onboarded)
-      const { data: profiles, error: profilesError } = await supabase
-        .from("profiles")
-        .select("user_id, full_name, avatar_url, college_id");
-
-      if (profilesError) throw profilesError;
-
-      // Get all points
-      const { data: points, error: pointsError } = await supabase
-        .from("user_points")
-        .select("user_id, points");
-
-      if (pointsError) throw pointsError;
-
-      // Calculate total points per user and rank
-      const userPoints = new Map<string, number>();
-      points?.forEach((p) => {
-        userPoints.set(p.user_id, (userPoints.get(p.user_id) || 0) + p.points);
-      });
-
-      const leaderboard: LeaderboardEntry[] = profiles
-        ?.map((profile) => ({
-          user_id: profile.user_id,
-          full_name: profile.full_name,
-          avatar_url: profile.avatar_url,
-          college_id: profile.college_id,
-          total_points: userPoints.get(profile.user_id) || 0,
-          rank: 0,
-        }))
-        .filter((entry) => entry.total_points > 0) // Only show users with points
-        .sort((a, b) => b.total_points - a.total_points)
-        .map((entry, index) => ({ ...entry, rank: index + 1 }))
-        .slice(0, limit) || [];
-
-      return leaderboard;
+      // Return mock data until database is set up
+      return MOCK_LEADERBOARD.slice(0, limit);
     },
   });
 }
@@ -62,56 +40,14 @@ export function useUserRank() {
     queryFn: async () => {
       if (!user) return null;
 
-      // Get all profiles
-      const { data: profiles, error: profilesError } = await supabase
-        .from("profiles")
-        .select("user_id, full_name, avatar_url, college_id");
-
-      if (profilesError) throw profilesError;
-
-      // Get all points
-      const { data: points, error: pointsError } = await supabase
-        .from("user_points")
-        .select("user_id, points");
-
-      if (pointsError) throw pointsError;
-
-      // Calculate total points per user
-      const userPoints = new Map<string, number>();
-      points?.forEach((p) => {
-        userPoints.set(p.user_id, (userPoints.get(p.user_id) || 0) + p.points);
-      });
-
-      // Rank all users with points
-      const ranked = profiles
-        ?.map((profile) => ({
-          user_id: profile.user_id,
-          full_name: profile.full_name,
-          avatar_url: profile.avatar_url,
-          college_id: profile.college_id,
-          total_points: userPoints.get(profile.user_id) || 0,
-          rank: 0,
-        }))
-        .filter((entry) => entry.total_points > 0)
-        .sort((a, b) => b.total_points - a.total_points)
-        .map((entry, index) => ({ ...entry, rank: index + 1 })) || [];
-
-      // Find current user or return their default state
-      const userEntry = ranked.find((e) => e.user_id === user.id);
-      
-      if (userEntry) {
-        return userEntry;
-      }
-
-      // User has no points yet, return unranked state
-      const userProfile = profiles?.find((p) => p.user_id === user.id);
+      // Return mock user rank
       return {
         user_id: user.id,
-        full_name: userProfile?.full_name || null,
-        avatar_url: userProfile?.avatar_url || null,
-        college_id: userProfile?.college_id || null,
-        total_points: 0,
-        rank: 0,
+        full_name: "You",
+        avatar_url: null,
+        college_id: "UNIV001",
+        total_points: 2450,
+        rank: 5,
       };
     },
     enabled: !!user,
@@ -126,63 +62,13 @@ export function useUserStats() {
     queryFn: async () => {
       if (!user) return null;
 
-      // Get total points
-      const { data: pointsData, error: pointsError } = await supabase
-        .from("user_points")
-        .select("points, created_at")
-        .eq("user_id", user.id);
-
-      if (pointsError) throw pointsError;
-
-      const totalPoints = pointsData?.reduce((sum, p) => sum + p.points, 0) || 0;
-
-      // Get registered events count
-      const { count: eventsCount, error: eventsError } = await supabase
-        .from("user_opportunities")
-        .select("*", { count: "exact", head: true })
-        .eq("user_id", user.id);
-
-      if (eventsError) throw eventsError;
-
-      // Get all profiles for rank calculation
-      const { data: profiles } = await supabase
-        .from("profiles")
-        .select("user_id");
-
-      const { data: allPoints } = await supabase
-        .from("user_points")
-        .select("user_id, points");
-
-      // Calculate rank - only rank users with points
-      const userPointsMap = new Map<string, number>();
-      allPoints?.forEach((p) => {
-        userPointsMap.set(p.user_id, (userPointsMap.get(p.user_id) || 0) + p.points);
-      });
-
-      const sortedUsers = profiles
-        ?.map((p) => ({
-          user_id: p.user_id,
-          points: userPointsMap.get(p.user_id) || 0,
-        }))
-        .filter((u) => u.points > 0)
-        .sort((a, b) => b.points - a.points) || [];
-
-      const rank = sortedUsers.findIndex((u) => u.user_id === user.id) + 1 || null;
-
-      // Get points earned this week
-      const weekAgo = new Date();
-      weekAgo.setDate(weekAgo.getDate() - 7);
-
-      const weeklyPoints = pointsData
-        ?.filter((p) => new Date(p.created_at) >= weekAgo)
-        .reduce((sum, p) => sum + p.points, 0) || 0;
-
+      // Return mock stats until database is set up
       return {
-        totalPoints,
-        eventsCount: eventsCount || 0,
-        teamsCount: 0, // Teams table doesn't exist yet
-        rank: totalPoints > 0 ? rank : null, // Only show rank if user has points
-        weeklyPoints,
+        totalPoints: 2450,
+        eventsCount: 12,
+        teamsCount: 3,
+        rank: 5,
+        weeklyPoints: 198,
       };
     },
     enabled: !!user,

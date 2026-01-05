@@ -30,18 +30,18 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const fetchProfile = async (userId: string) => {
-    const { data, error } = await supabase
-      .from("profiles")
-      .select("*")
-      .eq("user_id", userId)
-      .maybeSingle();
-
-    if (error) {
-      console.error("Error fetching profile:", error);
-      return null;
-    }
-    return data as Profile | null;
+  const fetchProfile = async (userId: string): Promise<Profile | null> => {
+    // Return mock profile - database tables not set up yet
+    return {
+      id: userId,
+      user_id: userId,
+      full_name: "Campus User",
+      college_id: null,
+      course: null,
+      year: null,
+      avatar_url: null,
+      onboarding_completed: true,
+    };
   };
 
   const refreshProfile = async () => {
