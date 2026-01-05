@@ -614,18 +614,6 @@ const Dashboard = () => {
               Here's what's happening with your campus journey
             </p>
           </div>
-          <Link to="/opportunities">
-            <motion.div whileHover={{
-            scale: 1.02
-          }} whileTap={{
-            scale: 0.98
-          }}>
-              <Button className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 transition-all duration-300">
-                Browse Opportunities
-                <ChevronRight className="h-4 w-4 ml-1" />
-              </Button>
-            </motion.div>
-          </Link>
         </motion.div>
 
         {/* Stats Cards */}
