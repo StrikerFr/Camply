@@ -171,7 +171,7 @@ const FAKE_CONVERSATIONS = [
 ];
 
 const Teams = () => {
-  const [activeTab, setActiveTab] = useState<"messages" | "find">("messages");
+  const [activeTab, setActiveTab] = useState<"messages" | "teams" | "find">("messages");
   const [searchQuery, setSearchQuery] = useState("");
   const [connectedUsers, setConnectedUsers] = useState<string[]>([]);
   const [selectedPerson, setSelectedPerson] = useState<typeof FAKE_TEAMMATES[0] | null>(null);
@@ -295,6 +295,17 @@ const Teams = () => {
             )}
           >
             Messages
+          </button>
+          <button
+            onClick={() => setActiveTab("teams")}
+            className={cn(
+              "px-4 py-3 text-sm font-medium border-b-2 transition-colors",
+              activeTab === "teams"
+                ? "border-primary text-primary"
+                : "border-transparent text-muted-foreground hover:text-foreground"
+            )}
+          >
+            Teams
           </button>
           <button
             onClick={() => setActiveTab("find")}
@@ -562,6 +573,134 @@ const Teams = () => {
                   </motion.div>
                 )}
               </div>
+            </div>
+          </motion.div>
+        ) : activeTab === "teams" ? (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="space-y-4"
+          >
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {teamsLoading ? (
+                <div className="col-span-full flex items-center justify-center py-12">
+                  <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                </div>
+              ) : myTeams && myTeams.length > 0 ? (
+                <>
+                  {myTeams.map((team, index) => (
+                    <motion.div
+                      key={team.id}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.1 + index * 0.05 }}
+                      whileHover={{ y: -4, scale: 1.01 }}
+                      className="group relative overflow-hidden bg-card border border-border rounded-2xl p-5 hover:border-primary/30 hover:shadow-xl transition-all duration-300"
+                    >
+                      <div className="pointer-events-none absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-gradient-to-br from-primary/5 via-transparent to-transparent" />
+                      
+                      <div className="relative">
+                        <div className="flex items-start justify-between mb-4">
+                          <div>
+                            <h3 className="text-lg font-semibold text-foreground flex items-center gap-2">
+                              {team.name}
+                              {team.leader_id === profile?.user_id && (
+                                <Crown className="h-4 w-4 text-yellow-500" />
+                              )}
+                            </h3>
+                            <p className="text-sm text-muted-foreground">{team.opportunity?.title || "No event"}</p>
+                          </div>
+                          <Badge variant="default" className="bg-primary/10 text-primary border-0">
+                            <Trophy className="h-3 w-3 mr-1" />
+                            Active
+                          </Badge>
+                        </div>
+
+                        {/* Team Members */}
+                        <div className="flex items-center gap-3 mb-4">
+                          <div className="flex -space-x-2">
+                            {team.members.slice(0, 4).map((member) => (
+                              <div
+                                key={member.id}
+                                className="w-9 h-9 rounded-full bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center text-xs font-bold text-primary-foreground border-2 border-background shadow-md"
+                                title={member.profile?.full_name || "Member"}
+                              >
+                                {member.profile?.full_name?.charAt(0) || "?"}
+                              </div>
+                            ))}
+                            {team.members.length > 4 && (
+                              <div className="w-9 h-9 rounded-full bg-muted flex items-center justify-center text-xs font-medium text-muted-foreground border-2 border-background">
+                                +{team.members.length - 4}
+                              </div>
+                            )}
+                          </div>
+                          <span className="text-sm text-muted-foreground">
+                            {team.members.length} member{team.members.length !== 1 ? 's' : ''}
+                          </span>
+                        </div>
+
+                        <div className="flex gap-2">
+                          <Button 
+                            variant="outline" 
+                            size="sm" 
+                            className="flex-1 transition-all duration-200 hover:bg-primary/10 hover:border-primary/50 hover:scale-[1.02] active:scale-95"
+                            onClick={() => {
+                              setActiveTab("messages");
+                              toast.success(`Opening ${team.name} chat`);
+                            }}
+                          >
+                            <MessageCircle className="h-4 w-4 mr-2" />
+                            Chat
+                          </Button>
+                          <Button 
+                            variant="outline" 
+                            size="sm" 
+                            className="flex-1 transition-all duration-200 hover:bg-primary/10 hover:border-primary/50 hover:scale-[1.02] active:scale-95"
+                            onClick={() => toast.success("Invite link copied!")}
+                          >
+                            <UserPlus className="h-4 w-4 mr-2" />
+                            Invite
+                          </Button>
+                        </div>
+                      </div>
+                    </motion.div>
+                  ))}
+                  
+                  {/* Create Team Card */}
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.2 }}
+                    onClick={handleCreateTeam}
+                    className="border-2 border-dashed border-border rounded-2xl p-8 flex flex-col items-center justify-center text-center hover:border-primary/30 hover:bg-primary/5 transition-all duration-300 cursor-pointer group"
+                  >
+                    <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
+                      <Plus className="h-7 w-7 text-primary" />
+                    </div>
+                    <h3 className="font-semibold text-foreground mb-1">Create a New Team</h3>
+                    <p className="text-sm text-muted-foreground">Start a team for an upcoming event</p>
+                  </motion.div>
+                </>
+              ) : (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="col-span-full text-center py-16"
+                >
+                  <div className="w-20 h-20 mx-auto rounded-2xl bg-muted/50 flex items-center justify-center mb-5">
+                    <Users className="h-10 w-10 text-muted-foreground/50" />
+                  </div>
+                  <h3 className="text-xl font-semibold text-foreground mb-2">No teams yet</h3>
+                  <p className="text-muted-foreground mb-6 max-w-sm mx-auto">Create your first team to collaborate with others on competitions and projects</p>
+                  <Button 
+                    onClick={handleCreateTeam}
+                    className="transition-all duration-200 hover:scale-105 hover:shadow-lg hover:shadow-primary/20"
+                  >
+                    <Plus className="h-4 w-4 mr-2" />
+                    Create Team
+                  </Button>
+                </motion.div>
+              )}
             </div>
           </motion.div>
         ) : (
