@@ -158,7 +158,21 @@ const NEWS = [
   }
 ];
 
-const COMPETITIONS = [
+interface Competition {
+  id: string;
+  title: string;
+  date: string;
+  prize: string;
+  category: string;
+  registrations: number;
+  description: string;
+  rules?: string[];
+  eligibility?: string;
+  teamSize?: string;
+  venue?: string;
+}
+
+const COMPETITIONS: Competition[] = [
   {
     id: "1",
     title: "RoboWars Championship",
@@ -166,7 +180,11 @@ const COMPETITIONS = [
     prize: "₹50,000",
     category: "Robotics",
     registrations: 45,
-    description: "Build and battle combat robots in an arena showdown. Teams compete in weight categories with custom-designed bots."
+    description: "Build and battle combat robots in an arena showdown. Teams compete in weight categories with custom-designed bots.",
+    rules: ["Max weight: 15kg", "No flame or liquid weapons", "Remote controlled only", "3-minute rounds"],
+    eligibility: "All undergraduate students",
+    teamSize: "2-4 members",
+    venue: "Central Robotics Arena"
   },
   {
     id: "2",
@@ -175,7 +193,11 @@ const COMPETITIONS = [
     prize: "₹30,000",
     category: "Management",
     registrations: 120,
-    description: "Analyze real-world business challenges and present innovative solutions to industry judges and mentors."
+    description: "Analyze real-world business challenges and present innovative solutions to industry judges and mentors.",
+    rules: ["20-minute presentation", "10-minute Q&A", "PPT mandatory", "No pre-prepared cases"],
+    eligibility: "All students (UG & PG)",
+    teamSize: "3-5 members",
+    venue: "Lecture Hall Complex"
   },
   {
     id: "3",
@@ -184,7 +206,11 @@ const COMPETITIONS = [
     prize: "₹25,000",
     category: "Cybersecurity",
     registrations: 80,
-    description: "Test your hacking skills in this cybersecurity challenge. Solve puzzles, exploit vulnerabilities, and capture flags."
+    description: "Test your hacking skills in this cybersecurity challenge. Solve puzzles, exploit vulnerabilities, and capture flags.",
+    rules: ["No external help", "Internet allowed", "Original solutions only", "24-hour duration"],
+    eligibility: "All students with basic programming knowledge",
+    teamSize: "1-3 members",
+    venue: "Online + Computer Centre"
   }
 ];
 
@@ -254,6 +280,7 @@ const CLUBS = [
 const MyCollege = () => {
   const [activeTab, setActiveTab] = useState("events");
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
+  const [selectedCompetition, setSelectedCompetition] = useState<Competition | null>(null);
   return (
     <DashboardLayout>
       <div className="max-w-7xl mx-auto space-y-8">
@@ -477,6 +504,13 @@ const MyCollege = () => {
                     </div>
                     <span className="text-sm text-muted-foreground">{comp.registrations} registered</span>
                   </div>
+                  <Button 
+                    className="w-full mt-4" 
+                    variant="outline"
+                    onClick={() => setSelectedCompetition(comp)}
+                  >
+                    View Details
+                  </Button>
                 </motion.div>
               ))}
             </div>
@@ -609,6 +643,81 @@ const MyCollege = () => {
                 <Button className="flex-1">
                   <Bell className="h-4 w-4 mr-2" />
                   Set Reminder
+                </Button>
+                <Button variant="outline" size="icon">
+                  <Share2 className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* Competition Details Dialog */}
+        <Dialog open={!!selectedCompetition} onOpenChange={() => setSelectedCompetition(null)}>
+          <DialogContent className="sm:max-w-lg">
+            <DialogHeader>
+              <div className="flex items-center gap-2 mb-2">
+                <span className="px-2.5 py-1 text-xs font-medium bg-muted text-muted-foreground rounded-full">
+                  {selectedCompetition?.category}
+                </span>
+                <span className="px-2.5 py-1 text-xs font-medium bg-primary/10 text-primary rounded-full flex items-center gap-1">
+                  <Trophy className="h-3 w-3" />
+                  {selectedCompetition?.prize}
+                </span>
+              </div>
+              <DialogTitle className="text-xl">{selectedCompetition?.title}</DialogTitle>
+            </DialogHeader>
+            
+            <div className="space-y-4">
+              <p className="text-muted-foreground">{selectedCompetition?.description}</p>
+              
+              <div className="grid grid-cols-2 gap-3 text-sm">
+                <div className="flex items-center gap-2 text-muted-foreground">
+                  <Calendar className="h-4 w-4 text-primary" />
+                  <span>{selectedCompetition?.date}</span>
+                </div>
+                <div className="flex items-center gap-2 text-muted-foreground">
+                  <Users className="h-4 w-4 text-primary" />
+                  <span>{selectedCompetition?.registrations} registered</span>
+                </div>
+                {selectedCompetition?.teamSize && (
+                  <div className="flex items-center gap-2 text-muted-foreground">
+                    <Users className="h-4 w-4 text-primary" />
+                    <span>{selectedCompetition.teamSize}</span>
+                  </div>
+                )}
+                {selectedCompetition?.venue && (
+                  <div className="flex items-center gap-2 text-muted-foreground">
+                    <MapPin className="h-4 w-4 text-primary" />
+                    <span>{selectedCompetition.venue}</span>
+                  </div>
+                )}
+              </div>
+              
+              {selectedCompetition?.eligibility && (
+                <div className="p-3 bg-muted/50 rounded-lg">
+                  <span className="text-xs text-muted-foreground">Eligibility: </span>
+                  <span className="text-sm text-foreground">{selectedCompetition.eligibility}</span>
+                </div>
+              )}
+              
+              {selectedCompetition?.rules && (
+                <div>
+                  <h4 className="font-semibold text-foreground mb-2">Rules</h4>
+                  <ul className="space-y-1.5">
+                    {selectedCompetition.rules.map((rule, idx) => (
+                      <li key={idx} className="flex items-center gap-2 text-sm text-muted-foreground">
+                        <span className="w-1.5 h-1.5 bg-primary rounded-full" />
+                        {rule}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+              
+              <div className="flex gap-2 pt-2">
+                <Button className="flex-1">
+                  Register Now
                 </Button>
                 <Button variant="outline" size="icon">
                   <Share2 className="h-4 w-4" />
