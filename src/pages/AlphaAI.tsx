@@ -34,6 +34,7 @@ const AlphaAI = () => {
   const [sessions, setSessions] = useState<ChatSession[]>([]);
   const [activeSessionId, setActiveSessionId] = useState<string | null>(null);
   const [isAiLoading, setIsAiLoading] = useState(false);
+  const [isEnhancing, setIsEnhancing] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const recognitionRef = useRef<any>(null);
   const chatContainerRef = useRef<HTMLDivElement>(null);
@@ -279,7 +280,7 @@ const AlphaAI = () => {
       toast.error("Please enter a prompt to enhance");
       return;
     }
-    setIsAiLoading(true);
+    setIsEnhancing(true);
     try {
       const { data, error } = await supabase.functions.invoke('alpha-ai-chat', {
         body: {
@@ -295,7 +296,7 @@ const AlphaAI = () => {
       console.error('Error enhancing prompt:', error);
       toast.error("Failed to enhance prompt");
     } finally {
-      setIsAiLoading(false);
+      setIsEnhancing(false);
     }
   };
 
@@ -696,13 +697,15 @@ const AlphaAI = () => {
               <motion.div 
                 whileHover={{ scale: 1.1, rotate: 10 }} 
                 whileTap={{ scale: 0.9 }}
+                animate={isEnhancing ? { rotate: [0, 360] } : {}}
+                transition={isEnhancing ? { duration: 1, repeat: Infinity, ease: "linear" } : {}}
               >
                 <Button
                   variant="ghost"
                   size="icon"
                   onClick={handleEnhancePrompt}
-                  disabled={isAiLoading || !chatInput.trim()}
-                  className="shrink-0 h-11 w-11 hover:bg-amber-500/10 rounded-xl text-amber-400 hover:text-amber-300 transition-all duration-300"
+                  disabled={isAiLoading || isEnhancing || !chatInput.trim()}
+                  className={`shrink-0 h-11 w-11 hover:bg-amber-500/10 rounded-xl transition-all duration-300 ${isEnhancing ? 'text-amber-300 animate-pulse' : 'text-amber-400 hover:text-amber-300'}`}
                 >
                   <Sparkles className="h-5 w-5" />
                 </Button>
