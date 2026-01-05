@@ -313,186 +313,253 @@ const Teams = () => {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-card border border-border rounded-xl overflow-hidden"
-            style={{ height: "calc(100vh - 280px)", minHeight: "500px" }}
+            className="relative overflow-hidden rounded-2xl border border-border/50 bg-gradient-to-b from-card to-card/80 shadow-2xl shadow-black/10"
+            style={{ height: "calc(100vh - 280px)", minHeight: "520px" }}
           >
-            <div className="flex h-full">
+            {/* Subtle gradient overlay */}
+            <div className="absolute inset-0 bg-gradient-to-br from-primary/[0.02] via-transparent to-transparent pointer-events-none" />
+            
+            <div className="relative flex h-full">
               {/* Conversations List */}
               <div className={cn(
-                "w-full md:w-80 border-r border-border flex flex-col",
+                "w-full md:w-[320px] border-r border-border/50 flex flex-col bg-background/50 backdrop-blur-sm",
                 selectedConversation && "hidden md:flex"
               )}>
-                {/* Search */}
-                <div className="p-3 border-b border-border">
-                  <div className="relative">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                {/* Search Header */}
+                <div className="p-4 border-b border-border/50">
+                  <div className="relative group">
+                    <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground transition-colors group-focus-within:text-primary" />
                     <Input
                       placeholder="Search messages..."
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      className="pl-10 bg-muted/50 border-0 h-9"
+                      className="pl-10 h-10 bg-muted/30 border border-border/50 rounded-xl focus:border-primary/50 focus:bg-muted/50 transition-all duration-300"
                     />
                   </div>
                 </div>
 
                 {/* Conversation List */}
                 <ScrollArea className="flex-1">
-                  {filteredConversations.length > 0 ? (
-                    filteredConversations.map((conv) => (
-                      <button
-                        key={conv.id}
-                        onClick={() => setSelectedConversation(conv)}
-                        className={cn(
-                          "w-full flex items-start gap-3 p-3 hover:bg-muted/50 transition-colors text-left",
-                          selectedConversation?.id === conv.id && "bg-muted"
-                        )}
+                  <div className="p-2">
+                    {filteredConversations.length > 0 ? (
+                      <AnimatePresence>
+                        {filteredConversations.map((conv, index) => (
+                          <motion.button
+                            key={conv.id}
+                            initial={{ opacity: 0, x: -20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ delay: index * 0.05 }}
+                            onClick={() => setSelectedConversation(conv)}
+                            className={cn(
+                              "w-full flex items-center gap-3 p-3 rounded-xl transition-all duration-300 text-left group mb-1",
+                              selectedConversation?.id === conv.id 
+                                ? "bg-primary/10 border border-primary/20 shadow-sm" 
+                                : "hover:bg-muted/70 border border-transparent"
+                            )}
+                          >
+                            <div className="relative">
+                              <div className={cn(
+                                "w-12 h-12 rounded-full flex items-center justify-center text-base font-bold text-primary-foreground transition-transform duration-300 group-hover:scale-105",
+                                "bg-gradient-to-br from-primary via-primary to-primary/80 shadow-lg shadow-primary/20"
+                              )}>
+                                {conv.name.charAt(0)}
+                              </div>
+                              {conv.online && (
+                                <motion.div 
+                                  initial={{ scale: 0 }}
+                                  animate={{ scale: 1 }}
+                                  className="absolute -bottom-0.5 -right-0.5 w-4 h-4 bg-emerald-500 rounded-full border-[3px] border-card shadow-lg"
+                                />
+                              )}
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center justify-between gap-2">
+                                <span className="font-semibold text-sm text-foreground truncate">{conv.name}</span>
+                                <span className="text-[11px] text-muted-foreground whitespace-nowrap">{conv.time}</span>
+                              </div>
+                              <p className="text-[13px] text-muted-foreground truncate mt-0.5">{conv.lastMessage}</p>
+                            </div>
+                            {conv.unread > 0 && (
+                              <motion.div 
+                                initial={{ scale: 0 }}
+                                animate={{ scale: 1 }}
+                                className="w-5 h-5 rounded-full bg-primary flex items-center justify-center text-[10px] font-bold text-primary-foreground shadow-lg shadow-primary/30"
+                              >
+                                {conv.unread}
+                              </motion.div>
+                            )}
+                          </motion.button>
+                        ))}
+                      </AnimatePresence>
+                    ) : (
+                      <motion.div 
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        className="flex flex-col items-center justify-center py-16 px-4 text-center"
                       >
-                        <div className="relative">
-                          <div className="w-11 h-11 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center text-sm font-bold text-primary-foreground">
-                            {conv.name.charAt(0)}
-                          </div>
-                          {conv.online && (
-                            <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-card" />
-                          )}
+                        <div className="w-16 h-16 rounded-2xl bg-muted/50 flex items-center justify-center mb-4">
+                          <MessageCircle className="h-8 w-8 text-muted-foreground/50" />
                         </div>
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center justify-between gap-2">
-                            <span className="font-medium text-sm text-foreground truncate">{conv.name}</span>
-                            <span className="text-xs text-muted-foreground whitespace-nowrap">{conv.time}</span>
-                          </div>
-                          <p className="text-sm text-muted-foreground truncate mt-0.5">{conv.lastMessage}</p>
-                        </div>
-                        {conv.unread > 0 && (
-                          <div className="w-5 h-5 rounded-full bg-primary flex items-center justify-center text-xs font-bold text-primary-foreground">
-                            {conv.unread}
-                          </div>
-                        )}
-                      </button>
-                    ))
-                  ) : (
-                    <div className="flex flex-col items-center justify-center py-12 px-4 text-center">
-                      <MessageCircle className="h-12 w-12 text-muted-foreground/50 mb-3" />
-                      <p className="text-sm text-muted-foreground">No conversations yet</p>
-                      <p className="text-xs text-muted-foreground mt-1">Connect with people to start chatting</p>
-                    </div>
-                  )}
+                        <p className="text-sm font-medium text-foreground">No conversations yet</p>
+                        <p className="text-xs text-muted-foreground mt-1">Connect with people to start chatting</p>
+                      </motion.div>
+                    )}
+                  </div>
                 </ScrollArea>
               </div>
 
               {/* Chat Area */}
               <div className={cn(
-                "flex-1 flex flex-col",
+                "flex-1 flex flex-col bg-gradient-to-b from-background/80 to-background",
                 !selectedConversation && "hidden md:flex"
               )}>
                 {selectedConversation ? (
                   <>
                     {/* Chat Header */}
-                    <div className="flex items-center justify-between px-4 py-3 border-b border-border">
-                      <div className="flex items-center gap-3">
+                    <motion.div 
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="flex items-center justify-between px-5 py-4 border-b border-border/50 bg-background/50 backdrop-blur-md"
+                    >
+                      <div className="flex items-center gap-4">
                         <Button
                           variant="ghost"
                           size="sm"
-                          className="md:hidden h-8 w-8 p-0"
+                          className="md:hidden h-9 w-9 p-0 rounded-xl"
                           onClick={() => setSelectedConversation(null)}
                         >
                           <ChevronLeft className="h-5 w-5" />
                         </Button>
                         <div className="relative">
-                          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center text-sm font-bold text-primary-foreground">
+                          <div className="w-11 h-11 rounded-full bg-gradient-to-br from-primary via-primary to-primary/80 flex items-center justify-center text-base font-bold text-primary-foreground shadow-lg shadow-primary/20">
                             {selectedConversation.name.charAt(0)}
                           </div>
                           {selectedConversation.online && (
-                            <div className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 rounded-full border-2 border-card" />
+                            <div className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-emerald-500 rounded-full border-[2.5px] border-background" />
                           )}
                         </div>
                         <div>
-                          <h3 className="font-semibold text-sm text-foreground">{selectedConversation.name}</h3>
-                          <p className="text-xs text-muted-foreground">
-                            {selectedConversation.online ? "Online" : "Offline"}
+                          <h3 className="font-semibold text-foreground">{selectedConversation.name}</h3>
+                          <p className={cn(
+                            "text-xs font-medium",
+                            selectedConversation.online ? "text-emerald-500" : "text-muted-foreground"
+                          )}>
+                            {selectedConversation.online ? "● Online" : "Offline"}
                           </p>
                         </div>
                       </div>
                       <div className="flex items-center gap-1">
-                        <Button variant="ghost" size="sm" className="h-9 w-9 p-0">
-                          <Phone className="h-4 w-4" />
+                        <Button variant="ghost" size="sm" className="h-10 w-10 p-0 rounded-xl hover:bg-primary/10 hover:text-primary transition-colors">
+                          <Phone className="h-[18px] w-[18px]" />
                         </Button>
-                        <Button variant="ghost" size="sm" className="h-9 w-9 p-0">
-                          <Video className="h-4 w-4" />
+                        <Button variant="ghost" size="sm" className="h-10 w-10 p-0 rounded-xl hover:bg-primary/10 hover:text-primary transition-colors">
+                          <Video className="h-[18px] w-[18px]" />
                         </Button>
-                        <Button variant="ghost" size="sm" className="h-9 w-9 p-0">
-                          <MoreVertical className="h-4 w-4" />
+                        <Button variant="ghost" size="sm" className="h-10 w-10 p-0 rounded-xl hover:bg-muted transition-colors">
+                          <MoreVertical className="h-[18px] w-[18px]" />
                         </Button>
                       </div>
-                    </div>
+                    </motion.div>
 
                     {/* Messages */}
-                    <ScrollArea className="flex-1 p-4">
-                      <div className="space-y-4">
-                        {selectedConversation.messages.map((msg) => (
-                          <div
-                            key={msg.id}
-                            className={cn(
-                              "flex",
-                              msg.sender === "me" ? "justify-end" : "justify-start"
-                            )}
-                          >
-                            <div
+                    <ScrollArea className="flex-1 px-5 py-4">
+                      <div className="space-y-3 max-w-3xl mx-auto">
+                        <AnimatePresence>
+                          {selectedConversation.messages.map((msg, index) => (
+                            <motion.div
+                              key={msg.id}
+                              initial={{ opacity: 0, y: 20, scale: 0.95 }}
+                              animate={{ opacity: 1, y: 0, scale: 1 }}
+                              transition={{ delay: index * 0.05 }}
                               className={cn(
-                                "max-w-[75%] px-4 py-2.5 rounded-2xl",
-                                msg.sender === "me"
-                                  ? "bg-primary text-primary-foreground rounded-br-md"
-                                  : "bg-muted text-foreground rounded-bl-md"
+                                "flex",
+                                msg.sender === "me" ? "justify-end" : "justify-start"
                               )}
                             >
-                              <p className="text-sm">{msg.text}</p>
-                              <p className={cn(
-                                "text-[10px] mt-1",
-                                msg.sender === "me" ? "text-primary-foreground/70" : "text-muted-foreground"
-                              )}>
-                                {msg.time}
-                              </p>
-                            </div>
-                          </div>
-                        ))}
+                              {msg.sender !== "me" && (
+                                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center text-xs font-bold text-primary-foreground mr-2 mt-1 shrink-0 shadow-md">
+                                  {selectedConversation.name.charAt(0)}
+                                </div>
+                              )}
+                              <div
+                                className={cn(
+                                  "max-w-[70%] px-4 py-3 shadow-sm",
+                                  msg.sender === "me"
+                                    ? "bg-gradient-to-br from-primary to-primary/90 text-primary-foreground rounded-2xl rounded-br-lg shadow-primary/20"
+                                    : "bg-muted/80 backdrop-blur-sm text-foreground rounded-2xl rounded-bl-lg border border-border/50"
+                                )}
+                              >
+                                <p className="text-[14px] leading-relaxed">{msg.text}</p>
+                                <p className={cn(
+                                  "text-[10px] mt-1.5 flex items-center gap-1",
+                                  msg.sender === "me" ? "text-primary-foreground/60 justify-end" : "text-muted-foreground"
+                                )}>
+                                  {msg.time}
+                                  {msg.sender === "me" && <Check className="h-3 w-3" />}
+                                </p>
+                              </div>
+                            </motion.div>
+                          ))}
+                        </AnimatePresence>
                         <div ref={messagesEndRef} />
                       </div>
                     </ScrollArea>
 
                     {/* Message Input */}
-                    <div className="p-3 border-t border-border">
-                      <div className="flex items-center gap-2">
-                        <Button variant="ghost" size="sm" className="h-9 w-9 p-0 shrink-0">
-                          <Paperclip className="h-4 w-4" />
+                    <motion.div 
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="p-4 border-t border-border/50 bg-background/50 backdrop-blur-md"
+                    >
+                      <div className="flex items-center gap-3 max-w-3xl mx-auto">
+                        <Button variant="ghost" size="sm" className="h-10 w-10 p-0 shrink-0 rounded-xl hover:bg-muted">
+                          <Paperclip className="h-5 w-5 text-muted-foreground" />
                         </Button>
-                        <Input
-                          placeholder="Type a message..."
-                          value={messageInput}
-                          onChange={(e) => setMessageInput(e.target.value)}
-                          onKeyDown={(e) => e.key === "Enter" && handleSendMessage()}
-                          className="flex-1 bg-muted/50 border-0"
-                        />
-                        <Button variant="ghost" size="sm" className="h-9 w-9 p-0 shrink-0">
-                          <Smile className="h-4 w-4" />
-                        </Button>
+                        <div className="relative flex-1">
+                          <Input
+                            placeholder="Type a message..."
+                            value={messageInput}
+                            onChange={(e) => setMessageInput(e.target.value)}
+                            onKeyDown={(e) => e.key === "Enter" && handleSendMessage()}
+                            className="h-11 bg-muted/30 border border-border/50 rounded-xl pr-12 focus:border-primary/50 focus:bg-muted/50 transition-all duration-300"
+                          />
+                          <Button variant="ghost" size="sm" className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8 p-0 rounded-lg hover:bg-transparent">
+                            <Smile className="h-5 w-5 text-muted-foreground hover:text-primary transition-colors" />
+                          </Button>
+                        </div>
                         <Button 
                           size="sm" 
-                          className="h-9 w-9 p-0 shrink-0"
+                          className={cn(
+                            "h-10 w-10 p-0 shrink-0 rounded-xl transition-all duration-300",
+                            messageInput.trim() 
+                              ? "bg-primary hover:bg-primary/90 shadow-lg shadow-primary/30 scale-100" 
+                              : "bg-muted text-muted-foreground scale-95"
+                          )}
                           onClick={handleSendMessage}
                           disabled={!messageInput.trim()}
                         >
-                          <Send className="h-4 w-4" />
+                          <Send className="h-5 w-5" />
                         </Button>
                       </div>
-                    </div>
+                    </motion.div>
                   </>
                 ) : (
-                  <div className="flex-1 flex flex-col items-center justify-center text-center p-6">
-                    <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mb-4">
-                      <MessageCircle className="h-8 w-8 text-muted-foreground" />
+                  <motion.div 
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    className="flex-1 flex flex-col items-center justify-center text-center p-8"
+                  >
+                    <div className="relative mb-6">
+                      <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-muted to-muted/50 flex items-center justify-center">
+                        <MessageCircle className="h-10 w-10 text-muted-foreground/70" />
+                      </div>
+                      <div className="absolute -top-1 -right-1 w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center">
+                        <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+                      </div>
                     </div>
-                    <h3 className="font-semibold text-foreground mb-1">Select a conversation</h3>
-                    <p className="text-sm text-muted-foreground">Choose from your existing conversations or find new people to connect with</p>
-                  </div>
+                    <h3 className="text-lg font-semibold text-foreground mb-2">Start a conversation</h3>
+                    <p className="text-sm text-muted-foreground max-w-xs">Choose from your connections or find new people to connect and collaborate with</p>
+                  </motion.div>
                 )}
               </div>
             </div>
