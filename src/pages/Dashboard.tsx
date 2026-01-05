@@ -664,7 +664,7 @@ const Dashboard = () => {
             stopOnMouseEnter: true,
             playOnInit: true
           })]} className="w-full cursor-grab active:cursor-grabbing select-none">
-            <CarouselContent className="-ml-4">
+            <CarouselContent className="-ml-4 py-4">
               {[...FAKE_OPPORTUNITIES, ...FAKE_OPPORTUNITIES].map((opp, index) => <CarouselItem key={`${opp.id}-${index}`} className="pl-4 basis-[80%] sm:basis-[45%] lg:basis-[32%]">
                   <motion.div initial={{
                   opacity: 0,
@@ -679,8 +679,8 @@ const Dashboard = () => {
                   duration: 0.6,
                   ease: [0.16, 1, 0.3, 1]
                 }} whileHover={{
-                  y: -12,
-                  scale: 1.03,
+                  y: -8,
+                  scale: 1.02,
                   transition: {
                     type: "spring",
                     stiffness: 400,
