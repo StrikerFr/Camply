@@ -167,10 +167,10 @@ const Teams = () => {
         >
           <div>
             <h1 className="text-2xl lg:text-3xl font-display font-bold text-foreground">
-              Teams
+              Connect
             </h1>
             <p className="text-muted-foreground">
-              Manage your teams and find new teammates
+              Manage your teams and connect with people
             </p>
           </div>
           <Button 
@@ -209,7 +209,7 @@ const Teams = () => {
                 : "border-transparent text-muted-foreground hover:text-foreground"
             )}
           >
-            Find Teammates
+            Find People
           </button>
         </motion.div>
 
