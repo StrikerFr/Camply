@@ -694,7 +694,7 @@ const AlphaAI = () => {
                 <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-primary/20 to-primary/10 opacity-0 group-focus-within:opacity-100 -z-10 blur-xl transition-opacity duration-300" />
                 <motion.div
                   className="absolute right-3 top-1/2 -translate-y-1/2"
-                  whileHover={{ scale: 1.1, rotate: 15 }}
+                  whileHover={{ scale: 1.15, rotate: 15 }}
                   whileTap={{ scale: 0.9 }}
                 >
                   <Button
@@ -702,7 +702,7 @@ const AlphaAI = () => {
                     size="sm"
                     onClick={handleEnhancePrompt}
                     disabled={isAiLoading || !chatInput.trim()}
-                    className="h-8 px-2 hover:bg-primary/10 hover:text-primary"
+                    className="h-8 px-2.5 bg-gradient-to-r from-amber-500/20 to-orange-500/20 hover:from-amber-500/30 hover:to-orange-500/30 border border-amber-500/30 rounded-lg text-amber-400 hover:text-amber-300 transition-all duration-300"
                   >
                     <Sparkles className="h-4 w-4" />
                   </Button>
