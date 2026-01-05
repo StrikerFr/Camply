@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { motion } from "framer-motion";
+import { useState, useRef, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
 import { 
   Search,
@@ -13,7 +13,14 @@ import {
   Filter,
   Loader2,
   Check,
-  X
+  X,
+  Send,
+  Phone,
+  Video,
+  MoreVertical,
+  Smile,
+  Paperclip,
+  ChevronLeft
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -29,6 +36,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 // Fake teammate data
 const FAKE_TEAMMATES = [
@@ -106,14 +114,76 @@ const FAKE_TEAMMATES = [
   }
 ];
 
+// Fake conversations data
+const FAKE_CONVERSATIONS = [
+  {
+    id: "1",
+    name: "Sarah Chen",
+    lastMessage: "Hey! Are you free to work on the hackathon project tonight?",
+    time: "2m ago",
+    unread: 2,
+    online: true,
+    messages: [
+      { id: "1", sender: "them", text: "Hi there! I saw your profile and I think we'd make a great team!", time: "10:30 AM" },
+      { id: "2", sender: "me", text: "Hey Sarah! Thanks for reaching out. What kind of project are you thinking?", time: "10:32 AM" },
+      { id: "3", sender: "them", text: "I'm looking to build something for the upcoming AI hackathon. Are you interested?", time: "10:35 AM" },
+      { id: "4", sender: "me", text: "That sounds amazing! I've been wanting to work on something with ML.", time: "10:40 AM" },
+      { id: "5", sender: "them", text: "Hey! Are you free to work on the hackathon project tonight?", time: "Just now" },
+    ]
+  },
+  {
+    id: "2",
+    name: "Alex Rivera",
+    lastMessage: "The ML model is ready for testing 🚀",
+    time: "1h ago",
+    unread: 0,
+    online: true,
+    messages: [
+      { id: "1", sender: "them", text: "I've been working on the recommendation system", time: "Yesterday" },
+      { id: "2", sender: "me", text: "How's it coming along?", time: "Yesterday" },
+      { id: "3", sender: "them", text: "The ML model is ready for testing 🚀", time: "1h ago" },
+    ]
+  },
+  {
+    id: "3",
+    name: "Jordan Kim",
+    lastMessage: "Let me know when you've pushed the changes",
+    time: "3h ago",
+    unread: 0,
+    online: false,
+    messages: [
+      { id: "1", sender: "me", text: "Hey Jordan, I'm working on the API integration", time: "Yesterday" },
+      { id: "2", sender: "them", text: "Great! Make sure to follow the REST conventions", time: "Yesterday" },
+      { id: "3", sender: "them", text: "Let me know when you've pushed the changes", time: "3h ago" },
+    ]
+  },
+  {
+    id: "4",
+    name: "Maya Patel",
+    lastMessage: "I've updated the Figma file with the new designs",
+    time: "Yesterday",
+    unread: 0,
+    online: false,
+    messages: [
+      { id: "1", sender: "them", text: "I've updated the Figma file with the new designs", time: "Yesterday" },
+    ]
+  },
+];
+
 const Teams = () => {
-  const [activeTab, setActiveTab] = useState<"my-teams" | "find">("my-teams");
+  const [activeTab, setActiveTab] = useState<"messages" | "find">("messages");
   const [searchQuery, setSearchQuery] = useState("");
   const [connectedUsers, setConnectedUsers] = useState<string[]>([]);
   const [selectedPerson, setSelectedPerson] = useState<typeof FAKE_TEAMMATES[0] | null>(null);
   const [showCreateTeamDialog, setShowCreateTeamDialog] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
   const { profile } = useAuth();
+
+  // Messaging state
+  const [selectedConversation, setSelectedConversation] = useState<typeof FAKE_CONVERSATIONS[0] | null>(null);
+  const [messageInput, setMessageInput] = useState("");
+  const [conversations, setConversations] = useState(FAKE_CONVERSATIONS);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const { data: myTeams, isLoading: teamsLoading } = useMyTeams();
 
@@ -123,6 +193,14 @@ const Teams = () => {
       person.skills.some(s => s.toLowerCase().includes(searchQuery.toLowerCase()));
     return matchesSearch;
   });
+
+  const filteredConversations = conversations.filter((conv) =>
+    conv.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [selectedConversation?.messages]);
 
   const handleConnect = (person: typeof FAKE_TEAMMATES[0]) => {
     if (connectedUsers.includes(person.user_id)) {
@@ -144,16 +222,34 @@ const Teams = () => {
     setShowCreateTeamDialog(true);
   };
 
-  const handleChat = (teamName: string) => {
-    toast.success(`Opening chat for ${teamName}`, {
-      description: "Team chat is coming soon!",
-    });
-  };
+  const handleSendMessage = () => {
+    if (!messageInput.trim() || !selectedConversation) return;
 
-  const handleInvite = (teamName: string) => {
-    toast.success(`Invite link copied!`, {
-      description: `Share this link to invite members to ${teamName}`,
-    });
+    const newMessage = {
+      id: Date.now().toString(),
+      sender: "me" as const,
+      text: messageInput,
+      time: "Just now"
+    };
+
+    setConversations(prev => prev.map(conv => {
+      if (conv.id === selectedConversation.id) {
+        return {
+          ...conv,
+          messages: [...conv.messages, newMessage],
+          lastMessage: messageInput,
+          time: "Just now"
+        };
+      }
+      return conv;
+    }));
+
+    setSelectedConversation(prev => prev ? {
+      ...prev,
+      messages: [...prev.messages, newMessage]
+    } : null);
+
+    setMessageInput("");
   };
 
   return (
@@ -190,15 +286,15 @@ const Teams = () => {
           className="flex gap-2 border-b border-border"
         >
           <button
-            onClick={() => setActiveTab("my-teams")}
+            onClick={() => setActiveTab("messages")}
             className={cn(
               "px-4 py-3 text-sm font-medium border-b-2 transition-colors",
-              activeTab === "my-teams"
+              activeTab === "messages"
                 ? "border-primary text-primary"
                 : "border-transparent text-muted-foreground hover:text-foreground"
             )}
           >
-            My Teams
+            Messages
           </button>
           <button
             onClick={() => setActiveTab("find")}
@@ -213,117 +309,194 @@ const Teams = () => {
           </button>
         </motion.div>
 
-        {activeTab === "my-teams" ? (
-          <div className="grid md:grid-cols-2 gap-4">
-            {teamsLoading ? (
-              <div className="col-span-2 flex items-center justify-center py-12">
-                <Loader2 className="h-8 w-8 animate-spin text-primary" />
-              </div>
-            ) : myTeams && myTeams.length > 0 ? (
-              myTeams.map((team, index) => (
-                <motion.div
-                  key={team.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.1 + index * 0.05 }}
-                  className="bg-card border border-border rounded-xl p-5 hover:border-primary/30 transition-colors"
-                >
-                  <div className="flex items-start justify-between mb-4">
-                    <div>
-                      <h3 className="text-lg font-semibold text-foreground flex items-center gap-2">
-                        {team.name}
-                        {team.leader_id === profile?.user_id && (
-                          <Crown className="h-4 w-4 text-yellow-500" />
+        {activeTab === "messages" ? (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="bg-card border border-border rounded-xl overflow-hidden"
+            style={{ height: "calc(100vh - 280px)", minHeight: "500px" }}
+          >
+            <div className="flex h-full">
+              {/* Conversations List */}
+              <div className={cn(
+                "w-full md:w-80 border-r border-border flex flex-col",
+                selectedConversation && "hidden md:flex"
+              )}>
+                {/* Search */}
+                <div className="p-3 border-b border-border">
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      placeholder="Search messages..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="pl-10 bg-muted/50 border-0 h-9"
+                    />
+                  </div>
+                </div>
+
+                {/* Conversation List */}
+                <ScrollArea className="flex-1">
+                  {filteredConversations.length > 0 ? (
+                    filteredConversations.map((conv) => (
+                      <button
+                        key={conv.id}
+                        onClick={() => setSelectedConversation(conv)}
+                        className={cn(
+                          "w-full flex items-start gap-3 p-3 hover:bg-muted/50 transition-colors text-left",
+                          selectedConversation?.id === conv.id && "bg-muted"
                         )}
-                      </h3>
-                      <p className="text-sm text-muted-foreground">{team.opportunity?.title || "No event"}</p>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <div className="text-right">
-                        <div className="flex items-center gap-1 text-primary font-semibold">
-                          <Trophy className="h-4 w-4" />
-                          Active
+                      >
+                        <div className="relative">
+                          <div className="w-11 h-11 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center text-sm font-bold text-primary-foreground">
+                            {conv.name.charAt(0)}
+                          </div>
+                          {conv.online && (
+                            <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-card" />
+                          )}
                         </div>
-                        <div className="text-xs text-muted-foreground">{team.members.length} members</div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center justify-between gap-2">
+                            <span className="font-medium text-sm text-foreground truncate">{conv.name}</span>
+                            <span className="text-xs text-muted-foreground whitespace-nowrap">{conv.time}</span>
+                          </div>
+                          <p className="text-sm text-muted-foreground truncate mt-0.5">{conv.lastMessage}</p>
+                        </div>
+                        {conv.unread > 0 && (
+                          <div className="w-5 h-5 rounded-full bg-primary flex items-center justify-center text-xs font-bold text-primary-foreground">
+                            {conv.unread}
+                          </div>
+                        )}
+                      </button>
+                    ))
+                  ) : (
+                    <div className="flex flex-col items-center justify-center py-12 px-4 text-center">
+                      <MessageCircle className="h-12 w-12 text-muted-foreground/50 mb-3" />
+                      <p className="text-sm text-muted-foreground">No conversations yet</p>
+                      <p className="text-xs text-muted-foreground mt-1">Connect with people to start chatting</p>
+                    </div>
+                  )}
+                </ScrollArea>
+              </div>
+
+              {/* Chat Area */}
+              <div className={cn(
+                "flex-1 flex flex-col",
+                !selectedConversation && "hidden md:flex"
+              )}>
+                {selectedConversation ? (
+                  <>
+                    {/* Chat Header */}
+                    <div className="flex items-center justify-between px-4 py-3 border-b border-border">
+                      <div className="flex items-center gap-3">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="md:hidden h-8 w-8 p-0"
+                          onClick={() => setSelectedConversation(null)}
+                        >
+                          <ChevronLeft className="h-5 w-5" />
+                        </Button>
+                        <div className="relative">
+                          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center text-sm font-bold text-primary-foreground">
+                            {selectedConversation.name.charAt(0)}
+                          </div>
+                          {selectedConversation.online && (
+                            <div className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 rounded-full border-2 border-card" />
+                          )}
+                        </div>
+                        <div>
+                          <h3 className="font-semibold text-sm text-foreground">{selectedConversation.name}</h3>
+                          <p className="text-xs text-muted-foreground">
+                            {selectedConversation.online ? "Online" : "Offline"}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <Button variant="ghost" size="sm" className="h-9 w-9 p-0">
+                          <Phone className="h-4 w-4" />
+                        </Button>
+                        <Button variant="ghost" size="sm" className="h-9 w-9 p-0">
+                          <Video className="h-4 w-4" />
+                        </Button>
+                        <Button variant="ghost" size="sm" className="h-9 w-9 p-0">
+                          <MoreVertical className="h-4 w-4" />
+                        </Button>
                       </div>
                     </div>
-                  </div>
 
-                  {/* Team Members */}
-                  <div className="flex items-center gap-2 mb-4">
-                    <div className="flex -space-x-2">
-                      {team.members.slice(0, 4).map((member, i) => (
-                        <div
-                          key={member.id}
-                          className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center text-xs font-bold text-primary-foreground border-2 border-background"
-                          title={member.profile?.full_name || "Member"}
+                    {/* Messages */}
+                    <ScrollArea className="flex-1 p-4">
+                      <div className="space-y-4">
+                        {selectedConversation.messages.map((msg) => (
+                          <div
+                            key={msg.id}
+                            className={cn(
+                              "flex",
+                              msg.sender === "me" ? "justify-end" : "justify-start"
+                            )}
+                          >
+                            <div
+                              className={cn(
+                                "max-w-[75%] px-4 py-2.5 rounded-2xl",
+                                msg.sender === "me"
+                                  ? "bg-primary text-primary-foreground rounded-br-md"
+                                  : "bg-muted text-foreground rounded-bl-md"
+                              )}
+                            >
+                              <p className="text-sm">{msg.text}</p>
+                              <p className={cn(
+                                "text-[10px] mt-1",
+                                msg.sender === "me" ? "text-primary-foreground/70" : "text-muted-foreground"
+                              )}>
+                                {msg.time}
+                              </p>
+                            </div>
+                          </div>
+                        ))}
+                        <div ref={messagesEndRef} />
+                      </div>
+                    </ScrollArea>
+
+                    {/* Message Input */}
+                    <div className="p-3 border-t border-border">
+                      <div className="flex items-center gap-2">
+                        <Button variant="ghost" size="sm" className="h-9 w-9 p-0 shrink-0">
+                          <Paperclip className="h-4 w-4" />
+                        </Button>
+                        <Input
+                          placeholder="Type a message..."
+                          value={messageInput}
+                          onChange={(e) => setMessageInput(e.target.value)}
+                          onKeyDown={(e) => e.key === "Enter" && handleSendMessage()}
+                          className="flex-1 bg-muted/50 border-0"
+                        />
+                        <Button variant="ghost" size="sm" className="h-9 w-9 p-0 shrink-0">
+                          <Smile className="h-4 w-4" />
+                        </Button>
+                        <Button 
+                          size="sm" 
+                          className="h-9 w-9 p-0 shrink-0"
+                          onClick={handleSendMessage}
+                          disabled={!messageInput.trim()}
                         >
-                          {member.profile?.full_name?.charAt(0) || "?"}
-                        </div>
-                      ))}
+                          <Send className="h-4 w-4" />
+                        </Button>
+                      </div>
                     </div>
-                    <span className="text-sm text-muted-foreground">
-                      {team.members.length} members
-                    </span>
+                  </>
+                ) : (
+                  <div className="flex-1 flex flex-col items-center justify-center text-center p-6">
+                    <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mb-4">
+                      <MessageCircle className="h-8 w-8 text-muted-foreground" />
+                    </div>
+                    <h3 className="font-semibold text-foreground mb-1">Select a conversation</h3>
+                    <p className="text-sm text-muted-foreground">Choose from your existing conversations or find new people to connect with</p>
                   </div>
-
-                  <div className="flex gap-2">
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
-                      className="flex-1 transition-all duration-200 hover:bg-primary/10 hover:border-primary/50 hover:scale-[1.02] active:scale-95"
-                      onClick={() => handleChat(team.name)}
-                    >
-                      <MessageCircle className="h-4 w-4 mr-2" />
-                      Chat
-                    </Button>
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
-                      className="flex-1 transition-all duration-200 hover:bg-primary/10 hover:border-primary/50 hover:scale-[1.02] active:scale-95"
-                      onClick={() => handleInvite(team.name)}
-                    >
-                      <UserPlus className="h-4 w-4 mr-2" />
-                      Invite
-                    </Button>
-                  </div>
-                </motion.div>
-              ))
-            ) : (
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="col-span-2 text-center py-12"
-              >
-                <div className="text-6xl mb-4">👥</div>
-                <h3 className="text-lg font-semibold text-foreground mb-2">No teams yet</h3>
-                <p className="text-muted-foreground mb-4">Create your first team or join an existing one</p>
-                <Button 
-                  onClick={handleCreateTeam}
-                  className="transition-all duration-200 hover:scale-105 hover:shadow-lg hover:shadow-primary/20"
-                >
-                  <Plus className="h-4 w-4 mr-2" />
-                  Create Team
-                </Button>
-              </motion.div>
-            )}
-
-            {/* Create Team Card */}
-            {myTeams && myTeams.length > 0 && (
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2 }}
-                className="border-2 border-dashed border-border rounded-xl p-8 flex flex-col items-center justify-center text-center hover:border-primary/30 transition-colors cursor-pointer"
-              >
-                <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-3">
-                  <Plus className="h-6 w-6 text-primary" />
-                </div>
-                <h3 className="font-semibold text-foreground mb-1">Create a New Team</h3>
-                <p className="text-sm text-muted-foreground">Start a team for an upcoming event</p>
-              </motion.div>
-            )}
-          </div>
+                )}
+              </div>
+            </div>
+          </motion.div>
         ) : (
           <div className="space-y-4">
             {/* Search */}
