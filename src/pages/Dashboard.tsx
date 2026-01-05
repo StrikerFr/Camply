@@ -1,7 +1,7 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect, useRef } from "react";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
-import { Trophy, Calendar, Users, TrendingUp, ArrowRight, Clock, MapPin, Zap, Target, ArrowUp, Check, ChevronRight, Star, Award, Code, Palette, Briefcase, Sparkles, MessageSquare, Bot, Send, ChevronLeft, SlidersHorizontal, Mic, Upload } from "lucide-react";
+import { Trophy, Calendar, Users, TrendingUp, ArrowRight, Clock, MapPin, Zap, Target, ArrowUp, Check, ChevronRight, Star, Award, Code, Palette, Briefcase, Sparkles, MessageSquare, Bot, Send, ChevronLeft, SlidersHorizontal, Mic, Upload, MicOff, Image } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import Autoplay from "embla-carousel-autoplay";
@@ -10,6 +10,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Input } from "@/components/ui/input";
 const FAKE_OPPORTUNITIES = [{
   id: "1",
   title: "Hackathon 2026 - Code for Change",
@@ -303,6 +304,89 @@ const Dashboard = () => {
     stat: string;
     amount: number;
   } | null>(null);
+  
+  // AI Chat states
+  const [chatInput, setChatInput] = useState("");
+  const [isListening, setIsListening] = useState(false);
+  const [uploadedImage, setUploadedImage] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const recognitionRef = useRef<any>(null);
+
+  // Web Speech API for voice input
+  const startListening = () => {
+    if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+      toast.error("Speech recognition is not supported in your browser");
+      return;
+    }
+
+    const SpeechRecognition = (window as any).webkitSpeechRecognition || (window as any).SpeechRecognition;
+    recognitionRef.current = new SpeechRecognition();
+    recognitionRef.current.continuous = false;
+    recognitionRef.current.interimResults = true;
+    recognitionRef.current.lang = 'en-US';
+
+    recognitionRef.current.onstart = () => {
+      setIsListening(true);
+      toast.info("Listening...", { duration: 2000 });
+    };
+
+    recognitionRef.current.onresult = (event: any) => {
+      const transcript = Array.from(event.results)
+        .map((result: any) => result[0].transcript)
+        .join('');
+      setChatInput(transcript);
+    };
+
+    recognitionRef.current.onerror = (event: any) => {
+      console.error('Speech recognition error:', event.error);
+      setIsListening(false);
+      toast.error("Failed to recognize speech");
+    };
+
+    recognitionRef.current.onend = () => {
+      setIsListening(false);
+    };
+
+    recognitionRef.current.start();
+  };
+
+  const stopListening = () => {
+    if (recognitionRef.current) {
+      recognitionRef.current.stop();
+      setIsListening(false);
+    }
+  };
+
+  const handleMicClick = () => {
+    if (isListening) {
+      stopListening();
+    } else {
+      startListening();
+    }
+  };
+
+  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      if (!file.type.startsWith('image/')) {
+        toast.error("Please upload an image file");
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setUploadedImage(e.target?.result as string);
+        toast.success("Image uploaded successfully!");
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleTalkToAlpha = () => {
+    toast.info("Talk to Alpha - Coming Soon! 🚀", { 
+      description: "Voice conversation feature is under development",
+      duration: 3000 
+    });
+  };
 
   // Simulate loading state
   useEffect(() => {
@@ -622,7 +706,7 @@ const Dashboard = () => {
             </div>
 
             {/* AI Chat Area */}
-            <div className="bg-card border border-border rounded-xl h-[320px] flex flex-col">
+            <div className="bg-card border border-border rounded-xl h-[480px] flex flex-col">
               {/* Chat Messages Area */}
               <div className="flex-1 p-4 overflow-y-auto space-y-3">
                 <div className="flex gap-3">
@@ -633,25 +717,77 @@ const Dashboard = () => {
                     <p className="text-sm text-foreground">Hey! I'm Alpha AI, your campus assistant. Ask me anything about events, opportunities, or how to earn more points!</p>
                   </div>
                 </div>
+                
+                {/* Show uploaded image preview */}
+                {uploadedImage && (
+                  <div className="flex gap-3 justify-end">
+                    <div className="bg-primary/10 rounded-lg rounded-tr-none p-2 max-w-[60%]">
+                      <div className="relative">
+                        <img src={uploadedImage} alt="Uploaded" className="rounded-md max-h-40 object-contain" />
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          className="absolute -top-2 -right-2 h-6 w-6 bg-destructive text-destructive-foreground rounded-full hover:bg-destructive/90"
+                          onClick={() => setUploadedImage(null)}
+                        >
+                          ×
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
               
               {/* Chat Input */}
               <div className="p-4 border-t border-border">
-                <input type="text" placeholder="Ask Alpha AI..." className="w-full bg-transparent border-none text-sm text-foreground placeholder:text-muted-foreground focus:outline-none mb-3" />
+                <input 
+                  type="text" 
+                  placeholder="Ask Alpha AI..." 
+                  value={chatInput}
+                  onChange={(e) => setChatInput(e.target.value)}
+                  className="w-full bg-transparent border-none text-sm text-foreground placeholder:text-muted-foreground focus:outline-none mb-3" 
+                />
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <Button variant="outline" size="sm" className="h-8 gap-1.5 text-xs font-medium border-border hover:bg-muted/50">
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="h-8 gap-1.5 text-xs font-medium border-border hover:bg-muted/50"
+                      onClick={handleTalkToAlpha}
+                    >
                       <Mic className="h-3.5 w-3.5" />
                       Talk to Alpha
                     </Button>
-                    <Button variant="outline" size="sm" className="h-8 gap-1.5 text-xs font-medium border-border hover:bg-muted/50">
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="h-8 gap-1.5 text-xs font-medium border-border hover:bg-muted/50"
+                      onClick={() => fileInputRef.current?.click()}
+                    >
                       <Upload className="h-3.5 w-3.5" />
                       Upload Image
                     </Button>
+                    <input 
+                      ref={fileInputRef}
+                      type="file" 
+                      accept="image/*" 
+                      onChange={handleImageUpload}
+                      className="hidden" 
+                    />
                   </div>
                   <div className="flex items-center gap-2">
-                    <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-foreground">
-                      <Mic className="h-4 w-4" />
+                    <Button 
+                      variant="ghost" 
+                      size="icon" 
+                      className={cn(
+                        "h-8 w-8 transition-all",
+                        isListening 
+                          ? "text-red-500 hover:text-red-400 bg-red-500/10 animate-pulse" 
+                          : "text-muted-foreground hover:text-foreground"
+                      )}
+                      onClick={handleMicClick}
+                    >
+                      {isListening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
                     </Button>
                     <Button variant="ghost" size="icon" className="h-8 w-8 text-amber-500 hover:text-amber-400 hover:bg-amber-500/10">
                       <Sparkles className="h-4 w-4" />
