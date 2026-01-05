@@ -473,115 +473,13 @@ const Dashboard = () => {
           duration: 0.5
         }} className="space-y-6">
             {/* Leaderboard Preview */}
-            <div className="bg-card border border-border rounded-xl overflow-hidden">
-              <div className="flex items-center justify-between px-5 py-4 border-b border-border">
-                <div className="flex items-center gap-2.5">
-                  <Trophy className="h-4 w-4 text-primary" />
-                  <span className="font-semibold text-foreground">Leaderboard</span>
-                </div>
-                <Link to="/leaderboard">
-                  <Button variant="ghost" size="sm" className="h-7 text-xs text-muted-foreground hover:text-foreground">
-                    View All
-                  </Button>
-                </Link>
-              </div>
-              <div className="divide-y divide-border/60">
-                {leaderboard.slice(0, 5).map((user, index) => <motion.div key={index} initial={{
-                opacity: 0,
-                x: -10
-              }} animate={{
-                opacity: 1,
-                x: 0
-              }} transition={{
-                delay: 0.4 + index * 0.05
-              }} className={cn("flex items-center gap-3 px-5 py-3.5 transition-all duration-200", user.isUser && "bg-primary/5 border-l-2 border-l-primary")}>
-                    {/* Rank Badge */}
-                    <div className={cn("w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold transition-all", user.rank === 1 && "bg-gradient-to-br from-amber-400 to-amber-600 text-black shadow-md shadow-amber-500/30", user.rank === 2 && "bg-gradient-to-br from-zinc-300 to-zinc-500 text-black shadow-md shadow-zinc-400/30", user.rank === 3 && "bg-gradient-to-br from-amber-600 to-amber-800 text-white shadow-md shadow-amber-700/30", user.rank > 3 && "bg-muted text-muted-foreground")}>
-                      {user.rank}
-                    </div>
-                    
-                    {/* Avatar */}
-                    <div className={cn("w-9 h-9 rounded-full flex items-center justify-center text-sm font-semibold transition-all", user.isUser ? "bg-primary text-primary-foreground ring-2 ring-primary/30" : "bg-muted text-muted-foreground")}>
-                      {user.avatar}
-                    </div>
-                    
-                    {/* Name */}
-                    <div className="flex-1 min-w-0">
-                      <p className={cn("text-sm font-medium truncate", user.isUser ? "text-primary" : "text-foreground")}>
-                        {user.name}
-                      </p>
-                    </div>
-                    
-                    {/* Points */}
-                    <span className={cn("text-sm font-semibold tabular-nums", user.isUser ? "text-primary" : "text-muted-foreground")}>
-                      {user.points.toLocaleString()}
-                    </span>
-                  </motion.div>)}
-              </div>
-            </div>
+            
 
             {/* Achievements */}
-            <div className="bg-card border border-border rounded-xl p-5">
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-2.5">
-                  <Award className="h-4 w-4 text-primary" />
-                  <span className="font-semibold text-foreground">Achievements</span>
-                </div>
-                <span className="text-xs text-muted-foreground font-medium bg-muted px-2 py-0.5 rounded-full">
-                  {FAKE_ACHIEVEMENTS.filter(a => a.unlocked).length}/{FAKE_ACHIEVEMENTS.length}
-                </span>
-              </div>
-              <div className="grid grid-cols-4 gap-3">
-                {FAKE_ACHIEVEMENTS.map((achievement, index) => <motion.div key={achievement.id} initial={{
-                opacity: 0,
-                scale: 0.8
-              }} animate={{
-                opacity: 1,
-                scale: 1
-              }} transition={{
-                delay: 0.5 + index * 0.05
-              }} whileHover={achievement.unlocked ? {
-                scale: 1.08,
-                y: -2
-              } : {}} className={cn("aspect-square rounded-xl flex items-center justify-center text-2xl transition-all duration-200 cursor-default", achievement.unlocked ? "bg-muted hover:bg-accent hover:shadow-md" : "bg-muted/40 opacity-40 grayscale")} title={achievement.name}>
-                    {achievement.icon}
-                  </motion.div>)}
-              </div>
-            </div>
+            
 
             {/* Quick Actions */}
-            <div className="bg-card border border-border rounded-xl p-5">
-              <div className="flex items-center gap-2.5 mb-4">
-                <Sparkles className="h-4 w-4 text-primary" />
-                <h3 className="font-semibold text-foreground">Quick Actions</h3>
-              </div>
-              <div className="space-y-2.5">
-                <Link to="/teams" className="block">
-                  <motion.div whileHover={{
-                  scale: 1.01
-                }} whileTap={{
-                  scale: 0.99
-                }}>
-                    <Button variant="outline" size="sm" className="w-full justify-start h-10 text-sm border-border hover:bg-muted hover:border-border/60 text-foreground transition-all duration-200">
-                      <Users className="h-4 w-4 mr-2.5 text-muted-foreground" />
-                      Find Teammates
-                    </Button>
-                  </motion.div>
-                </Link>
-                <Link to="/profile" className="block">
-                  <motion.div whileHover={{
-                  scale: 1.01
-                }} whileTap={{
-                  scale: 0.99
-                }}>
-                    <Button variant="outline" size="sm" className="w-full justify-start h-10 text-sm border-border hover:bg-muted hover:border-border/60 text-foreground transition-all duration-200">
-                      <Award className="h-4 w-4 mr-2.5 text-muted-foreground" />
-                      View Profile
-                    </Button>
-                  </motion.div>
-                </Link>
-              </div>
-            </div>
+            
           </motion.div>
         </div>
       </div>
