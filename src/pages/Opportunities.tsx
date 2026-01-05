@@ -199,7 +199,7 @@ const Opportunities = () => {
                       <div className="flex items-center gap-4 text-sm text-muted-foreground">
                         <span className="flex items-center gap-1">
                           <Users className="h-4 w-4" />
-                          {getTeamSize(opp.team_size_min, opp.team_size_max)}
+                          {opp.max_participants ? `Up to ${opp.max_participants}` : "Unlimited"}
                         </span>
                         <span className="flex items-center gap-1 text-primary font-medium">
                           <Zap className="h-4 w-4" />

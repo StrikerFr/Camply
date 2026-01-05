@@ -1,9 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
-
-// Since teams and achievements tables don't exist yet, we'll use mock data
-// that can be replaced with real data once the tables are created
 
 export interface Team {
   id: string;
@@ -41,11 +37,19 @@ export interface Teammate {
   totalPoints: number;
 }
 
+// Mock teammates data
+const MOCK_TEAMMATES: Teammate[] = [
+  { user_id: "1", full_name: "Arjun Sharma", avatar_url: null, skills: ["JavaScript", "React", "Node.js"], totalPoints: 4520 },
+  { user_id: "2", full_name: "Priya Patel", avatar_url: null, skills: ["Python", "Machine Learning", "Data Science"], totalPoints: 3890 },
+  { user_id: "3", full_name: "Rahul Kumar", avatar_url: null, skills: ["UI/UX Design", "Figma", "Adobe XD"], totalPoints: 3450 },
+  { user_id: "4", full_name: "Maya Singh", avatar_url: null, skills: ["Marketing", "Content Writing", "SEO"], totalPoints: 3120 },
+  { user_id: "5", full_name: "Vikram Reddy", avatar_url: null, skills: ["Java", "Spring Boot", "AWS"], totalPoints: 2890 },
+  { user_id: "6", full_name: "Ananya Gupta", avatar_url: null, skills: ["Flutter", "Dart", "Firebase"], totalPoints: 2650 },
+];
+
 export function useMyTeams() {
   const { user } = useAuth();
 
-  // Teams table doesn't exist yet - return empty for now
-  // This will work once the migration is applied
   return useQuery({
     queryKey: ["my-teams", user?.id],
     queryFn: async (): Promise<TeamWithMembers[]> => {
@@ -63,44 +67,8 @@ export function useFindTeammates() {
     queryKey: ["find-teammates"],
     queryFn: async (): Promise<Teammate[]> => {
       if (!user) return [];
-
-      // Get profiles with onboarding completed, excluding current user
-      const { data: profiles, error: profilesError } = await supabase
-        .from("profiles")
-        .select("user_id, full_name, avatar_url")
-        .eq("onboarding_completed", true)
-        .neq("user_id", user.id)
-        .limit(20);
-
-      if (profilesError) throw profilesError;
-      if (!profiles || profiles.length === 0) return [];
-
-      const userIds = profiles.map((p) => p.user_id);
-
-      // Get skills for each user
-      const { data: skills, error: skillsError } = await supabase
-        .from("user_skills")
-        .select("user_id, skill")
-        .in("user_id", userIds);
-
-      if (skillsError) throw skillsError;
-
-      // Get points for each user
-      const { data: points, error: pointsError } = await supabase
-        .from("user_points")
-        .select("user_id, points")
-        .in("user_id", userIds);
-
-      if (pointsError) throw pointsError;
-
-      // Combine data
-      return profiles.map((profile) => ({
-        user_id: profile.user_id,
-        full_name: profile.full_name,
-        avatar_url: profile.avatar_url,
-        skills: skills?.filter((s) => s.user_id === profile.user_id).map((s) => s.skill) || [],
-        totalPoints: points?.filter((p) => p.user_id === profile.user_id).reduce((sum, p) => sum + p.points, 0) || 0,
-      }));
+      // Return mock teammates until database is set up
+      return MOCK_TEAMMATES;
     },
     enabled: !!user,
   });
