@@ -891,7 +891,7 @@ const Dashboard = () => {
               
               {/* Chat Input */}
               <div className="p-4 border-t border-border">
-                <input type="text" placeholder="Search Opportunities....." value={chatInput} onChange={e => setChatInput(e.target.value)} onKeyDown={handleKeyPress} disabled={isAiLoading} className="w-full bg-transparent border-none text-sm text-foreground placeholder:text-muted-foreground focus:outline-none mb-3" />
+                <input type="text" placeholder="Search....." value={chatInput} onChange={e => setChatInput(e.target.value)} onKeyDown={handleKeyPress} disabled={isAiLoading} className="w-full bg-transparent border-none text-sm text-foreground placeholder:text-muted-foreground focus:outline-none mb-3" />
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <Button variant="outline" size="sm" className="h-8 gap-1.5 text-xs font-medium border-border hover:bg-muted/50" onClick={handleTalkToAlpha}>
