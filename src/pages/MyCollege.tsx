@@ -13,10 +13,19 @@ import {
   Code,
   Rocket,
   Star,
-  Building2
+  Building2,
+  X,
+  Share2,
+  Bell
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 // Mock data for IIT Patna
 const COLLEGE_INFO = {
@@ -36,7 +45,20 @@ const TABS = [
   { id: "clubs", label: "Clubs", icon: Users },
 ];
 
-const EVENTS = [
+interface Event {
+  id: string;
+  title: string;
+  date: string;
+  type: string;
+  description: string;
+  location: string;
+  isLive: boolean;
+  highlights?: string[];
+  organizer?: string;
+  contact?: string;
+}
+
+const EVENTS: Event[] = [
   {
     id: "1",
     title: "Celesta 2026 - Annual Techno-Management Fest",
@@ -44,7 +66,10 @@ const EVENTS = [
     type: "Tech Fest",
     description: "The annual techno-management fest featuring competitions, workshops, and guest lectures.",
     location: "Main Campus",
-    isLive: true
+    isLive: true,
+    highlights: ["50+ Technical Events", "Guest Lectures by Industry Leaders", "Robotics Competitions", "Hackathons", "Workshops on AI/ML"],
+    organizer: "Technical Affairs Council",
+    contact: "celesta@iitp.ac.in"
   },
   {
     id: "2",
@@ -53,7 +78,10 @@ const EVENTS = [
     type: "Cultural",
     description: "Annual cultural festival with music, dance, drama, and art competitions.",
     location: "Open Air Theatre",
-    isLive: false
+    isLive: false,
+    highlights: ["Pro Nights with Celebrity Performers", "Dance Competitions", "Battle of Bands", "Art Exhibition", "Stand-up Comedy Night"],
+    organizer: "Cultural Affairs Council",
+    contact: "anwesha@iitp.ac.in"
   },
   {
     id: "3",
@@ -62,7 +90,10 @@ const EVENTS = [
     type: "Career",
     description: "Meet top recruiters and industry leaders. Networking opportunities for students.",
     location: "Lecture Hall Complex",
-    isLive: false
+    isLive: false,
+    highlights: ["1:1 Mentorship Sessions", "Resume Review", "Mock Interviews", "Networking Dinner", "Career Guidance Talks"],
+    organizer: "Training & Placement Cell",
+    contact: "placement@iitp.ac.in"
   }
 ];
 
@@ -222,7 +253,7 @@ const CLUBS = [
 
 const MyCollege = () => {
   const [activeTab, setActiveTab] = useState("events");
-
+  const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   return (
     <DashboardLayout>
       <div className="max-w-7xl mx-auto space-y-8">
@@ -328,7 +359,7 @@ const MyCollege = () => {
                         </span>
                       </div>
                     </div>
-                    <Button>View Details</Button>
+                    <Button onClick={() => setSelectedEvent(event)}>View Details</Button>
                   </div>
                 </motion.div>
               ))}
@@ -517,6 +548,75 @@ const MyCollege = () => {
             </div>
           )}
         </motion.div>
+
+        {/* Event Details Dialog */}
+        <Dialog open={!!selectedEvent} onOpenChange={() => setSelectedEvent(null)}>
+          <DialogContent className="sm:max-w-lg">
+            <DialogHeader>
+              <div className="flex items-center gap-2 mb-2">
+                <span className="px-2.5 py-1 text-xs font-medium bg-primary/10 text-primary rounded-full">
+                  {selectedEvent?.type}
+                </span>
+                {selectedEvent?.isLive && (
+                  <span className="px-2.5 py-1 text-xs font-medium bg-emerald-500/10 text-emerald-500 rounded-full flex items-center gap-1">
+                    <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" />
+                    Live
+                  </span>
+                )}
+              </div>
+              <DialogTitle className="text-xl">{selectedEvent?.title}</DialogTitle>
+            </DialogHeader>
+            
+            <div className="space-y-4">
+              <p className="text-muted-foreground">{selectedEvent?.description}</p>
+              
+              <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
+                <span className="flex items-center gap-1.5">
+                  <Calendar className="h-4 w-4 text-primary" />
+                  {selectedEvent?.date}
+                </span>
+                <span className="flex items-center gap-1.5">
+                  <MapPin className="h-4 w-4 text-primary" />
+                  {selectedEvent?.location}
+                </span>
+              </div>
+              
+              {selectedEvent?.highlights && (
+                <div>
+                  <h4 className="font-semibold text-foreground mb-2">Highlights</h4>
+                  <ul className="space-y-1.5">
+                    {selectedEvent.highlights.map((highlight, idx) => (
+                      <li key={idx} className="flex items-center gap-2 text-sm text-muted-foreground">
+                        <Star className="h-3.5 w-3.5 text-primary" />
+                        {highlight}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+              
+              {(selectedEvent?.organizer || selectedEvent?.contact) && (
+                <div className="pt-4 border-t border-border">
+                  <h4 className="font-semibold text-foreground mb-2">Contact</h4>
+                  <div className="space-y-1 text-sm text-muted-foreground">
+                    {selectedEvent?.organizer && <p>Organized by: {selectedEvent.organizer}</p>}
+                    {selectedEvent?.contact && <p>Email: {selectedEvent.contact}</p>}
+                  </div>
+                </div>
+              )}
+              
+              <div className="flex gap-2 pt-2">
+                <Button className="flex-1">
+                  <Bell className="h-4 w-4 mr-2" />
+                  Set Reminder
+                </Button>
+                <Button variant="outline" size="icon">
+                  <Share2 className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
     </DashboardLayout>
   );
