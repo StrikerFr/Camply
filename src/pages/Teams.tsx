@@ -314,7 +314,7 @@ const Teams = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             className="relative overflow-hidden rounded-2xl border border-border/50 bg-gradient-to-b from-card to-card/80 shadow-2xl shadow-black/10"
-            style={{ height: "calc(100vh - 280px)", minHeight: "520px" }}
+            style={{ height: "calc(100vh - 240px)", minHeight: "560px" }}
           >
             {/* Subtle gradient overlay */}
             <div className="absolute inset-0 bg-gradient-to-br from-primary/[0.02] via-transparent to-transparent pointer-events-none" />
@@ -322,7 +322,7 @@ const Teams = () => {
             <div className="relative flex h-full">
               {/* Conversations List */}
               <div className={cn(
-                "w-full md:w-[320px] border-r border-border/50 flex flex-col bg-background/50 backdrop-blur-sm",
+                "w-full md:w-[360px] lg:w-[380px] border-r border-border/50 flex flex-col bg-background/50 backdrop-blur-sm shrink-0",
                 selectedConversation && "hidden md:flex"
               )}>
                 {/* Search Header */}
@@ -340,7 +340,7 @@ const Teams = () => {
 
                 {/* Conversation List */}
                 <ScrollArea className="flex-1">
-                  <div className="p-2">
+                  <div className="p-3">
                     {filteredConversations.length > 0 ? (
                       <AnimatePresence>
                         {filteredConversations.map((conv, index) => (
@@ -351,13 +351,13 @@ const Teams = () => {
                             transition={{ delay: index * 0.05 }}
                             onClick={() => setSelectedConversation(conv)}
                             className={cn(
-                              "w-full flex items-center gap-3 p-3 rounded-xl transition-all duration-300 text-left group mb-1",
+                              "w-full flex items-center gap-3 p-3.5 rounded-xl transition-all duration-300 text-left group mb-1.5",
                               selectedConversation?.id === conv.id 
                                 ? "bg-primary/10 border border-primary/20 shadow-sm" 
                                 : "hover:bg-muted/70 border border-transparent"
                             )}
                           >
-                            <div className="relative">
+                            <div className="relative shrink-0">
                               <div className={cn(
                                 "w-12 h-12 rounded-full flex items-center justify-center text-base font-bold text-primary-foreground transition-transform duration-300 group-hover:scale-105",
                                 "bg-gradient-to-br from-primary via-primary to-primary/80 shadow-lg shadow-primary/20"
@@ -372,18 +372,18 @@ const Teams = () => {
                                 />
                               )}
                             </div>
-                            <div className="flex-1 min-w-0">
-                              <div className="flex items-center justify-between gap-2">
+                            <div className="flex-1 min-w-0 overflow-hidden">
+                              <div className="flex items-center justify-between gap-3">
                                 <span className="font-semibold text-sm text-foreground truncate">{conv.name}</span>
-                                <span className="text-[11px] text-muted-foreground whitespace-nowrap">{conv.time}</span>
+                                <span className="text-[11px] text-muted-foreground whitespace-nowrap shrink-0">{conv.time}</span>
                               </div>
-                              <p className="text-[13px] text-muted-foreground truncate mt-0.5">{conv.lastMessage}</p>
+                              <p className="text-[13px] text-muted-foreground truncate mt-1 pr-2">{conv.lastMessage}</p>
                             </div>
                             {conv.unread > 0 && (
                               <motion.div 
                                 initial={{ scale: 0 }}
                                 animate={{ scale: 1 }}
-                                className="w-5 h-5 rounded-full bg-primary flex items-center justify-center text-[10px] font-bold text-primary-foreground shadow-lg shadow-primary/30"
+                                className="w-6 h-6 rounded-full bg-primary flex items-center justify-center text-[11px] font-bold text-primary-foreground shadow-lg shadow-primary/30 shrink-0"
                               >
                                 {conv.unread}
                               </motion.div>
