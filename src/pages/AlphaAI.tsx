@@ -702,7 +702,7 @@ const AlphaAI = () => {
                   size="icon"
                   onClick={handleEnhancePrompt}
                   disabled={isAiLoading || !chatInput.trim()}
-                  className="shrink-0 h-11 w-11 bg-gradient-to-br from-amber-500/20 to-orange-500/20 hover:from-amber-500/30 hover:to-orange-500/30 border border-amber-500/40 rounded-xl text-amber-400 hover:text-amber-300 transition-all duration-300"
+                  className="shrink-0 h-11 w-11 hover:bg-amber-500/10 rounded-xl text-amber-400 hover:text-amber-300 transition-all duration-300"
                 >
                   <Sparkles className="h-5 w-5" />
                 </Button>
