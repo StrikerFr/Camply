@@ -348,6 +348,8 @@ interface Review {
   rating: number | null;
   category: string;
   created_at: string;
+  parent_id: string | null;
+  replies?: Review[];
 }
 
 const MyCollege = () => {
@@ -364,6 +366,8 @@ const MyCollege = () => {
   const [newRating, setNewRating] = useState<number>(5);
   const [newCategory, setNewCategory] = useState("General");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [replyingTo, setReplyingTo] = useState<string | null>(null);
+  const [replyContent, setReplyContent] = useState("");
 
   // Fetch reviews
   useEffect(() => {
@@ -378,11 +382,25 @@ const MyCollege = () => {
       const { data, error } = await supabase
         .from("college_reviews")
         .select("*")
+        .is("parent_id", null)
         .order("created_at", { ascending: false })
         .limit(50);
       
       if (error) throw error;
-      setReviews(data || []);
+      
+      // Fetch replies for each review
+      const reviewsWithReplies = await Promise.all(
+        (data || []).map(async (review) => {
+          const { data: replies } = await supabase
+            .from("college_reviews")
+            .select("*")
+            .eq("parent_id", review.id)
+            .order("created_at", { ascending: true });
+          return { ...review, replies: replies || [] };
+        })
+      );
+      
+      setReviews(reviewsWithReplies);
     } catch (error) {
       console.error("Error fetching reviews:", error);
       toast.error("Failed to load reviews");
@@ -425,6 +443,40 @@ const MyCollege = () => {
     } catch (error) {
       console.error("Error submitting review:", error);
       toast.error("Failed to submit review");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleSubmitReply = async (parentId: string) => {
+    if (!replyContent.trim()) {
+      toast.error("Please write a reply");
+      return;
+    }
+    if (replyContent.trim().length < 5) {
+      toast.error("Reply must be at least 5 characters");
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      const { error } = await supabase
+        .from("college_reviews")
+        .insert({
+          content: replyContent.trim(),
+          parent_id: parentId,
+          category: "Reply",
+        });
+      
+      if (error) throw error;
+      
+      toast.success("Reply posted anonymously!");
+      setReplyContent("");
+      setReplyingTo(null);
+      fetchReviews();
+    } catch (error) {
+      console.error("Error submitting reply:", error);
+      toast.error("Failed to post reply");
     } finally {
       setIsSubmitting(false);
     }
@@ -882,7 +934,7 @@ const MyCollege = () => {
                       <p className="text-foreground/90 leading-relaxed mb-3">{review.content}</p>
                       
                       {review.rating && (
-                        <div className="flex items-center gap-1">
+                        <div className="flex items-center gap-1 mb-3">
                           {[1, 2, 3, 4, 5].map((star) => (
                             <Star
                               key={star}
@@ -893,6 +945,85 @@ const MyCollege = () => {
                                   : "text-muted-foreground/30"
                               )}
                             />
+                          ))}
+                        </div>
+                      )}
+                      
+                      {/* Reply Button */}
+                      <div className="flex items-center gap-3 pt-3 border-t border-border/50">
+                        <button
+                          onClick={() => setReplyingTo(replyingTo === review.id ? null : review.id)}
+                          className="text-xs text-muted-foreground hover:text-primary transition-colors flex items-center gap-1"
+                        >
+                          <MessageSquare className="h-3.5 w-3.5" />
+                          Reply
+                        </button>
+                        {review.replies && review.replies.length > 0 && (
+                          <span className="text-xs text-muted-foreground">
+                            {review.replies.length} {review.replies.length === 1 ? 'reply' : 'replies'}
+                          </span>
+                        )}
+                      </div>
+                      
+                      {/* Reply Input */}
+                      {replyingTo === review.id && (
+                        <motion.div
+                          initial={{ opacity: 0, height: 0 }}
+                          animate={{ opacity: 1, height: "auto" }}
+                          exit={{ opacity: 0, height: 0 }}
+                          className="mt-3 pl-4 border-l-2 border-primary/30"
+                        >
+                          <div className="flex gap-2">
+                            <Textarea
+                              placeholder="Write an anonymous reply..."
+                              value={replyContent}
+                              onChange={(e) => setReplyContent(e.target.value)}
+                              className="min-h-[60px] resize-none text-sm"
+                              maxLength={500}
+                            />
+                          </div>
+                          <div className="flex justify-end gap-2 mt-2">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => {
+                                setReplyingTo(null);
+                                setReplyContent("");
+                              }}
+                            >
+                              Cancel
+                            </Button>
+                            <Button
+                              size="sm"
+                              onClick={() => handleSubmitReply(review.id)}
+                              disabled={isSubmitting || !replyContent.trim()}
+                            >
+                              <Send className="h-3.5 w-3.5 mr-1" />
+                              Reply
+                            </Button>
+                          </div>
+                        </motion.div>
+                      )}
+                      
+                      {/* Replies List */}
+                      {review.replies && review.replies.length > 0 && (
+                        <div className="mt-4 space-y-3 pl-4 border-l-2 border-muted">
+                          {review.replies.map((reply) => (
+                            <motion.div
+                              key={reply.id}
+                              initial={{ opacity: 0 }}
+                              animate={{ opacity: 1 }}
+                              className="bg-muted/30 rounded-lg p-3"
+                            >
+                              <div className="flex items-center gap-2 mb-2">
+                                <div className="w-6 h-6 rounded-full bg-gradient-to-br from-secondary/20 to-secondary/5 flex items-center justify-center">
+                                  <User className="h-3 w-3 text-secondary-foreground" />
+                                </div>
+                                <span className="text-xs font-medium text-foreground">Anonymous</span>
+                                <span className="text-xs text-muted-foreground">• {formatTimeAgo(reply.created_at)}</span>
+                              </div>
+                              <p className="text-sm text-foreground/80">{reply.content}</p>
+                            </motion.div>
                           ))}
                         </div>
                       )}
