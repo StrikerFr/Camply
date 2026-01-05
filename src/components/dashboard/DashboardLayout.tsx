@@ -14,7 +14,9 @@ import {
   Settings,
   ChevronDown,
   Rocket,
-  ExternalLink
+  ExternalLink,
+  Bot,
+  GraduationCap
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -34,6 +36,8 @@ interface DashboardLayoutProps {
 
 const navItems = [
   { icon: LayoutDashboard, label: "Home", href: "/dashboard" },
+  { icon: Bot, label: "Alpha AI", href: "/alpha-ai" },
+  { icon: GraduationCap, label: "My College", href: "/my-college" },
   { icon: Rocket, label: "Opportunities", href: "/opportunities" },
   { icon: Users, label: "Connect", href: "/teams" },
   { icon: Trophy, label: "Leaderboard", href: "/leaderboard" },

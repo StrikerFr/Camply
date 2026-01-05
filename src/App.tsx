@@ -16,6 +16,8 @@ import Opportunities from "./pages/Opportunities";
 import Teams from "./pages/Teams";
 import Leaderboard from "./pages/Leaderboard";
 import Settings from "./pages/Settings";
+import AlphaAI from "./pages/AlphaAI";
+import MyCollege from "./pages/MyCollege";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -40,6 +42,8 @@ const App = () => (
               <Route path="/teams" element={<Teams />} />
               <Route path="/leaderboard" element={<Leaderboard />} />
               <Route path="/settings" element={<Settings />} />
+              <Route path="/alpha-ai" element={<AlphaAI />} />
+              <Route path="/my-college" element={<MyCollege />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
