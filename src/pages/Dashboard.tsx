@@ -441,8 +441,9 @@ const Dashboard = () => {
               dragFree: true,
               skipSnaps: false,
               containScroll: "trimSnaps",
+              duration: 25,
             }}
-            className="w-full cursor-grab active:cursor-grabbing"
+            className="w-full cursor-grab active:cursor-grabbing select-none"
           >
             <CarouselContent className="-ml-3">
               {FAKE_OPPORTUNITIES.map((opp, index) => (
