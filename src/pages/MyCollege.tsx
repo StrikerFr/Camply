@@ -134,7 +134,8 @@ const COMPETITIONS = [
     date: "March 16, 2026",
     prize: "₹50,000",
     category: "Robotics",
-    registrations: 45
+    registrations: 45,
+    description: "Build and battle combat robots in an arena showdown. Teams compete in weight categories with custom-designed bots."
   },
   {
     id: "2",
@@ -142,7 +143,8 @@ const COMPETITIONS = [
     date: "February 25, 2026",
     prize: "₹30,000",
     category: "Management",
-    registrations: 120
+    registrations: 120,
+    description: "Analyze real-world business challenges and present innovative solutions to industry judges and mentors."
   },
   {
     id: "3",
@@ -150,7 +152,8 @@ const COMPETITIONS = [
     date: "January 28, 2026",
     prize: "₹25,000",
     category: "Cybersecurity",
-    registrations: 80
+    registrations: 80,
+    description: "Test your hacking skills in this cybersecurity challenge. Solve puzzles, exploit vulnerabilities, and capture flags."
   }
 ];
 
@@ -419,13 +422,20 @@ const MyCollege = () => {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.1 }}
-                  className="bg-card border border-border rounded-xl p-5 hover:border-primary/50 transition-colors"
+                  whileHover={{ 
+                    y: -6,
+                    transition: { type: "spring", stiffness: 400, damping: 25 }
+                  }}
+                  className="bg-card border border-border rounded-xl p-5 hover:border-primary/50 hover:shadow-lg hover:shadow-primary/5 transition-all duration-300 cursor-pointer group"
                 >
                   <span className="px-2.5 py-1 text-xs font-medium bg-muted text-muted-foreground rounded-full">
                     {comp.category}
                   </span>
-                  <h3 className="text-lg font-semibold text-foreground mt-3">{comp.title}</h3>
-                  <div className="flex items-center gap-2 mt-2 text-sm text-muted-foreground">
+                  <h3 className="text-lg font-semibold text-foreground mt-3 group-hover:text-primary transition-colors">{comp.title}</h3>
+                  <p className="text-sm text-muted-foreground mt-2 line-clamp-2 group-hover:text-foreground/70 transition-colors">
+                    {comp.description}
+                  </p>
+                  <div className="flex items-center gap-2 mt-3 text-sm text-muted-foreground">
                     <Calendar className="h-4 w-4" />
                     {comp.date}
                   </div>
