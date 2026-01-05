@@ -155,12 +155,66 @@ const COMPETITIONS = [
 ];
 
 const CLUBS = [
-  { id: "1", name: "Coding Club", members: 450, icon: "💻", category: "Technical" },
-  { id: "2", name: "Robotics Society", members: 180, icon: "🤖", category: "Technical" },
-  { id: "3", name: "Music Club", members: 200, icon: "🎵", category: "Cultural" },
-  { id: "4", name: "Photography Club", members: 150, icon: "📷", category: "Cultural" },
-  { id: "5", name: "Entrepreneurship Cell", members: 300, icon: "🚀", category: "Professional" },
-  { id: "6", name: "Literary Society", members: 120, icon: "📚", category: "Cultural" },
+  { 
+    id: "1", 
+    name: "Coding Club", 
+    members: 450, 
+    icon: "💻", 
+    category: "Technical",
+    description: "A community of passionate programmers solving complex problems, participating in competitive coding, and building innovative projects together.",
+    events: 12,
+    isJoined: false
+  },
+  { 
+    id: "2", 
+    name: "Robotics Society", 
+    members: 180, 
+    icon: "🤖", 
+    category: "Technical",
+    description: "Design, build, and program robots for national and international competitions. From drones to humanoids, we do it all!",
+    events: 8,
+    isJoined: true
+  },
+  { 
+    id: "3", 
+    name: "Music Club", 
+    members: 200, 
+    icon: "🎵", 
+    category: "Cultural",
+    description: "Express yourself through music! Weekly jam sessions, band performances, and opportunities to perform at college fests.",
+    events: 15,
+    isJoined: false
+  },
+  { 
+    id: "4", 
+    name: "Photography Club", 
+    members: 150, 
+    icon: "📷", 
+    category: "Cultural",
+    description: "Capture moments, learn professional photography techniques, and showcase your work in exhibitions and competitions.",
+    events: 6,
+    isJoined: false
+  },
+  { 
+    id: "5", 
+    name: "Entrepreneurship Cell", 
+    members: 300, 
+    icon: "🚀", 
+    category: "Professional",
+    description: "Turn ideas into startups! Networking with founders, startup workshops, and incubation support for aspiring entrepreneurs.",
+    events: 20,
+    isJoined: true
+  },
+  { 
+    id: "6", 
+    name: "Literary Society", 
+    members: 120, 
+    icon: "📚", 
+    category: "Cultural",
+    description: "For lovers of words - poetry slams, creative writing workshops, debates, and literary festivals throughout the year.",
+    events: 10,
+    isJoined: false
+  },
 ];
 
 const MyCollege = () => {
@@ -395,21 +449,58 @@ const MyCollege = () => {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.1 }}
-                  className="bg-card border border-border rounded-xl p-5 hover:border-primary/50 transition-colors cursor-pointer"
+                  whileHover={{ 
+                    y: -6,
+                    transition: { type: "spring", stiffness: 400, damping: 25 }
+                  }}
+                  className="bg-card border border-border rounded-xl p-5 hover:border-primary/50 hover:shadow-lg hover:shadow-primary/5 transition-all duration-300 cursor-pointer group"
                 >
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-xl bg-muted flex items-center justify-center text-2xl">
-                      {club.icon}
+                  <div className="flex items-start justify-between">
+                    <div className="flex items-center gap-4">
+                      <motion.div 
+                        className="w-14 h-14 rounded-xl bg-gradient-to-br from-muted to-muted/50 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform duration-300"
+                        whileHover={{ rotate: [0, -10, 10, 0] }}
+                        transition={{ duration: 0.5 }}
+                      >
+                        {club.icon}
+                      </motion.div>
+                      <div>
+                        <h3 className="font-semibold text-foreground group-hover:text-primary transition-colors">{club.name}</h3>
+                        <p className="text-sm text-muted-foreground">{club.members} members</p>
+                      </div>
                     </div>
-                    <div>
-                      <h3 className="font-semibold text-foreground">{club.name}</h3>
-                      <p className="text-sm text-muted-foreground">{club.members} members</p>
-                    </div>
+                    {club.isJoined && (
+                      <span className="px-2 py-1 text-xs font-medium bg-emerald-500/10 text-emerald-500 rounded-full">
+                        Joined
+                      </span>
+                    )}
                   </div>
-                  <div className="mt-4">
+                  
+                  <p className="text-sm text-muted-foreground mt-4 line-clamp-2 group-hover:text-foreground/70 transition-colors">
+                    {club.description}
+                  </p>
+                  
+                  <div className="flex items-center gap-3 mt-4 pt-4 border-t border-border">
                     <span className="px-2.5 py-1 text-xs font-medium bg-muted text-muted-foreground rounded-full">
                       {club.category}
                     </span>
+                    <span className="text-xs text-muted-foreground flex items-center gap-1">
+                      <Calendar className="h-3 w-3" />
+                      {club.events} events
+                    </span>
+                  </div>
+                  
+                  <div className="mt-4 flex gap-2">
+                    <Button 
+                      variant={club.isJoined ? "outline" : "default"} 
+                      size="sm" 
+                      className="flex-1 group-hover:shadow-md transition-shadow"
+                    >
+                      {club.isJoined ? "View Club" : "Join Club"}
+                    </Button>
+                    <Button variant="ghost" size="sm" className="px-3">
+                      <ExternalLink className="h-4 w-4" />
+                    </Button>
                   </div>
                 </motion.div>
               ))}
