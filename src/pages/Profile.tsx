@@ -47,12 +47,12 @@ const FAKE_STATS = {
 const FAKE_SKILLS = ["React", "TypeScript", "Python", "UI/UX Design", "Node.js", "Machine Learning"];
 
 const FAKE_ACHIEVEMENTS = [
-  { id: "1", name: "First Steps", icon: "🚀", unlocked: true, description: "Complete your first event" },
-  { id: "2", name: "Team Player", icon: "👥", unlocked: true, description: "Join your first team" },
-  { id: "3", name: "Rising Star", icon: "⭐", unlocked: true, description: "Reach 1000 points" },
-  { id: "4", name: "Hackathon Hero", icon: "💻", unlocked: true, description: "Win a hackathon" },
-  { id: "5", name: "Networker", icon: "🤝", unlocked: false, description: "Connect with 50 people" },
-  { id: "6", name: "Legend", icon: "👑", unlocked: false, description: "Reach top 10 on leaderboard" },
+  { id: "1", name: "First Steps", icon: "🚀", unlocked: true, description: "Complete your first event", progress: 100, current: 1, target: 1 },
+  { id: "2", name: "Team Player", icon: "👥", unlocked: true, description: "Join your first team", progress: 100, current: 3, target: 1 },
+  { id: "3", name: "Rising Star", icon: "⭐", unlocked: true, description: "Reach 1000 points", progress: 100, current: 2450, target: 1000 },
+  { id: "4", name: "Hackathon Hero", icon: "💻", unlocked: true, description: "Win a hackathon", progress: 100, current: 1, target: 1 },
+  { id: "5", name: "Networker", icon: "🤝", unlocked: false, description: "Connect with 50 people", progress: 68, current: 34, target: 50 },
+  { id: "6", name: "Legend", icon: "👑", unlocked: false, description: "Reach top 10 on leaderboard", progress: 20, current: 12, target: 10 },
 ];
 
 const FAKE_ACTIVITY = [
@@ -266,31 +266,130 @@ const Profile = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2 }}
-                className="bg-card border border-border rounded-xl p-5"
+                className="bg-card border border-border rounded-xl p-6"
               >
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="font-semibold text-foreground">Achievements</h3>
-                  <span className="text-sm text-muted-foreground">{unlockedCount}/{totalCount} unlocked</span>
+                <div className="flex items-center justify-between mb-6">
+                  <div>
+                    <h3 className="font-semibold text-foreground text-lg">Achievements</h3>
+                    <p className="text-sm text-muted-foreground">Your journey milestones</p>
+                  </div>
+                  <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10">
+                    <Trophy className="h-4 w-4 text-primary" />
+                    <span className="text-sm font-medium text-primary">{unlockedCount}/{totalCount}</span>
+                  </div>
                 </div>
-                <div className="grid grid-cols-3 sm:grid-cols-6 gap-3">
-                  {FAKE_ACHIEVEMENTS.map((ach) => (
-                    <div
-                      key={ach.id}
-                      className={cn(
-                        "aspect-square rounded-xl flex flex-col items-center justify-center p-2 transition-transform hover:scale-105 cursor-pointer",
-                        ach.unlocked
-                          ? "bg-primary/10 border border-primary/30"
-                          : "bg-secondary/50 opacity-40"
-                      )}
-                      title={`${ach.name}: ${ach.description}`}
-                    >
-                      <span className="text-2xl mb-1">{ach.icon}</span>
-                      <span className="text-[10px] text-center text-muted-foreground leading-tight">
-                        {ach.name}
-                      </span>
-                    </div>
-                  ))}
+
+                {/* Progress Timeline */}
+                <div className="relative">
+                  {/* Timeline connector line */}
+                  <div className="absolute top-8 left-0 right-0 h-1 bg-border rounded-full hidden sm:block">
+                    <motion.div 
+                      initial={{ width: 0 }}
+                      animate={{ width: `${(unlockedCount / totalCount) * 100}%` }}
+                      transition={{ duration: 1, delay: 0.5 }}
+                      className="h-full bg-gradient-to-r from-primary to-primary/60 rounded-full"
+                    />
+                  </div>
+
+                  {/* Achievement Cards */}
+                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+                    {FAKE_ACHIEVEMENTS.map((ach, index) => (
+                      <motion.div
+                        key={ach.id}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.3 + index * 0.1 }}
+                        whileHover={{ scale: 1.05, y: -4 }}
+                        className={cn(
+                          "relative flex flex-col items-center p-4 rounded-2xl cursor-pointer transition-all duration-300 group",
+                          ach.unlocked
+                            ? "bg-gradient-to-b from-primary/15 to-primary/5 border border-primary/30 shadow-lg shadow-primary/10"
+                            : "bg-secondary/30 border border-border"
+                        )}
+                      >
+                        {/* Step number */}
+                        <div className={cn(
+                          "absolute -top-2 -left-2 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold border-2",
+                          ach.unlocked 
+                            ? "bg-primary text-primary-foreground border-background" 
+                            : "bg-muted text-muted-foreground border-background"
+                        )}>
+                          {index + 1}
+                        </div>
+
+                        {/* Icon container */}
+                        <div className={cn(
+                          "w-14 h-14 rounded-xl flex items-center justify-center mb-3 transition-transform duration-300 group-hover:scale-110",
+                          ach.unlocked 
+                            ? "bg-primary/20 shadow-inner" 
+                            : "bg-muted/50"
+                        )}>
+                          <span className={cn(
+                            "text-3xl transition-all duration-300",
+                            !ach.unlocked && "grayscale opacity-50"
+                          )}>
+                            {ach.icon}
+                          </span>
+                        </div>
+
+                        {/* Name */}
+                        <span className={cn(
+                          "text-xs font-medium text-center leading-tight mb-2",
+                          ach.unlocked ? "text-foreground" : "text-muted-foreground"
+                        )}>
+                          {ach.name}
+                        </span>
+
+                        {/* Progress bar */}
+                        <div className="w-full h-1.5 bg-border rounded-full overflow-hidden">
+                          <motion.div
+                            initial={{ width: 0 }}
+                            animate={{ width: `${ach.progress}%` }}
+                            transition={{ duration: 0.8, delay: 0.5 + index * 0.1 }}
+                            className={cn(
+                              "h-full rounded-full",
+                              ach.unlocked 
+                                ? "bg-gradient-to-r from-primary to-primary/80" 
+                                : "bg-muted-foreground/50"
+                            )}
+                          />
+                        </div>
+
+                        {/* Progress text */}
+                        <span className={cn(
+                          "text-[10px] mt-1.5",
+                          ach.unlocked ? "text-primary" : "text-muted-foreground"
+                        )}>
+                          {ach.unlocked ? "Completed ✓" : `${ach.current}/${ach.target}`}
+                        </span>
+
+                        {/* Glow effect on hover */}
+                        {ach.unlocked && (
+                          <div className="absolute inset-0 rounded-2xl bg-primary/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
+                        )}
+                      </motion.div>
+                    ))}
+                  </div>
                 </div>
+
+                {/* Next Achievement Hint */}
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 1 }}
+                  className="mt-6 p-4 rounded-xl bg-secondary/30 border border-border flex items-center gap-4"
+                >
+                  <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+                    <span className="text-xl">🎯</span>
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-sm font-medium text-foreground">Next: Networker</p>
+                    <p className="text-xs text-muted-foreground">Connect with 16 more people to unlock</p>
+                  </div>
+                  <div className="text-right">
+                    <span className="text-lg font-bold text-primary">68%</span>
+                  </div>
+                </motion.div>
               </motion.div>
 
               {/* Activity Feed */}
