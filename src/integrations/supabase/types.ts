@@ -22,6 +22,7 @@ export type Database = {
           created_at: string
           id: string
           is_approved: boolean | null
+          parent_id: string | null
           rating: number | null
         }
         Insert: {
@@ -31,6 +32,7 @@ export type Database = {
           created_at?: string
           id?: string
           is_approved?: boolean | null
+          parent_id?: string | null
           rating?: number | null
         }
         Update: {
@@ -40,9 +42,18 @@ export type Database = {
           created_at?: string
           id?: string
           is_approved?: boolean | null
+          parent_id?: string | null
           rating?: number | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "college_reviews_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "college_reviews"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
