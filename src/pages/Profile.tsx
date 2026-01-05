@@ -227,7 +227,7 @@ const Profile = () => {
                   {FAKE_SKILLS.map((skill) => (
                     <span
                       key={skill}
-                      className="px-3 py-1 text-sm bg-primary/10 text-primary rounded-full"
+                      className="px-3 py-1 text-sm bg-muted text-muted-foreground rounded-full cursor-pointer transition-colors hover:bg-primary/10 hover:text-primary"
                     >
                       {skill}
                     </span>
