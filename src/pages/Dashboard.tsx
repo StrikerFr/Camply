@@ -32,6 +32,62 @@ const FAKE_OPPORTUNITIES = [{
   registration_deadline: "Feb 1, 2026",
   location: "Open Auditorium",
   points: 250
+}, {
+  id: "4",
+  title: "Design Sprint Challenge",
+  category: "Design",
+  is_featured: true,
+  registration_deadline: "Jan 25, 2026",
+  location: "Innovation Hub",
+  points: 400
+}, {
+  id: "5",
+  title: "Startup Pitch Competition",
+  category: "Business",
+  is_featured: false,
+  registration_deadline: "Feb 5, 2026",
+  location: "Auditorium A",
+  points: 450
+}, {
+  id: "6",
+  title: "AI/ML Workshop",
+  category: "Tech",
+  is_featured: true,
+  registration_deadline: "Jan 30, 2026",
+  location: "Tech Block",
+  points: 350
+}, {
+  id: "7",
+  title: "Photography Exhibition",
+  category: "Cultural",
+  is_featured: false,
+  registration_deadline: "Feb 10, 2026",
+  location: "Art Gallery",
+  points: 200
+}, {
+  id: "8",
+  title: "Public Speaking Workshop",
+  category: "Management",
+  is_featured: false,
+  registration_deadline: "Feb 8, 2026",
+  location: "Seminar Hall",
+  points: 280
+}, {
+  id: "9",
+  title: "Robotics Championship",
+  category: "Tech",
+  is_featured: true,
+  registration_deadline: "Feb 15, 2026",
+  location: "Engineering Block",
+  points: 550
+}, {
+  id: "10",
+  title: "Music Fest - Harmony",
+  category: "Cultural",
+  is_featured: false,
+  registration_deadline: "Feb 20, 2026",
+  location: "Open Stage",
+  points: 320
 }];
 const FAKE_LEADERBOARD_INITIAL = [{
   rank: 1,
