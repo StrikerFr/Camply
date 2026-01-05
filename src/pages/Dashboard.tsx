@@ -1,7 +1,8 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect, useRef } from "react";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
-import { Trophy, Calendar, Users, TrendingUp, ArrowRight, Clock, MapPin, Zap, Target, ArrowUp, Check, ChevronRight, Star, Award, Code, Palette, Briefcase, Sparkles, MessageSquare, Bot, Send, ChevronLeft } from "lucide-react";
+import { Trophy, Calendar, Users, TrendingUp, ArrowRight, Clock, MapPin, Zap, Target, ArrowUp, Check, ChevronRight, Star, Award, Code, Palette, Briefcase, Sparkles, MessageSquare, Bot, Send, ChevronLeft, SlidersHorizontal, Mic, Upload } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import Autoplay from "embla-carousel-autoplay";
 import { Button } from "@/components/ui/button";
@@ -607,6 +608,17 @@ const Dashboard = () => {
                   <p className="text-sm text-muted-foreground">by Camply</p>
                 </div>
               </div>
+              
+              {/* Gen Z Mode & Settings */}
+              <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-medium text-muted-foreground">gen z mode</span>
+                  <Switch className="data-[state=checked]:bg-primary" />
+                </div>
+                <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-foreground hover:bg-muted/50">
+                  <SlidersHorizontal className="h-4 w-4" />
+                </Button>
+              </div>
             </div>
 
             {/* AI Chat Area */}
@@ -625,11 +637,29 @@ const Dashboard = () => {
               
               {/* Chat Input */}
               <div className="p-4 border-t border-border">
-                <div className="flex items-center gap-2">
-                  <input type="text" placeholder="Ask Alpha AI..." className="flex-1 bg-muted/50 border border-border rounded-lg px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/50 transition-all" />
-                  <Button size="icon" className="h-10 w-10 bg-primary hover:bg-primary/90">
-                    <Send className="h-4 w-4" />
-                  </Button>
+                <input type="text" placeholder="Ask Alpha AI..." className="w-full bg-transparent border-none text-sm text-foreground placeholder:text-muted-foreground focus:outline-none mb-3" />
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Button variant="outline" size="sm" className="h-8 gap-1.5 text-xs font-medium border-border hover:bg-muted/50">
+                      <Mic className="h-3.5 w-3.5" />
+                      Talk to Alpha
+                    </Button>
+                    <Button variant="outline" size="sm" className="h-8 gap-1.5 text-xs font-medium border-border hover:bg-muted/50">
+                      <Upload className="h-3.5 w-3.5" />
+                      Upload Image
+                    </Button>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-foreground">
+                      <Mic className="h-4 w-4" />
+                    </Button>
+                    <Button variant="ghost" size="icon" className="h-8 w-8 text-amber-500 hover:text-amber-400 hover:bg-amber-500/10">
+                      <Sparkles className="h-4 w-4" />
+                    </Button>
+                    <Button size="icon" className="h-8 w-8 bg-gradient-to-r from-cyan-500 to-primary hover:opacity-90">
+                      <Send className="h-4 w-4" />
+                    </Button>
+                  </div>
                 </div>
               </div>
             </div>
