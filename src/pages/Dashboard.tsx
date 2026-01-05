@@ -59,26 +59,24 @@ const FAKE_LEADERBOARD_INITIAL = [{
   avatar: "Y",
   isUser: true
 }];
-const FAKE_ACHIEVEMENTS = [{
+const FAKE_PROJECTS = [{
   id: "1",
-  name: "First Event",
-  icon: "🎯",
-  unlocked: true
+  name: "Alpha AI",
+  icon: "🤖",
+  status: "active",
+  progress: 75
 }, {
   id: "2",
-  name: "Team Player",
-  icon: "🤝",
-  unlocked: true
+  name: "Campus Connect",
+  icon: "🎓",
+  status: "active",
+  progress: 40
 }, {
   id: "3",
-  name: "Point Master",
-  icon: "⚡",
-  unlocked: true
-}, {
-  id: "4",
-  name: "Champion",
-  icon: "🏆",
-  unlocked: false
+  name: "Event Tracker",
+  icon: "📅",
+  status: "paused",
+  progress: 60
 }];
 const categoryIcons: Record<string, React.ReactNode> = {
   Tech: <Code className="h-3 w-3" />,
@@ -365,14 +363,51 @@ const Dashboard = () => {
               <StatCardSkeleton />
               <StatCardSkeleton />
             </> : stats.map((stat, index) => {
-          const statRoutes: Record<string, string> = {
-            "Events": "/opportunities",
-            "Teams": "/teams",
-            "Rank": "/leaderboard"
-          };
-          const Icon = stat.icon;
-          return;
-        })}
+              const statRoutes: Record<string, string> = {
+                "Events": "/opportunities",
+                "Teams": "/teams",
+                "Rank": "/leaderboard"
+              };
+              const Icon = stat.icon;
+              return (
+                <motion.div
+                  key={stat.label}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.1 + index * 0.05, duration: 0.5 }}
+                  whileHover={{ scale: 1.02, y: -2 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={() => navigate(statRoutes[stat.label])}
+                  className="bg-card border border-border rounded-xl p-5 cursor-pointer hover:shadow-lg hover:border-primary/20 transition-all duration-300"
+                >
+                  <div className="flex items-center justify-between mb-4">
+                    <div className={cn(
+                      "p-2.5 rounded-lg transition-colors",
+                      stat.isChanging ? "bg-emerald-500/20" : "bg-primary/10"
+                    )}>
+                      <Icon className={cn("h-5 w-5", stat.isChanging ? "text-emerald-400" : "text-primary")} />
+                    </div>
+                    {stat.isChanging && (
+                      <motion.div
+                        initial={{ opacity: 0, scale: 0.5 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        className="flex items-center gap-1 text-emerald-400 text-xs font-medium"
+                      >
+                        <ArrowUp className="h-3 w-3" />
+                        {recentChange?.amount && Math.abs(recentChange.amount)}
+                      </motion.div>
+                    )}
+                  </div>
+                  <CountUpNumber
+                    value={stat.value}
+                    prefix={stat.isRank ? "#" : ""}
+                    className="text-2xl font-bold text-foreground"
+                    isAnimating={stat.isChanging}
+                  />
+                  <p className="text-muted-foreground text-sm mt-1">{stat.change}</p>
+                </motion.div>
+              );
+            })}
         </div>
 
         <div className="grid lg:grid-cols-3 gap-6 lg:gap-8">
@@ -482,32 +517,48 @@ const Dashboard = () => {
               </div>
             </div>
 
-            {/* Achievements */}
+            {/* My Projects */}
             <div className="bg-card border border-border rounded-xl p-5">
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2.5">
-                  <Award className="h-4 w-4 text-primary" />
-                  <span className="font-semibold text-foreground">Achievements</span>
+                  <Briefcase className="h-4 w-4 text-primary" />
+                  <span className="font-semibold text-foreground">My Projects</span>
                 </div>
                 <span className="text-xs text-muted-foreground font-medium bg-muted px-2 py-0.5 rounded-full">
-                  {FAKE_ACHIEVEMENTS.filter(a => a.unlocked).length}/{FAKE_ACHIEVEMENTS.length}
+                  {FAKE_PROJECTS.filter(p => p.status === "active").length} active
                 </span>
               </div>
-              <div className="grid grid-cols-4 gap-3">
-                {FAKE_ACHIEVEMENTS.map((achievement, index) => <motion.div key={achievement.id} initial={{
-                opacity: 0,
-                scale: 0.8
-              }} animate={{
-                opacity: 1,
-                scale: 1
-              }} transition={{
-                delay: 0.5 + index * 0.05
-              }} whileHover={achievement.unlocked ? {
-                scale: 1.08,
-                y: -2
-              } : {}} className={cn("aspect-square rounded-xl flex items-center justify-center text-2xl transition-all duration-200 cursor-default", achievement.unlocked ? "bg-muted hover:bg-accent hover:shadow-md" : "bg-muted/40 opacity-40 grayscale")} title={achievement.name}>
-                    {achievement.icon}
-                  </motion.div>)}
+              <div className="space-y-2.5">
+                {FAKE_PROJECTS.map((project, index) => <motion.div 
+                  key={project.id} 
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.5 + index * 0.05 }}
+                  whileHover={{ scale: 1.02, x: 2 }}
+                  className={cn(
+                    "flex items-center gap-3 p-2.5 rounded-lg cursor-pointer transition-all duration-200",
+                    project.status === "active" 
+                      ? "bg-muted/50 hover:bg-muted" 
+                      : "bg-muted/30 opacity-60"
+                  )}
+                >
+                  <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center text-lg">
+                    {project.icon}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-foreground truncate">{project.name}</p>
+                    <div className="flex items-center gap-2 mt-1">
+                      <div className="flex-1 h-1.5 bg-muted rounded-full overflow-hidden">
+                        <div 
+                          className="h-full bg-primary rounded-full transition-all duration-300" 
+                          style={{ width: `${project.progress}%` }}
+                        />
+                      </div>
+                      <span className="text-xs text-muted-foreground">{project.progress}%</span>
+                    </div>
+                  </div>
+                  <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                </motion.div>)}
               </div>
             </div>
 
