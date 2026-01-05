@@ -263,14 +263,6 @@ const Dashboard = () => {
 
   const stats = [
     { 
-      label: "Total Points", 
-      value: liveStats.totalPoints,
-      icon: Trophy, 
-      change: `+${liveStats.weeklyPoints} this week`,
-      isChanging: recentChange?.stat === "points",
-      accent: true
-    },
-    { 
       label: "Events", 
       value: liveStats.eventsCount,
       icon: Calendar, 
@@ -323,7 +315,7 @@ const Dashboard = () => {
         </motion.div>
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-5">
+        <div className="grid grid-cols-3 gap-4 lg:gap-5">
           {isLoading ? (
             <>
               <StatCardSkeleton />
@@ -351,16 +343,11 @@ const Dashboard = () => {
                     "relative bg-card border rounded-xl p-5 cursor-pointer group overflow-hidden transition-all duration-300",
                     stat.isChanging 
                       ? "border-emerald-500/40 shadow-lg shadow-emerald-500/10" 
-                      : "border-border hover:border-border/60 hover:shadow-lg hover:shadow-black/20",
-                    stat.accent && "border-primary/20 hover:border-primary/30"
+                      : "border-border hover:border-border/60 hover:shadow-lg hover:shadow-black/20"
                   )}
                   whileHover={{ y: -3, transition: { duration: 0.2 } }}
                   whileTap={{ scale: 0.98 }}
                 >
-                  {/* Subtle glow on hover for accent card */}
-                  {stat.accent && (
-                    <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                  )}
                   
                   <AnimatePresence>
                     {stat.isChanging && (
@@ -376,16 +363,8 @@ const Dashboard = () => {
                   
                   <div className="relative z-10">
                     <div className="flex items-center justify-between mb-4">
-                      <div className={cn(
-                        "p-2.5 rounded-lg transition-all duration-300",
-                        stat.accent 
-                          ? "bg-primary/10 group-hover:bg-primary/15" 
-                          : "bg-muted group-hover:bg-accent"
-                      )}>
-                        <stat.icon className={cn(
-                          "h-4 w-4 transition-colors duration-300",
-                          stat.accent ? "text-primary" : "text-muted-foreground group-hover:text-foreground"
-                        )} />
+                      <div className="p-2.5 rounded-lg transition-all duration-300 bg-muted group-hover:bg-accent">
+                        <stat.icon className="h-4 w-4 transition-colors duration-300 text-muted-foreground group-hover:text-foreground" />
                       </div>
                       <AnimatePresence>
                         {stat.isChanging && recentChange && (
@@ -404,7 +383,7 @@ const Dashboard = () => {
                     
                     <div className={cn(
                       "text-2xl lg:text-3xl font-display font-bold tracking-tight",
-                      stat.isChanging ? "text-emerald-400" : stat.accent ? "text-primary" : "text-foreground"
+                      stat.isChanging ? "text-emerald-400" : "text-foreground"
                     )}>
                       {stat.isRank ? (
                         <CountUpNumber value={stat.value} prefix="#" isAnimating={stat.isChanging} />
@@ -414,10 +393,7 @@ const Dashboard = () => {
                     </div>
                     <div className="flex items-center justify-between mt-2">
                       <span className="text-sm text-muted-foreground font-medium">{stat.label}</span>
-                      <span className={cn(
-                        "text-xs font-medium",
-                        stat.accent ? "text-primary/70" : "text-muted-foreground/60"
-                      )}>
+                      <span className="text-xs font-medium text-muted-foreground/60">
                         {stat.change}
                       </span>
                     </div>
