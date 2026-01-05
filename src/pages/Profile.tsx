@@ -189,7 +189,7 @@ const Profile = () => {
                 <h3 className="font-semibold text-foreground mb-4">Stats Overview</h3>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="text-center p-3 rounded-lg bg-secondary/50 cursor-pointer transition-colors hover:bg-muted group">
-                    <div className="text-2xl font-display font-bold text-foreground transition-colors group-hover:text-muted-foreground">
+                    <div className="text-2xl font-display font-bold text-foreground transition-colors group-hover:text-primary">
                       {FAKE_STATS.totalPoints.toLocaleString()}
                     </div>
                     <div className="text-xs text-muted-foreground">Total Points</div>
