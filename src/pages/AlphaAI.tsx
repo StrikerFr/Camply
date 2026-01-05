@@ -410,12 +410,18 @@ const AlphaAI = () => {
               </div>
             </div>
             <div className="flex items-center gap-4">
-              <div className="flex items-center gap-2">
-                <span className="text-xs text-muted-foreground">Gen Z Mode</span>
+              <div className={`flex items-center gap-3 px-4 py-2 rounded-full border transition-all duration-300 ${
+                genZMode 
+                  ? 'bg-gradient-to-r from-purple-500/20 to-pink-500/20 border-purple-500/50 shadow-lg shadow-purple-500/20' 
+                  : 'bg-muted/50 border-border hover:border-primary/30'
+              }`}>
+                <span className={`text-sm font-medium transition-colors ${genZMode ? 'text-purple-400' : 'text-muted-foreground'}`}>
+                  🔥 Gen Z Mode
+                </span>
                 <Switch
                   checked={genZMode}
                   onCheckedChange={setGenZMode}
-                  className="data-[state=checked]:bg-primary"
+                  className="data-[state=checked]:bg-gradient-to-r data-[state=checked]:from-purple-500 data-[state=checked]:to-pink-500"
                 />
               </div>
               <div className="flex items-center gap-2">
@@ -572,11 +578,11 @@ const AlphaAI = () => {
                         <div
                           className={`px-5 py-3.5 rounded-2xl shadow-sm transition-all duration-200 ${
                             message.role === 'user'
-                              ? 'bg-gradient-to-br from-primary to-primary/90 text-primary-foreground rounded-br-md hover:shadow-lg hover:shadow-primary/20'
-                              : 'bg-muted/80 backdrop-blur-sm text-foreground rounded-bl-md border border-border/50 hover:bg-muted'
+                              ? 'bg-gradient-to-br from-primary to-primary/90 text-white rounded-br-md hover:shadow-lg hover:shadow-primary/20'
+                              : 'bg-white/10 backdrop-blur-sm text-white rounded-bl-md border border-white/10 hover:bg-white/15'
                           }`}
                         >
-                          <p className="text-sm whitespace-pre-wrap leading-relaxed">{message.content}</p>
+                          <p className="text-sm whitespace-pre-wrap leading-relaxed text-white">{message.content}</p>
                         </div>
                         <p className={`text-xs text-muted-foreground mt-1.5 opacity-0 group-hover:opacity-100 transition-opacity duration-200 ${message.role === 'user' ? 'text-right' : ''}`}>
                           {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
