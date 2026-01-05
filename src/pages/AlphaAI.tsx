@@ -1,7 +1,7 @@
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect, useRef } from "react";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
-import { Bot, Send, Mic, MicOff, Image, Save, Sparkles, Trash2, MessageSquare, Plus, Clock } from "lucide-react";
+import { Bot, Send, Mic, MicOff, Image, Sparkles, Trash2, MessageSquare, Plus, Clock, Zap, Target, Users, Lightbulb } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
@@ -435,87 +435,215 @@ const AlphaAI = () => {
           {/* Messages */}
           <div
             ref={chatContainerRef}
-            className="flex-1 overflow-y-auto p-6 space-y-4"
+            className="flex-1 overflow-y-auto p-6 space-y-4 relative"
           >
-            {messages.length === 0 ? (
-              <div className="flex flex-col items-center justify-center h-full text-center">
-                <div className="w-24 h-24 rounded-2xl bg-primary/10 flex items-center justify-center mb-6">
-                  <Bot className="h-12 w-12 text-primary" />
-                </div>
-                <h3 className="text-2xl font-semibold text-foreground mb-3">Welcome to Alpha AI</h3>
-                <p className="text-muted-foreground max-w-lg text-base">
-                  I'm your intelligent campus assistant. Ask me anything about opportunities, events, teams, or get help with your projects!
-                </p>
-                <div className="flex flex-wrap gap-3 mt-8 justify-center">
-                  {["Find hackathons near me", "How to improve my profile?", "Suggest team building activities"].map((suggestion) => (
-                    <button
-                      key={suggestion}
-                      onClick={() => setChatInput(suggestion)}
-                      className="px-5 py-2.5 text-sm bg-muted hover:bg-muted/80 rounded-full text-foreground transition-colors border border-border"
+            {/* Subtle background gradient */}
+            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-primary/[0.02] to-transparent pointer-events-none" />
+            
+            <AnimatePresence mode="wait">
+              {messages.length === 0 ? (
+                <motion.div 
+                  key="welcome"
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.95 }}
+                  transition={{ duration: 0.4, ease: "easeOut" }}
+                  className="flex flex-col items-center justify-center h-full text-center relative z-10"
+                >
+                  {/* Animated Bot Icon */}
+                  <motion.div 
+                    className="relative mb-8"
+                    initial={{ y: 20 }}
+                    animate={{ y: 0 }}
+                    transition={{ duration: 0.5, delay: 0.1 }}
+                  >
+                    <motion.div 
+                      className="w-28 h-28 rounded-3xl bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center border border-primary/20 shadow-lg shadow-primary/10"
+                      animate={{ 
+                        boxShadow: ["0 10px 40px -10px rgba(220, 38, 38, 0.1)", "0 10px 40px -10px rgba(220, 38, 38, 0.3)", "0 10px 40px -10px rgba(220, 38, 38, 0.1)"]
+                      }}
+                      transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
                     >
-                      {suggestion}
-                    </button>
+                      <Bot className="h-14 w-14 text-primary" />
+                    </motion.div>
+                    {/* Floating particles */}
+                    <motion.div 
+                      className="absolute -top-2 -right-2 w-4 h-4 rounded-full bg-primary/30"
+                      animate={{ y: [-5, 5, -5], opacity: [0.5, 1, 0.5] }}
+                      transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                    />
+                    <motion.div 
+                      className="absolute -bottom-1 -left-3 w-3 h-3 rounded-full bg-primary/20"
+                      animate={{ y: [5, -5, 5], opacity: [0.3, 0.8, 0.3] }}
+                      transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
+                    />
+                  </motion.div>
+
+                  <motion.h3 
+                    className="text-3xl font-bold text-foreground mb-4 bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text"
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.4, delay: 0.2 }}
+                  >
+                    Welcome to Alpha AI
+                  </motion.h3>
+                  
+                  <motion.p 
+                    className="text-muted-foreground max-w-lg text-base leading-relaxed"
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.4, delay: 0.3 }}
+                  >
+                    I'm your intelligent campus assistant. Ask me anything about opportunities, events, teams, or get help with your projects!
+                  </motion.p>
+
+                  {/* Interactive Suggestion Cards */}
+                  <motion.div 
+                    className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-10 w-full max-w-2xl"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: 0.4 }}
+                  >
+                    {[
+                      { text: "Find hackathons near me", icon: Target, color: "from-orange-500/10 to-red-500/10", iconColor: "text-orange-500" },
+                      { text: "How to improve my profile?", icon: Lightbulb, color: "from-yellow-500/10 to-amber-500/10", iconColor: "text-yellow-500" },
+                      { text: "Suggest team building activities", icon: Users, color: "from-blue-500/10 to-cyan-500/10", iconColor: "text-blue-500" },
+                      { text: "What opportunities match my skills?", icon: Zap, color: "from-purple-500/10 to-pink-500/10", iconColor: "text-purple-500" },
+                    ].map((suggestion, index) => (
+                      <motion.button
+                        key={suggestion.text}
+                        onClick={() => setChatInput(suggestion.text)}
+                        className={`group relative flex items-center gap-4 p-4 rounded-2xl bg-gradient-to-br ${suggestion.color} border border-border/50 hover:border-primary/30 transition-all duration-300 text-left overflow-hidden`}
+                        whileHover={{ scale: 1.02, y: -2 }}
+                        whileTap={{ scale: 0.98 }}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.3, delay: 0.5 + index * 0.1 }}
+                      >
+                        <div className={`shrink-0 w-10 h-10 rounded-xl bg-background/50 flex items-center justify-center ${suggestion.iconColor} group-hover:scale-110 transition-transform duration-300`}>
+                          <suggestion.icon className="h-5 w-5" />
+                        </div>
+                        <span className="text-sm font-medium text-foreground/90 group-hover:text-foreground transition-colors">
+                          {suggestion.text}
+                        </span>
+                        <motion.div 
+                          className="absolute inset-0 bg-gradient-to-r from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                        />
+                      </motion.button>
+                    ))}
+                  </motion.div>
+
+                  {/* Quick tips */}
+                  <motion.div 
+                    className="mt-8 flex items-center gap-2 text-xs text-muted-foreground/70"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.4, delay: 0.8 }}
+                  >
+                    <Sparkles className="h-3 w-3" />
+                    <span>Pro tip: Use the sparkle button to enhance your prompts</span>
+                  </motion.div>
+                </motion.div>
+              ) : (
+                <motion.div 
+                  key="messages"
+                  className="space-y-4 relative z-10"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                >
+                  {messages.map((message, index) => (
+                    <motion.div
+                      key={message.id}
+                      initial={{ opacity: 0, y: 15, scale: 0.95 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      transition={{ duration: 0.3, delay: index === messages.length - 1 ? 0.1 : 0 }}
+                      className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
+                    >
+                      <div className={`max-w-[70%] group ${message.role === 'user' ? 'order-1' : 'order-2'}`}>
+                        {message.image && (
+                          <motion.img
+                            src={message.image}
+                            alt="Uploaded"
+                            className="max-w-[250px] rounded-xl mb-2 shadow-lg"
+                            initial={{ opacity: 0, scale: 0.9 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                          />
+                        )}
+                        <div
+                          className={`px-5 py-3.5 rounded-2xl shadow-sm transition-all duration-200 ${
+                            message.role === 'user'
+                              ? 'bg-gradient-to-br from-primary to-primary/90 text-primary-foreground rounded-br-md hover:shadow-lg hover:shadow-primary/20'
+                              : 'bg-muted/80 backdrop-blur-sm text-foreground rounded-bl-md border border-border/50 hover:bg-muted'
+                          }`}
+                        >
+                          <p className="text-sm whitespace-pre-wrap leading-relaxed">{message.content}</p>
+                        </div>
+                        <p className={`text-xs text-muted-foreground mt-1.5 opacity-0 group-hover:opacity-100 transition-opacity duration-200 ${message.role === 'user' ? 'text-right' : ''}`}>
+                          {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        </p>
+                      </div>
+                    </motion.div>
                   ))}
-                </div>
-              </div>
-            ) : (
-              messages.map((message) => (
-                <motion.div
-                  key={message.id}
+                </motion.div>
+              )}
+            </AnimatePresence>
+            
+            {/* Loading indicator */}
+            <AnimatePresence>
+              {isAiLoading && (
+                <motion.div 
+                  className="flex justify-start relative z-10"
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
+                  exit={{ opacity: 0, y: -10 }}
                 >
-                  <div className={`max-w-[70%] ${message.role === 'user' ? 'order-1' : 'order-2'}`}>
-                    {message.image && (
-                      <img
-                        src={message.image}
-                        alt="Uploaded"
-                        className="max-w-[250px] rounded-xl mb-2"
+                  <div className="bg-muted/80 backdrop-blur-sm rounded-2xl rounded-bl-md px-5 py-4 border border-border/50">
+                    <div className="flex gap-2 items-center">
+                      <motion.span 
+                        className="w-2.5 h-2.5 bg-primary/70 rounded-full"
+                        animate={{ scale: [1, 1.2, 1], opacity: [0.5, 1, 0.5] }}
+                        transition={{ duration: 0.8, repeat: Infinity, delay: 0 }}
                       />
-                    )}
-                    <div
-                      className={`px-5 py-3 rounded-2xl ${
-                        message.role === 'user'
-                          ? 'bg-primary text-primary-foreground rounded-br-md'
-                          : 'bg-muted text-foreground rounded-bl-md'
-                      }`}
-                    >
-                      <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+                      <motion.span 
+                        className="w-2.5 h-2.5 bg-primary/70 rounded-full"
+                        animate={{ scale: [1, 1.2, 1], opacity: [0.5, 1, 0.5] }}
+                        transition={{ duration: 0.8, repeat: Infinity, delay: 0.2 }}
+                      />
+                      <motion.span 
+                        className="w-2.5 h-2.5 bg-primary/70 rounded-full"
+                        animate={{ scale: [1, 1.2, 1], opacity: [0.5, 1, 0.5] }}
+                        transition={{ duration: 0.8, repeat: Infinity, delay: 0.4 }}
+                      />
+                      <span className="text-xs text-muted-foreground ml-2">Alpha is thinking...</span>
                     </div>
-                    <p className={`text-xs text-muted-foreground mt-1.5 ${message.role === 'user' ? 'text-right' : ''}`}>
-                      {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                    </p>
                   </div>
                 </motion.div>
-              ))
-            )}
-            {isAiLoading && (
-              <div className="flex justify-start">
-                <div className="bg-muted rounded-2xl rounded-bl-md px-5 py-3">
-                  <div className="flex gap-1.5">
-                    <span className="w-2 h-2 bg-muted-foreground/50 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-                    <span className="w-2 h-2 bg-muted-foreground/50 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-                    <span className="w-2 h-2 bg-muted-foreground/50 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
-                  </div>
-                </div>
-              </div>
-            )}
+              )}
+            </AnimatePresence>
           </div>
 
           {/* Input Area */}
-          <div className="p-5 border-t border-border bg-muted/20">
-            {uploadedImage && (
-              <div className="mb-3 relative inline-block">
-                <img src={uploadedImage} alt="Preview" className="h-20 rounded-lg" />
-                <button
-                  onClick={() => setUploadedImage(null)}
-                  className="absolute -top-2 -right-2 w-6 h-6 bg-destructive text-destructive-foreground rounded-full flex items-center justify-center text-sm"
+          <div className="p-5 border-t border-border bg-gradient-to-t from-muted/30 to-transparent">
+            <AnimatePresence>
+              {uploadedImage && (
+                <motion.div 
+                  className="mb-4 relative inline-block"
+                  initial={{ opacity: 0, scale: 0.9, y: 10 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.9, y: 10 }}
                 >
-                  ×
-                </button>
-              </div>
-            )}
+                  <img src={uploadedImage} alt="Preview" className="h-24 rounded-xl shadow-lg border border-border" />
+                  <motion.button
+                    onClick={() => setUploadedImage(null)}
+                    className="absolute -top-2 -right-2 w-7 h-7 bg-destructive text-destructive-foreground rounded-full flex items-center justify-center text-sm shadow-lg"
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
+                  >
+                    ×
+                  </motion.button>
+                </motion.div>
+              )}
+            </AnimatePresence>
             <div className="flex items-center gap-3">
               <input
                 type="file"
@@ -524,50 +652,66 @@ const AlphaAI = () => {
                 accept="image/*"
                 className="hidden"
               />
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => fileInputRef.current?.click()}
-                className="shrink-0 h-11 w-11"
-              >
-                <Image className="h-5 w-5" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={handleMicClick}
-                className={`shrink-0 h-11 w-11 ${isListening ? 'text-primary bg-primary/10' : ''}`}
-              >
-                {isListening ? <MicOff className="h-5 w-5" /> : <Mic className="h-5 w-5" />}
-              </Button>
-              <div className="flex-1 relative">
+              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => fileInputRef.current?.click()}
+                  className="shrink-0 h-11 w-11 hover:bg-primary/10 hover:text-primary transition-colors"
+                >
+                  <Image className="h-5 w-5" />
+                </Button>
+              </motion.div>
+              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={handleMicClick}
+                  className={`shrink-0 h-11 w-11 transition-all duration-300 ${isListening ? 'text-primary bg-primary/10 animate-pulse' : 'hover:bg-primary/10 hover:text-primary'}`}
+                >
+                  {isListening ? <MicOff className="h-5 w-5" /> : <Mic className="h-5 w-5" />}
+                </Button>
+              </motion.div>
+              <div className="flex-1 relative group">
                 <input
                   type="text"
                   value={chatInput}
                   onChange={(e) => setChatInput(e.target.value)}
                   onKeyPress={handleKeyPress}
                   placeholder="Ask Alpha AI anything..."
-                  className="w-full px-5 py-3.5 bg-background border border-border rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 pr-14 text-base"
+                  className="w-full px-5 py-3.5 bg-background border border-border rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/50 pr-14 text-base transition-all duration-300"
                   disabled={isAiLoading}
                 />
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={handleEnhancePrompt}
-                  disabled={isAiLoading || !chatInput.trim()}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 h-8 px-2"
+                <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-primary/20 to-primary/10 opacity-0 group-focus-within:opacity-100 -z-10 blur-xl transition-opacity duration-300" />
+                <motion.div
+                  className="absolute right-3 top-1/2 -translate-y-1/2"
+                  whileHover={{ scale: 1.1, rotate: 15 }}
+                  whileTap={{ scale: 0.9 }}
                 >
-                  <Sparkles className="h-4 w-4" />
-                </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={handleEnhancePrompt}
+                    disabled={isAiLoading || !chatInput.trim()}
+                    className="h-8 px-2 hover:bg-primary/10 hover:text-primary"
+                  >
+                    <Sparkles className="h-4 w-4" />
+                  </Button>
+                </motion.div>
               </div>
-              <Button
-                onClick={handleSendMessage}
-                disabled={isAiLoading || (!chatInput.trim() && !uploadedImage)}
-                className="shrink-0 h-11 w-11"
-                size="icon"
+              <motion.div 
+                whileHover={{ scale: 1.05 }} 
+                whileTap={{ scale: 0.95 }}
               >
-                <Send className="h-5 w-5" />
-              </Button>
+                <Button
+                  onClick={handleSendMessage}
+                  disabled={isAiLoading || (!chatInput.trim() && !uploadedImage)}
+                  className="shrink-0 h-11 w-11 bg-gradient-to-br from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 shadow-lg shadow-primary/20"
+                  size="icon"
+                >
+                  <Send className="h-5 w-5" />
+                </Button>
+              </motion.div>
             </div>
           </div>
         </motion.div>
