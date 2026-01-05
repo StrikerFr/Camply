@@ -1,7 +1,8 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect, useRef } from "react";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
-import { Trophy, Calendar, Users, TrendingUp, ArrowRight, Clock, MapPin, Zap, Target, ArrowUp, Check, ChevronRight, Star, Award, Code, Palette, Briefcase, Sparkles, MessageSquare, Bot, Send } from "lucide-react";
+import { Trophy, Calendar, Users, TrendingUp, ArrowRight, Clock, MapPin, Zap, Target, ArrowUp, Check, ChevronRight, Star, Award, Code, Palette, Briefcase, Sparkles, MessageSquare, Bot, Send, ChevronLeft } from "lucide-react";
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import { Button } from "@/components/ui/button";
 import { Link, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
@@ -356,59 +357,107 @@ const Dashboard = () => {
           </Link>
         </motion.div>
 
-        {/* Stats Grid */}
-        <div className="grid grid-cols-3 gap-4 lg:gap-5">
-          {isLoading ? <>
-              <StatCardSkeleton />
-              <StatCardSkeleton />
-              <StatCardSkeleton />
-            </> : stats.map((stat, index) => {
-              const statRoutes: Record<string, string> = {
-                "Events": "/opportunities",
-                "Teams": "/teams",
-                "Rank": "/leaderboard"
-              };
-              const Icon = stat.icon;
-              return (
-                <motion.div
-                  key={stat.label}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.1 + index * 0.05, duration: 0.5 }}
-                  whileHover={{ scale: 1.02, y: -2 }}
-                  whileTap={{ scale: 0.98 }}
-                  onClick={() => navigate(statRoutes[stat.label])}
-                  className="bg-card border border-border rounded-xl p-5 cursor-pointer hover:shadow-lg hover:border-primary/20 transition-all duration-300"
-                >
-                  <div className="flex items-center justify-between mb-4">
-                    <div className={cn(
-                      "p-2.5 rounded-lg transition-colors",
-                      stat.isChanging ? "bg-emerald-500/20" : "bg-primary/10"
-                    )}>
-                      <Icon className={cn("h-5 w-5", stat.isChanging ? "text-emerald-400" : "text-primary")} />
+        {/* Suggested Opportunities Carousel */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.15, duration: 0.5 }}
+        >
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-3">
+              <div className="p-2.5 rounded-lg bg-primary/10">
+                <Sparkles className="h-4 w-4 text-primary" />
+              </div>
+              <div>
+                <h2 className="font-semibold text-foreground text-lg tracking-tight">Suggested for You</h2>
+                <p className="text-sm text-muted-foreground">Based on your interests</p>
+              </div>
+            </div>
+            <Link to="/opportunities" className="text-sm text-primary hover:text-primary/80 transition-colors flex items-center gap-1">
+              View all <ChevronRight className="h-4 w-4" />
+            </Link>
+          </div>
+
+          <Carousel
+            opts={{
+              align: "start",
+              loop: true,
+            }}
+            className="w-full"
+          >
+            <CarouselContent className="-ml-4">
+              {FAKE_OPPORTUNITIES.map((opp, index) => (
+                <CarouselItem key={opp.id} className="pl-4 basis-full sm:basis-1/2 lg:basis-1/3">
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: 0.1 + index * 0.05 }}
+                    whileHover={{ y: -4, scale: 1.02 }}
+                    className="group bg-card border border-border rounded-xl p-5 cursor-pointer hover:shadow-xl hover:shadow-primary/10 hover:border-primary/30 transition-all duration-300 h-full"
+                    onClick={() => navigate("/opportunities")}
+                  >
+                    {/* Category Badge & Featured */}
+                    <div className="flex items-center justify-between mb-4">
+                      <div className={cn(
+                        "flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium",
+                        opp.category === "Tech" && "bg-blue-500/10 text-blue-400",
+                        opp.category === "Cultural" && "bg-purple-500/10 text-purple-400",
+                        opp.category === "Management" && "bg-amber-500/10 text-amber-400"
+                      )}>
+                        {categoryIcons[opp.category]}
+                        {opp.category}
+                      </div>
+                      {opp.is_featured && (
+                        <div className="flex items-center gap-1 text-primary text-xs font-medium">
+                          <Star className="h-3 w-3 fill-primary" />
+                          Featured
+                        </div>
+                      )}
                     </div>
-                    {stat.isChanging && (
-                      <motion.div
-                        initial={{ opacity: 0, scale: 0.5 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        className="flex items-center gap-1 text-emerald-400 text-xs font-medium"
+
+                    {/* Title */}
+                    <h3 className="font-semibold text-foreground text-base mb-3 line-clamp-2 group-hover:text-primary transition-colors">
+                      {opp.title}
+                    </h3>
+
+                    {/* Details */}
+                    <div className="space-y-2 mb-4">
+                      <div className="flex items-center gap-2 text-muted-foreground text-xs">
+                        <Clock className="h-3.5 w-3.5" />
+                        <span>{opp.registration_deadline}</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-muted-foreground text-xs">
+                        <MapPin className="h-3.5 w-3.5" />
+                        <span>{opp.location}</span>
+                      </div>
+                    </div>
+
+                    {/* Points & CTA */}
+                    <div className="flex items-center justify-between pt-3 border-t border-border/50">
+                      <div className="flex items-center gap-1.5">
+                        <Zap className="h-4 w-4 text-primary" />
+                        <span className="font-bold text-foreground">{opp.points}</span>
+                        <span className="text-muted-foreground text-xs">pts</span>
+                      </div>
+                      <Button 
+                        size="sm" 
+                        variant="ghost"
+                        className="h-8 px-3 text-xs font-medium text-primary hover:bg-primary/10 hover:text-primary group-hover:bg-primary group-hover:text-primary-foreground transition-all"
                       >
-                        <ArrowUp className="h-3 w-3" />
-                        {recentChange?.amount && Math.abs(recentChange.amount)}
-                      </motion.div>
-                    )}
-                  </div>
-                  <CountUpNumber
-                    value={stat.value}
-                    prefix={stat.isRank ? "#" : ""}
-                    className="text-2xl font-bold text-foreground"
-                    isAnimating={stat.isChanging}
-                  />
-                  <p className="text-muted-foreground text-sm mt-1">{stat.change}</p>
-                </motion.div>
-              );
-            })}
-        </div>
+                        Join
+                        <ArrowRight className="h-3 w-3 ml-1" />
+                      </Button>
+                    </div>
+                  </motion.div>
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+            <div className="flex items-center justify-end gap-2 mt-4">
+              <CarouselPrevious className="static translate-y-0 h-8 w-8 bg-card border-border hover:bg-primary/10 hover:border-primary/30" />
+              <CarouselNext className="static translate-y-0 h-8 w-8 bg-card border-border hover:bg-primary/10 hover:border-primary/30" />
+            </div>
+          </Carousel>
+        </motion.div>
 
         <div className="grid lg:grid-cols-3 gap-6 lg:gap-8">
           {/* Featured Opportunities */}
