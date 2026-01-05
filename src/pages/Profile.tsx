@@ -27,7 +27,8 @@ import {
   Lock,
   Mail,
   Trash2,
-  ChevronRight
+  ChevronRight,
+  Check
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
@@ -266,130 +267,85 @@ const Profile = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2 }}
-                className="bg-card border border-border rounded-xl p-6"
+                className="bg-card border border-border rounded-xl p-5"
               >
-                <div className="flex items-center justify-between mb-6">
-                  <div>
-                    <h3 className="font-semibold text-foreground text-lg">Achievements</h3>
-                    <p className="text-sm text-muted-foreground">Your journey milestones</p>
-                  </div>
-                  <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10">
-                    <Trophy className="h-4 w-4 text-primary" />
-                    <span className="text-sm font-medium text-primary">{unlockedCount}/{totalCount}</span>
-                  </div>
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="font-semibold text-foreground">Achievements</h3>
+                  <span className="text-xs text-muted-foreground px-2 py-1 rounded-full bg-muted">{unlockedCount}/{totalCount}</span>
                 </div>
 
-                {/* Progress Timeline */}
-                <div className="relative">
-                  {/* Timeline connector line */}
-                  <div className="absolute top-8 left-0 right-0 h-1 bg-border rounded-full hidden sm:block">
-                    <motion.div 
-                      initial={{ width: 0 }}
-                      animate={{ width: `${(unlockedCount / totalCount) * 100}%` }}
-                      transition={{ duration: 1, delay: 0.5 }}
-                      className="h-full bg-gradient-to-r from-primary to-primary/60 rounded-full"
-                    />
-                  </div>
-
-                  {/* Achievement Cards */}
-                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
-                    {FAKE_ACHIEVEMENTS.map((ach, index) => (
-                      <motion.div
-                        key={ach.id}
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.3 + index * 0.1 }}
-                        whileHover={{ scale: 1.05, y: -4 }}
-                        className={cn(
-                          "relative flex flex-col items-center p-4 rounded-2xl cursor-pointer transition-all duration-300 group",
-                          ach.unlocked
-                            ? "bg-gradient-to-b from-primary/15 to-primary/5 border border-primary/30 shadow-lg shadow-primary/10"
-                            : "bg-secondary/30 border border-border"
-                        )}
+                {/* Achievement Cards - Compact Grid */}
+                <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
+                  {FAKE_ACHIEVEMENTS.map((ach, index) => (
+                    <motion.div
+                      key={ach.id}
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ delay: 0.1 + index * 0.05 }}
+                      whileHover={{ scale: 1.1, rotate: ach.unlocked ? [0, -5, 5, 0] : 0 }}
+                      whileTap={{ scale: 0.95 }}
+                      className={cn(
+                        "relative flex flex-col items-center p-3 rounded-xl cursor-pointer transition-all duration-200 group",
+                        ach.unlocked
+                          ? "bg-muted/50 hover:bg-muted border border-transparent hover:border-primary/20"
+                          : "bg-muted/20 opacity-50 hover:opacity-70"
+                      )}
+                    >
+                      {/* Icon */}
+                      <motion.div 
+                        className="relative"
+                        whileHover={{ y: -2 }}
                       >
-                        {/* Step number */}
-                        <div className={cn(
-                          "absolute -top-2 -left-2 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold border-2",
-                          ach.unlocked 
-                            ? "bg-primary text-primary-foreground border-background" 
-                            : "bg-muted text-muted-foreground border-background"
-                        )}>
-                          {index + 1}
-                        </div>
-
-                        {/* Icon container */}
-                        <div className={cn(
-                          "w-14 h-14 rounded-xl flex items-center justify-center mb-3 transition-transform duration-300 group-hover:scale-110",
-                          ach.unlocked 
-                            ? "bg-primary/20 shadow-inner" 
-                            : "bg-muted/50"
-                        )}>
-                          <span className={cn(
-                            "text-3xl transition-all duration-300",
-                            !ach.unlocked && "grayscale opacity-50"
-                          )}>
-                            {ach.icon}
-                          </span>
-                        </div>
-
-                        {/* Name */}
                         <span className={cn(
-                          "text-xs font-medium text-center leading-tight mb-2",
-                          ach.unlocked ? "text-foreground" : "text-muted-foreground"
+                          "text-2xl block transition-all duration-200",
+                          ach.unlocked ? "group-hover:drop-shadow-lg" : "grayscale"
                         )}>
-                          {ach.name}
+                          {ach.icon}
                         </span>
-
-                        {/* Progress bar */}
-                        <div className="w-full h-1.5 bg-border rounded-full overflow-hidden">
-                          <motion.div
-                            initial={{ width: 0 }}
-                            animate={{ width: `${ach.progress}%` }}
-                            transition={{ duration: 0.8, delay: 0.5 + index * 0.1 }}
-                            className={cn(
-                              "h-full rounded-full",
-                              ach.unlocked 
-                                ? "bg-gradient-to-r from-primary to-primary/80" 
-                                : "bg-muted-foreground/50"
-                            )}
-                          />
-                        </div>
-
-                        {/* Progress text */}
-                        <span className={cn(
-                          "text-[10px] mt-1.5",
-                          ach.unlocked ? "text-primary" : "text-muted-foreground"
-                        )}>
-                          {ach.unlocked ? "Completed ✓" : `${ach.current}/${ach.target}`}
-                        </span>
-
-                        {/* Glow effect on hover */}
                         {ach.unlocked && (
-                          <div className="absolute inset-0 rounded-2xl bg-primary/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
+                          <motion.div
+                            initial={{ scale: 0 }}
+                            animate={{ scale: 1 }}
+                            className="absolute -bottom-1 -right-1 w-3.5 h-3.5 rounded-full bg-emerald-500 flex items-center justify-center"
+                          >
+                            <Check className="h-2 w-2 text-white" />
+                          </motion.div>
                         )}
                       </motion.div>
-                    ))}
-                  </div>
-                </div>
 
-                {/* Next Achievement Hint */}
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 1 }}
-                  className="mt-6 p-4 rounded-xl bg-secondary/30 border border-border flex items-center gap-4"
-                >
-                  <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
-                    <span className="text-xl">🎯</span>
-                  </div>
-                  <div className="flex-1">
-                    <p className="text-sm font-medium text-foreground">Next: Networker</p>
-                    <p className="text-xs text-muted-foreground">Connect with 16 more people to unlock</p>
-                  </div>
-                  <div className="text-right">
-                    <span className="text-lg font-bold text-primary">68%</span>
-                  </div>
-                </motion.div>
+                      {/* Name */}
+                      <span className={cn(
+                        "text-[10px] font-medium text-center leading-tight mt-2",
+                        ach.unlocked ? "text-foreground" : "text-muted-foreground"
+                      )}>
+                        {ach.name}
+                      </span>
+
+                      {/* Progress indicator for locked */}
+                      {!ach.unlocked && (
+                        <div className="w-full mt-1.5">
+                          <div className="h-1 bg-border rounded-full overflow-hidden">
+                            <motion.div
+                              initial={{ width: 0 }}
+                              animate={{ width: `${ach.progress}%` }}
+                              transition={{ duration: 0.6, delay: 0.3 + index * 0.05 }}
+                              className="h-full bg-muted-foreground/50 rounded-full"
+                            />
+                          </div>
+                          <span className="text-[8px] text-muted-foreground block text-center mt-0.5">
+                            {ach.progress}%
+                          </span>
+                        </div>
+                      )}
+
+                      {/* Hover tooltip */}
+                      <div className="absolute -top-12 left-1/2 -translate-x-1/2 px-2 py-1 bg-foreground text-background text-[10px] rounded-md opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-10">
+                        {ach.description}
+                        <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-foreground" />
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
               </motion.div>
 
               {/* Activity Feed */}
