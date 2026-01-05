@@ -464,36 +464,52 @@ const Dashboard = () => {
               {[...FAKE_OPPORTUNITIES, ...FAKE_OPPORTUNITIES].map((opp, index) => (
                 <CarouselItem key={`${opp.id}-${index}`} className="pl-4 basis-[80%] sm:basis-[45%] lg:basis-[32%]">
                   <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
+                    initial={{ opacity: 0, y: 30, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
                     transition={{ 
-                      delay: 0.1 + (index % FAKE_OPPORTUNITIES.length) * 0.05,
-                      duration: 0.4,
-                      ease: [0.25, 0.46, 0.45, 0.94]
+                      delay: 0.05 + (index % FAKE_OPPORTUNITIES.length) * 0.08,
+                      duration: 0.6,
+                      ease: [0.16, 1, 0.3, 1]
                     }}
                     whileHover={{ 
-                      y: -8, 
-                      scale: 1.02,
-                      transition: { duration: 0.3, ease: "easeOut" }
+                      y: -12, 
+                      scale: 1.03,
+                      transition: { 
+                        type: "spring",
+                        stiffness: 400,
+                        damping: 25
+                      }
                     }}
-                    className="group bg-card/80 backdrop-blur-sm border border-border/60 rounded-xl p-5 cursor-pointer transition-all duration-500 h-full select-none relative overflow-hidden hover:border-primary/40 hover:shadow-[0_0_40px_-10px] hover:shadow-primary/30"
+                    className="group bg-card/60 backdrop-blur-md border border-border/40 rounded-2xl p-5 cursor-pointer h-full select-none relative overflow-hidden"
                     onClick={() => navigate("/opportunities")}
                   >
-                    {/* Glow effect */}
-                    <div className="absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-gradient-to-br from-primary/10 via-transparent to-primary/5 pointer-events-none" />
+                    {/* Animated border glow */}
+                    <motion.div 
+                      className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 pointer-events-none"
+                      initial={false}
+                      transition={{ duration: 0.4, ease: "easeOut" }}
+                      style={{
+                        background: "linear-gradient(135deg, hsl(var(--primary) / 0.15), transparent 50%, hsl(var(--primary) / 0.1))",
+                        boxShadow: "inset 0 0 0 1px hsl(var(--primary) / 0.3), 0 0 30px -5px hsl(var(--primary) / 0.25)"
+                      }}
+                    />
+                    
+                    {/* Inner glow effect */}
+                    <div className="absolute -inset-px rounded-2xl opacity-0 group-hover:opacity-100 transition-all duration-500 bg-gradient-to-br from-primary/20 via-transparent to-primary/10 blur-sm pointer-events-none" />
                     
                     {/* Category Badge & Featured */}
                     <div className="relative flex items-center justify-between mb-4">
                       <motion.div 
-                        whileHover={{ scale: 1.05 }}
+                        whileHover={{ scale: 1.08 }}
+                        transition={{ type: "spring", stiffness: 500, damping: 20 }}
                         className={cn(
-                          "flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium transition-all duration-300",
-                          opp.category === "Tech" && "bg-blue-500/10 text-blue-400 group-hover:bg-blue-500/20",
-                          opp.category === "Cultural" && "bg-purple-500/10 text-purple-400 group-hover:bg-purple-500/20",
-                          opp.category === "Management" && "bg-amber-500/10 text-amber-400 group-hover:bg-amber-500/20",
-                          opp.category === "Design" && "bg-pink-500/10 text-pink-400 group-hover:bg-pink-500/20",
-                          opp.category === "Sports" && "bg-green-500/10 text-green-400 group-hover:bg-green-500/20",
-                          opp.category === "Research" && "bg-cyan-500/10 text-cyan-400 group-hover:bg-cyan-500/20"
+                          "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium backdrop-blur-sm transition-all duration-300 border",
+                          opp.category === "Tech" && "bg-blue-500/15 text-blue-400 border-blue-500/20 group-hover:bg-blue-500/25 group-hover:border-blue-400/40 group-hover:shadow-[0_0_20px_-5px] group-hover:shadow-blue-500/30",
+                          opp.category === "Cultural" && "bg-purple-500/15 text-purple-400 border-purple-500/20 group-hover:bg-purple-500/25 group-hover:border-purple-400/40 group-hover:shadow-[0_0_20px_-5px] group-hover:shadow-purple-500/30",
+                          opp.category === "Management" && "bg-amber-500/15 text-amber-400 border-amber-500/20 group-hover:bg-amber-500/25 group-hover:border-amber-400/40 group-hover:shadow-[0_0_20px_-5px] group-hover:shadow-amber-500/30",
+                          opp.category === "Design" && "bg-pink-500/15 text-pink-400 border-pink-500/20 group-hover:bg-pink-500/25 group-hover:border-pink-400/40 group-hover:shadow-[0_0_20px_-5px] group-hover:shadow-pink-500/30",
+                          opp.category === "Sports" && "bg-green-500/15 text-green-400 border-green-500/20 group-hover:bg-green-500/25 group-hover:border-green-400/40 group-hover:shadow-[0_0_20px_-5px] group-hover:shadow-green-500/30",
+                          opp.category === "Research" && "bg-cyan-500/15 text-cyan-400 border-cyan-500/20 group-hover:bg-cyan-500/25 group-hover:border-cyan-400/40 group-hover:shadow-[0_0_20px_-5px] group-hover:shadow-cyan-500/30"
                         )}
                       >
                         {categoryIcons[opp.category]}
@@ -502,45 +518,58 @@ const Dashboard = () => {
                       {opp.is_featured && (
                         <motion.div 
                           whileHover={{ scale: 1.1 }}
+                          transition={{ type: "spring", stiffness: 500, damping: 20 }}
                           className="flex items-center gap-1 text-primary text-xs font-medium"
                         >
-                          <Star className="h-3 w-3 fill-primary animate-pulse" />
+                          <Star className="h-3.5 w-3.5 fill-primary drop-shadow-[0_0_6px_hsl(var(--primary)/0.6)]" />
                           Featured
                         </motion.div>
                       )}
                     </div>
 
                     {/* Title */}
-                    <h3 className="relative font-semibold text-foreground text-base mb-3 line-clamp-2 group-hover:text-primary transition-colors duration-300">
+                    <h3 className="relative font-semibold text-foreground text-base mb-3 line-clamp-2 group-hover:text-primary transition-colors duration-400">
                       {opp.title}
                     </h3>
 
                     {/* Details */}
-                    <div className="relative space-y-2 mb-4">
-                      <div className="flex items-center gap-2 text-muted-foreground text-xs group-hover:text-muted-foreground/80 transition-colors">
-                        <Clock className="h-3.5 w-3.5" />
+                    <div className="relative space-y-2.5 mb-4">
+                      <div className="flex items-center gap-2 text-muted-foreground text-xs group-hover:text-muted-foreground/90 transition-colors duration-300">
+                        <Clock className="h-3.5 w-3.5 group-hover:text-primary/70 transition-colors duration-300" />
                         <span>{opp.registration_deadline}</span>
                       </div>
-                      <div className="flex items-center gap-2 text-muted-foreground text-xs group-hover:text-muted-foreground/80 transition-colors">
-                        <MapPin className="h-3.5 w-3.5" />
+                      <div className="flex items-center gap-2 text-muted-foreground text-xs group-hover:text-muted-foreground/90 transition-colors duration-300">
+                        <MapPin className="h-3.5 w-3.5 group-hover:text-primary/70 transition-colors duration-300" />
                         <span>{opp.location}</span>
                       </div>
                     </div>
 
                     {/* Points & CTA */}
-                    <div className="relative flex items-center justify-between pt-3 border-t border-border/50 group-hover:border-primary/20 transition-colors duration-300">
+                    <div className="relative flex items-center justify-between pt-3 border-t border-border/30 group-hover:border-primary/25 transition-all duration-400">
                       <div className="flex items-center gap-1.5">
-                        <Zap className="h-4 w-4 text-primary group-hover:animate-pulse" />
+                        <motion.div
+                          animate={{ 
+                            scale: [1, 1.15, 1],
+                            rotate: [0, 5, -5, 0]
+                          }}
+                          transition={{ 
+                            duration: 2,
+                            repeat: Infinity,
+                            repeatDelay: 3
+                          }}
+                        >
+                          <Zap className="h-4 w-4 text-primary drop-shadow-[0_0_4px_hsl(var(--primary)/0.5)]" />
+                        </motion.div>
                         <span className="font-bold text-foreground">{opp.points}</span>
                         <span className="text-muted-foreground text-xs">pts</span>
                       </div>
                       <Button 
                         size="sm" 
                         variant="ghost"
-                        className="h-8 px-3 text-xs font-medium text-primary hover:bg-primary/10 hover:text-primary group-hover:bg-primary group-hover:text-primary-foreground transition-all duration-300"
+                        className="h-8 px-3 text-xs font-medium text-primary hover:bg-primary/10 hover:text-primary group-hover:bg-primary group-hover:text-primary-foreground group-hover:shadow-lg group-hover:shadow-primary/20 transition-all duration-400"
                       >
                         Join
-                        <ArrowRight className="h-3 w-3 ml-1 group-hover:translate-x-0.5 transition-transform" />
+                        <ArrowRight className="h-3 w-3 ml-1 group-hover:translate-x-1 transition-transform duration-300" />
                       </Button>
                     </div>
                   </motion.div>
