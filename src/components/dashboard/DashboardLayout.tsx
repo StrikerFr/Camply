@@ -3,7 +3,6 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
   LayoutDashboard, 
-  Calendar, 
   Users, 
   Trophy, 
   User,
@@ -14,11 +13,7 @@ import {
   LogOut,
   Settings,
   ChevronDown,
-  Briefcase,
-  GraduationCap,
   Rocket,
-  MessageSquare,
-  FileText,
   ExternalLink
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -26,6 +21,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useAuth } from "@/contexts/AuthContext";
 import { ToggleTheme } from "@/components/ui/toggle-theme";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import logo from "@/assets/logo.png";
 
 interface DashboardLayoutProps {
@@ -35,8 +35,6 @@ interface DashboardLayoutProps {
 const navItems = [
   { icon: LayoutDashboard, label: "Home", href: "/dashboard" },
   { icon: Rocket, label: "Opportunities", href: "/opportunities" },
-  { icon: Briefcase, label: "Internships", href: "/opportunities?category=internship" },
-  { icon: GraduationCap, label: "Competitions", href: "/opportunities?category=competition" },
   { icon: Users, label: "Teams", href: "/teams" },
   { icon: Trophy, label: "Leaderboard", href: "/leaderboard" },
 ];
@@ -51,7 +49,6 @@ export const DashboardLayout = ({ children }: DashboardLayoutProps) => {
   const navigate = useNavigate();
   const { user, profile, signOut } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [profileMenuOpen, setProfileMenuOpen] = useState(false);
 
   const handleSignOut = async () => {
     await signOut();
@@ -73,22 +70,26 @@ export const DashboardLayout = ({ children }: DashboardLayoutProps) => {
             {/* Desktop Navigation */}
             <nav className="hidden lg:flex items-center gap-1">
               {navItems.map((item) => {
-                const isActive = location.pathname === item.href || 
-                  (item.href.includes('?') && location.pathname === '/opportunities');
+                const isActive = location.pathname === item.href;
                 return (
-                  <Link
-                    key={item.href}
-                    to={item.href}
-                    className={cn(
-                      "flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-all duration-200",
-                      isActive
-                        ? "bg-muted text-foreground"
-                        : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
-                    )}
-                  >
-                    <item.icon className="h-4 w-4" />
-                    {item.label}
-                  </Link>
+                  <Tooltip key={item.href}>
+                    <TooltipTrigger asChild>
+                      <Link
+                        to={item.href}
+                        className={cn(
+                          "flex items-center justify-center w-9 h-9 rounded-lg transition-all duration-200",
+                          isActive
+                            ? "bg-muted text-foreground"
+                            : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                        )}
+                      >
+                        <item.icon className="h-4 w-4" />
+                      </Link>
+                    </TooltipTrigger>
+                    <TooltipContent side="bottom" className="text-xs">
+                      {item.label}
+                    </TooltipContent>
+                  </Tooltip>
                 );
               })}
               
@@ -140,59 +141,22 @@ export const DashboardLayout = ({ children }: DashboardLayoutProps) => {
               <span className="absolute top-2 right-2 w-2 h-2 bg-primary rounded-full" />
             </Button>
 
-            {/* Profile Dropdown */}
-            <div className="relative">
-              <button
-                onClick={() => setProfileMenuOpen(!profileMenuOpen)}
-                className="flex items-center gap-2 p-1.5 rounded-lg hover:bg-muted transition-colors"
-              >
-                <div className="w-8 h-8 rounded-full bg-foreground flex items-center justify-center text-sm font-semibold text-background">
-                  {profile?.full_name?.charAt(0) || user?.email?.charAt(0) || "U"}
-                </div>
-                <ChevronDown className="hidden sm:block h-4 w-4 text-muted-foreground" />
-              </button>
-
-              <AnimatePresence>
-                {profileMenuOpen && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: 10 }}
-                    className="absolute right-0 mt-2 w-52 bg-card border border-border rounded-lg shadow-elevated overflow-hidden z-50"
-                  >
-                    <div className="p-4 border-b border-border">
-                      <p className="font-semibold text-sm text-foreground">{profile?.full_name || "User"}</p>
-                      <p className="text-xs text-muted-foreground truncate mt-0.5">{user?.email}</p>
-                    </div>
-                    <div className="p-2">
-                      <Link
-                        to="/profile"
-                        onClick={() => setProfileMenuOpen(false)}
-                        className="flex items-center gap-2.5 px-3 py-2 rounded-md text-sm text-foreground hover:bg-muted transition-colors"
-                      >
-                        <User className="h-4 w-4 text-muted-foreground" />
-                        View Profile
-                      </Link>
-                      <Link
-                        to="/settings"
-                        onClick={() => setProfileMenuOpen(false)}
-                        className="flex items-center gap-2.5 px-3 py-2 rounded-md text-sm text-foreground hover:bg-muted transition-colors"
-                      >
-                        <Settings className="h-4 w-4 text-muted-foreground" />
-                        Settings
-                      </Link>
-                      <button
-                        onClick={handleSignOut}
-                        className="flex w-full items-center gap-2.5 px-3 py-2 rounded-md text-sm text-primary hover:bg-primary/10 transition-colors"
-                      >
-                        <LogOut className="h-4 w-4" />
-                        Sign Out
-                      </button>
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
+            {/* Profile Button - Direct to Profile */}
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Link
+                  to="/profile"
+                  className="flex items-center p-1.5 rounded-lg hover:bg-muted transition-colors"
+                >
+                  <div className="w-8 h-8 rounded-full bg-foreground flex items-center justify-center text-sm font-semibold text-background">
+                    {profile?.full_name?.charAt(0) || user?.email?.charAt(0) || "U"}
+                  </div>
+                </Link>
+              </TooltipTrigger>
+              <TooltipContent side="bottom" className="text-xs">
+                Profile
+              </TooltipContent>
+            </Tooltip>
 
             {/* Mobile Menu Button */}
             <Button
@@ -265,13 +229,6 @@ export const DashboardLayout = ({ children }: DashboardLayoutProps) => {
         {children}
       </main>
 
-      {/* Click outside to close profile menu */}
-      {profileMenuOpen && (
-        <div 
-          className="fixed inset-0 z-40" 
-          onClick={() => setProfileMenuOpen(false)} 
-        />
-      )}
     </div>
   );
 };
