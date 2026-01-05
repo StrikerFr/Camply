@@ -382,18 +382,21 @@ const Dashboard = () => {
             opts={{
               align: "start",
               loop: true,
+              dragFree: true,
+              skipSnaps: false,
+              containScroll: "trimSnaps",
             }}
-            className="w-full"
+            className="w-full cursor-grab active:cursor-grabbing"
           >
-            <CarouselContent className="-ml-4">
+            <CarouselContent className="-ml-3">
               {FAKE_OPPORTUNITIES.map((opp, index) => (
-                <CarouselItem key={opp.id} className="pl-4 basis-full sm:basis-1/2 lg:basis-1/3">
+                <CarouselItem key={opp.id} className="pl-3 basis-[85%] sm:basis-1/2 lg:basis-1/3">
                   <motion.div
                     initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ delay: 0.1 + index * 0.05 }}
-                    whileHover={{ y: -4, scale: 1.02 }}
-                    className="group bg-card border border-border rounded-xl p-5 cursor-pointer hover:shadow-xl hover:shadow-primary/10 hover:border-primary/30 transition-all duration-300 h-full"
+                    whileHover={{ y: -4 }}
+                    className="group bg-card border border-border rounded-xl p-5 cursor-pointer hover:shadow-xl hover:shadow-primary/10 hover:border-primary/30 transition-all duration-300 h-full select-none"
                     onClick={() => navigate("/opportunities")}
                   >
                     {/* Category Badge & Featured */}
@@ -452,9 +455,9 @@ const Dashboard = () => {
                 </CarouselItem>
               ))}
             </CarouselContent>
-            <div className="flex items-center justify-end gap-2 mt-4">
-              <CarouselPrevious className="static translate-y-0 h-8 w-8 bg-card border-border hover:bg-primary/10 hover:border-primary/30" />
-              <CarouselNext className="static translate-y-0 h-8 w-8 bg-card border-border hover:bg-primary/10 hover:border-primary/30" />
+            <div className="hidden sm:flex items-center justify-end gap-2 mt-4">
+              <CarouselPrevious className="static translate-y-0 h-9 w-9 bg-card/80 backdrop-blur border-border hover:bg-primary hover:text-primary-foreground hover:border-primary transition-all" />
+              <CarouselNext className="static translate-y-0 h-9 w-9 bg-card/80 backdrop-blur border-border hover:bg-primary hover:text-primary-foreground hover:border-primary transition-all" />
             </div>
           </Carousel>
         </motion.div>
