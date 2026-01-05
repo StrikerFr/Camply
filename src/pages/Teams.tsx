@@ -333,7 +333,7 @@ const Teams = () => {
             <div className="relative flex h-full">
               {/* Conversations List */}
               <div className={cn(
-                "w-full md:w-[360px] lg:w-[380px] border-r border-border/50 flex flex-col bg-background/50 backdrop-blur-sm shrink-0",
+                "w-full md:w-[360px] lg:w-[380px] border-r border-border/50 flex flex-col bg-background/50 backdrop-blur-sm flex-shrink-0",
                 selectedConversation && "hidden md:flex"
               )}>
                 {/* Search Header */}
@@ -351,7 +351,7 @@ const Teams = () => {
 
                 {/* Conversation List */}
                 <ScrollArea className="flex-1">
-                  <div className="p-3">
+                  <div className="p-3 space-y-1">
                     {filteredConversations.length > 0 ? (
                       <AnimatePresence>
                         {filteredConversations.map((conv, index) => (
@@ -362,7 +362,7 @@ const Teams = () => {
                             transition={{ delay: index * 0.05 }}
                             onClick={() => setSelectedConversation(conv)}
                             className={cn(
-                              "w-full flex items-center gap-3 p-3.5 rounded-xl transition-all duration-300 text-left group mb-1.5",
+                              "w-full flex items-center gap-3 p-3.5 rounded-xl transition-all duration-300 text-left group",
                               selectedConversation?.id === conv.id 
                                 ? "bg-primary/10 border border-primary/20 shadow-sm" 
                                 : "hover:bg-muted/70 border border-transparent"
