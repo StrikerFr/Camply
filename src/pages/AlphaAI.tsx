@@ -410,14 +410,8 @@ const AlphaAI = () => {
               </div>
             </div>
             <div className="flex items-center gap-4">
-              <div className={`flex items-center gap-3 px-4 py-2 rounded-full border transition-all duration-300 ${
-                genZMode 
-                  ? 'bg-primary/10 border-white/50' 
-                  : 'bg-muted/50 border-white/20 hover:border-white/40'
-              }`}>
-                <span className={`text-sm font-medium transition-colors ${genZMode ? 'text-white' : 'text-muted-foreground'}`}>
-                  Gen Z Mode
-                </span>
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-muted-foreground">Gen Z Mode</span>
                 <Switch
                   checked={genZMode}
                   onCheckedChange={setGenZMode}
@@ -578,11 +572,11 @@ const AlphaAI = () => {
                         <div
                           className={`px-5 py-3.5 rounded-2xl shadow-sm transition-all duration-200 ${
                             message.role === 'user'
-                              ? 'bg-gradient-to-br from-primary to-primary/90 text-white rounded-br-md hover:shadow-lg hover:shadow-primary/20'
-                              : 'bg-white/10 backdrop-blur-sm text-white rounded-bl-md border border-white/10 hover:bg-white/15'
+                              ? 'bg-gradient-to-br from-primary to-primary/90 text-primary-foreground rounded-br-md hover:shadow-lg hover:shadow-primary/20'
+                              : 'bg-muted/80 backdrop-blur-sm text-foreground rounded-bl-md border border-border/50 hover:bg-muted'
                           }`}
                         >
-                          <p className="text-sm whitespace-pre-wrap leading-relaxed text-white">{message.content}</p>
+                          <p className="text-sm whitespace-pre-wrap leading-relaxed">{message.content}</p>
                         </div>
                         <p className={`text-xs text-muted-foreground mt-1.5 opacity-0 group-hover:opacity-100 transition-opacity duration-200 ${message.role === 'user' ? 'text-right' : ''}`}>
                           {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
