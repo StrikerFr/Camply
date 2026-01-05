@@ -435,25 +435,31 @@ const Dashboard = () => {
             </Link>
           </div>
 
-          <Carousel
-            opts={{
-              align: "start",
-              loop: true,
-              dragFree: true,
-              skipSnaps: true,
-              containScroll: false,
-              duration: 40,
-            }}
-            plugins={[
-              Autoplay({
-                delay: 2000,
-                stopOnInteraction: false,
-                stopOnMouseEnter: true,
-                playOnInit: true,
-              }),
-            ]}
-            className="w-full cursor-grab active:cursor-grabbing select-none"
-          >
+          <div className="relative">
+            {/* Left fade gradient */}
+            <div className="absolute left-0 top-0 bottom-0 w-16 bg-gradient-to-r from-background to-transparent z-10 pointer-events-none" />
+            {/* Right fade gradient */}
+            <div className="absolute right-0 top-0 bottom-0 w-16 bg-gradient-to-l from-background to-transparent z-10 pointer-events-none" />
+            
+            <Carousel
+              opts={{
+                align: "start",
+                loop: true,
+                dragFree: true,
+                skipSnaps: true,
+                containScroll: false,
+                duration: 40,
+              }}
+              plugins={[
+                Autoplay({
+                  delay: 2000,
+                  stopOnInteraction: false,
+                  stopOnMouseEnter: true,
+                  playOnInit: true,
+                }),
+              ]}
+              className="w-full cursor-grab active:cursor-grabbing select-none"
+            >
             <CarouselContent className="-ml-4">
               {[...FAKE_OPPORTUNITIES, ...FAKE_OPPORTUNITIES].map((opp, index) => (
                 <CarouselItem key={`${opp.id}-${index}`} className="pl-4 basis-[80%] sm:basis-[45%] lg:basis-[32%]">
@@ -545,7 +551,8 @@ const Dashboard = () => {
               <CarouselPrevious className="static translate-y-0 h-9 w-9 bg-card/80 backdrop-blur border-border/60 hover:bg-primary hover:text-primary-foreground hover:border-primary hover:shadow-lg hover:shadow-primary/20 transition-all duration-300" />
               <CarouselNext className="static translate-y-0 h-9 w-9 bg-card/80 backdrop-blur border-border/60 hover:bg-primary hover:text-primary-foreground hover:border-primary hover:shadow-lg hover:shadow-primary/20 transition-all duration-300" />
             </div>
-          </Carousel>
+            </Carousel>
+          </div>
         </motion.div>
 
         <div className="grid lg:grid-cols-3 gap-6 lg:gap-8">
