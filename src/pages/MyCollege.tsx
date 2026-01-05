@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
 import { 
   GraduationCap, 
@@ -16,7 +16,10 @@ import {
   Building2,
   X,
   Share2,
-  Bell
+  Bell,
+  MessageSquare,
+  Send,
+  User
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -26,6 +29,16 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { Textarea } from "@/components/ui/textarea";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 // Mock data for IIT Patna
 const COLLEGE_INFO = {
@@ -43,7 +56,10 @@ const TABS = [
   { id: "news", label: "News", icon: Newspaper },
   { id: "competitions", label: "Competitions", icon: Trophy },
   { id: "clubs", label: "Clubs", icon: Users },
+  { id: "reviews", label: "Anonymous Reviews", icon: MessageSquare },
 ];
+
+const REVIEW_CATEGORIES = ["General", "Academics", "Placements", "Campus Life", "Faculty", "Infrastructure", "Food", "Hostels"];
 
 interface Event {
   id: string;
@@ -326,12 +342,106 @@ const CLUBS = [
   },
 ];
 
+interface Review {
+  id: string;
+  content: string;
+  rating: number | null;
+  category: string;
+  created_at: string;
+}
+
 const MyCollege = () => {
   const [activeTab, setActiveTab] = useState("events");
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const [selectedCompetition, setSelectedCompetition] = useState<Competition | null>(null);
   const [selectedHackathon, setSelectedHackathon] = useState<Hackathon | null>(null);
   const [selectedNews, setSelectedNews] = useState<NewsItem | null>(null);
+  
+  // Reviews state
+  const [reviews, setReviews] = useState<Review[]>([]);
+  const [isLoadingReviews, setIsLoadingReviews] = useState(false);
+  const [newReview, setNewReview] = useState("");
+  const [newRating, setNewRating] = useState<number>(5);
+  const [newCategory, setNewCategory] = useState("General");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Fetch reviews
+  useEffect(() => {
+    if (activeTab === "reviews") {
+      fetchReviews();
+    }
+  }, [activeTab]);
+
+  const fetchReviews = async () => {
+    setIsLoadingReviews(true);
+    try {
+      const { data, error } = await supabase
+        .from("college_reviews")
+        .select("*")
+        .order("created_at", { ascending: false })
+        .limit(50);
+      
+      if (error) throw error;
+      setReviews(data || []);
+    } catch (error) {
+      console.error("Error fetching reviews:", error);
+      toast.error("Failed to load reviews");
+    } finally {
+      setIsLoadingReviews(false);
+    }
+  };
+
+  const handleSubmitReview = async () => {
+    if (!newReview.trim()) {
+      toast.error("Please write a review");
+      return;
+    }
+    if (newReview.trim().length < 10) {
+      toast.error("Review must be at least 10 characters");
+      return;
+    }
+    if (newReview.trim().length > 1000) {
+      toast.error("Review must be less than 1000 characters");
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      const { error } = await supabase
+        .from("college_reviews")
+        .insert({
+          content: newReview.trim(),
+          rating: newRating,
+          category: newCategory,
+        });
+      
+      if (error) throw error;
+      
+      toast.success("Review submitted anonymously!");
+      setNewReview("");
+      setNewRating(5);
+      setNewCategory("General");
+      fetchReviews();
+    } catch (error) {
+      console.error("Error submitting review:", error);
+      toast.error("Failed to submit review");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const formatTimeAgo = (dateString: string) => {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+    
+    if (diffInSeconds < 60) return "Just now";
+    if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)}m ago`;
+    if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)}h ago`;
+    if (diffInSeconds < 604800) return `${Math.floor(diffInSeconds / 86400)}d ago`;
+    return date.toLocaleDateString();
+  };
+
   return (
     <DashboardLayout>
       <div className="max-w-7xl mx-auto space-y-8">
@@ -638,6 +748,158 @@ const MyCollege = () => {
                   </div>
                 </motion.div>
               ))}
+            </div>
+          )}
+
+          {activeTab === "reviews" && (
+            <div className="space-y-6">
+              {/* Submit Review Section */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="bg-card border border-border rounded-xl p-5"
+              >
+                <div className="flex items-center gap-2 mb-4">
+                  <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center">
+                    <User className="h-5 w-5 text-muted-foreground" />
+                  </div>
+                  <div>
+                    <p className="font-medium text-foreground">Anonymous User</p>
+                    <p className="text-xs text-muted-foreground">Your identity is completely hidden</p>
+                  </div>
+                </div>
+                
+                <Textarea
+                  placeholder="Share your honest thoughts about the college... Your identity will remain completely anonymous."
+                  value={newReview}
+                  onChange={(e) => setNewReview(e.target.value)}
+                  className="min-h-[100px] resize-none mb-4"
+                  maxLength={1000}
+                />
+                
+                <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
+                  <div className="flex flex-wrap gap-3">
+                    <Select value={newCategory} onValueChange={setNewCategory}>
+                      <SelectTrigger className="w-[140px]">
+                        <SelectValue placeholder="Category" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {REVIEW_CATEGORIES.map((cat) => (
+                          <SelectItem key={cat} value={cat}>{cat}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    
+                    <div className="flex items-center gap-1">
+                      {[1, 2, 3, 4, 5].map((star) => (
+                        <button
+                          key={star}
+                          onClick={() => setNewRating(star)}
+                          className="p-1 hover:scale-110 transition-transform"
+                        >
+                          <Star
+                            className={cn(
+                              "h-5 w-5 transition-colors",
+                              star <= newRating
+                                ? "fill-yellow-400 text-yellow-400"
+                                : "text-muted-foreground"
+                            )}
+                          />
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  
+                  <Button 
+                    onClick={handleSubmitReview} 
+                    disabled={isSubmitting || !newReview.trim()}
+                    className="gap-2"
+                  >
+                    <Send className="h-4 w-4" />
+                    {isSubmitting ? "Posting..." : "Post Anonymously"}
+                  </Button>
+                </div>
+                
+                <p className="text-xs text-muted-foreground mt-3">
+                  {newReview.length}/1000 characters
+                </p>
+              </motion.div>
+
+              {/* Reviews List */}
+              {isLoadingReviews ? (
+                <div className="space-y-4">
+                  {[1, 2, 3].map((i) => (
+                    <div key={i} className="bg-card border border-border rounded-xl p-5 animate-pulse">
+                      <div className="flex items-center gap-3 mb-3">
+                        <div className="w-10 h-10 rounded-full bg-muted" />
+                        <div className="space-y-2">
+                          <div className="h-4 w-24 bg-muted rounded" />
+                          <div className="h-3 w-16 bg-muted rounded" />
+                        </div>
+                      </div>
+                      <div className="space-y-2">
+                        <div className="h-4 w-full bg-muted rounded" />
+                        <div className="h-4 w-3/4 bg-muted rounded" />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : reviews.length === 0 ? (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="text-center py-12"
+                >
+                  <MessageSquare className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                  <h3 className="text-lg font-semibold text-foreground mb-2">No reviews yet</h3>
+                  <p className="text-muted-foreground">Be the first to share your anonymous thoughts!</p>
+                </motion.div>
+              ) : (
+                <div className="space-y-4">
+                  {reviews.map((review, index) => (
+                    <motion.div
+                      key={review.id}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: index * 0.05 }}
+                      className="bg-card border border-border rounded-xl p-5 hover:border-primary/30 transition-colors"
+                    >
+                      <div className="flex items-start justify-between mb-3">
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center">
+                            <User className="h-5 w-5 text-primary" />
+                          </div>
+                          <div>
+                            <p className="font-medium text-foreground">Anonymous Student</p>
+                            <p className="text-xs text-muted-foreground">{formatTimeAgo(review.created_at)}</p>
+                          </div>
+                        </div>
+                        <span className="px-2.5 py-1 text-xs font-medium bg-muted text-muted-foreground rounded-full">
+                          {review.category}
+                        </span>
+                      </div>
+                      
+                      <p className="text-foreground/90 leading-relaxed mb-3">{review.content}</p>
+                      
+                      {review.rating && (
+                        <div className="flex items-center gap-1">
+                          {[1, 2, 3, 4, 5].map((star) => (
+                            <Star
+                              key={star}
+                              className={cn(
+                                "h-4 w-4",
+                                star <= review.rating!
+                                  ? "fill-yellow-400 text-yellow-400"
+                                  : "text-muted-foreground/30"
+                              )}
+                            />
+                          ))}
+                        </div>
+                      )}
+                    </motion.div>
+                  ))}
+                </div>
+              )}
             </div>
           )}
         </motion.div>
