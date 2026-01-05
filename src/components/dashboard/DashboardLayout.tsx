@@ -35,7 +35,7 @@ interface DashboardLayoutProps {
 const navItems = [
   { icon: LayoutDashboard, label: "Home", href: "/dashboard" },
   { icon: Rocket, label: "Opportunities", href: "/opportunities" },
-  { icon: Users, label: "Teams", href: "/teams" },
+  { icon: Users, label: "Connect", href: "/teams" },
   { icon: Trophy, label: "Leaderboard", href: "/leaderboard" },
 ];
 
