@@ -823,10 +823,10 @@ const Dashboard = () => {
               </div>
             </div>
 
-            {/* AI Chat Area - Match height with My Projects section */}
+            {/* AI Chat Area - Aligned with My Projects section */}
             <div className="bg-card border border-border rounded-xl flex flex-col" style={{
-            height: 'calc(100% - 60px)',
-            minHeight: '520px'
+            minHeight: '340px',
+            maxHeight: '340px'
           }}>
               {/* Chat Messages Area */}
               <div ref={chatContainerRef} className="flex-1 p-4 overflow-y-auto space-y-3">
