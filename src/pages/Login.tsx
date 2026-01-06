@@ -339,6 +339,13 @@ const Login = () => {
             </Link>
           </p>
 
+          <Link 
+            to="/dashboard" 
+            className="block text-center text-muted-foreground hover:text-foreground mt-4 text-sm transition-colors"
+          >
+            Skip for now →
+          </Link>
+
         </motion.div>
       </div>
     </div>
