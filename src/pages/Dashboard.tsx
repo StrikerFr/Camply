@@ -1063,32 +1063,6 @@ const Dashboard = () => {
                   </motion.div>
                 </Link>
               </div>
-              
-              {/* Quick Actions */}
-              <div className="mt-4 pt-4 border-t border-border/50">
-                <div className="flex items-center gap-2.5 mb-3">
-                  <Sparkles className="h-4 w-4 text-primary" />
-                  <h4 className="text-sm font-medium text-foreground">Quick Actions</h4>
-                </div>
-                <div className="space-y-2">
-                  <Link to="/teams?tab=find" className="block">
-                    <motion.div whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.99 }}>
-                      <Button variant="outline" size="sm" className="w-full justify-start h-9 text-sm border-border hover:bg-muted hover:border-border/60 text-foreground transition-all duration-200">
-                        <Users className="h-4 w-4 mr-2.5 text-muted-foreground" />
-                        Find Teammates
-                      </Button>
-                    </motion.div>
-                  </Link>
-                  <Link to="/profile" className="block">
-                    <motion.div whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.99 }}>
-                      <Button variant="outline" size="sm" className="w-full justify-start h-9 text-sm border-border hover:bg-muted hover:border-border/60 text-foreground transition-all duration-200">
-                        <Award className="h-4 w-4 mr-2.5 text-muted-foreground" />
-                        View Profile
-                      </Button>
-                    </motion.div>
-                  </Link>
-                </div>
-              </div>
             </div>
           </motion.div>
         </div>
