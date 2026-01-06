@@ -604,37 +604,38 @@ const MyCollege = () => {
 
   return (
     <DashboardLayout>
-      <div className="max-w-7xl mx-auto space-y-8">
+      <div className="max-w-7xl mx-auto space-y-5 sm:space-y-6 lg:space-y-8">
         {/* College Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="bg-card border border-border rounded-2xl p-6 lg:p-8"
+          className="bg-card border border-border rounded-xl sm:rounded-2xl p-4 sm:p-6 lg:p-8"
         >
-          <div className="flex flex-col lg:flex-row lg:items-center gap-6">
-            <div className="w-20 h-20 lg:w-24 lg:h-24 rounded-2xl bg-primary/10 flex items-center justify-center text-4xl lg:text-5xl">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6">
+            <div className="w-16 h-16 sm:w-20 sm:h-20 lg:w-24 lg:h-24 rounded-xl sm:rounded-2xl bg-primary/10 flex items-center justify-center text-3xl sm:text-4xl lg:text-5xl flex-shrink-0">
               {COLLEGE_INFO.logo}
             </div>
-            <div className="flex-1">
-              <h1 className="text-2xl lg:text-3xl font-display font-bold text-foreground tracking-tight">
-                {COLLEGE_INFO.name}
+            <div className="flex-1 min-w-0">
+              <h1 className="text-xl sm:text-2xl lg:text-3xl font-display font-bold text-foreground tracking-tight">
+                {COLLEGE_INFO.shortName}
+                <span className="hidden sm:inline"> - {COLLEGE_INFO.name.replace("Indian Institute of Technology ", "")}</span>
               </h1>
-              <div className="flex flex-wrap items-center gap-4 mt-2 text-muted-foreground">
+              <div className="flex flex-wrap items-center gap-3 sm:gap-4 mt-1.5 sm:mt-2 text-xs sm:text-sm text-muted-foreground">
                 <span className="flex items-center gap-1.5">
-                  <MapPin className="h-4 w-4" />
+                  <MapPin className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                   {COLLEGE_INFO.location}
                 </span>
                 <span className="flex items-center gap-1.5">
-                  <Building2 className="h-4 w-4" />
+                  <Building2 className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                   Est. {COLLEGE_INFO.established}
                 </span>
               </div>
             </div>
-            <Button variant="outline" className="gap-2" asChild>
+            <Button variant="outline" size="sm" className="gap-2 self-start sm:self-center" asChild>
               <a href={COLLEGE_INFO.website} target="_blank" rel="noopener noreferrer">
-                <ExternalLink className="h-4 w-4" />
-                Visit Website
+                <ExternalLink className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                <span className="hidden sm:inline">Visit </span>Website
               </a>
             </Button>
           </div>
@@ -645,21 +646,22 @@ const MyCollege = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1, duration: 0.5 }}
-          className="flex overflow-x-auto gap-2 pb-2"
+          className="flex overflow-x-auto gap-1.5 sm:gap-2 pb-2 -mx-3 px-3 sm:mx-0 sm:px-0 scrollbar-none"
         >
           {TABS.map((tab) => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
               className={cn(
-                "flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium whitespace-nowrap transition-all",
+                "flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg sm:rounded-xl text-xs sm:text-sm font-medium whitespace-nowrap transition-all flex-shrink-0",
                 activeTab === tab.id
-                  ? "bg-primary text-primary-foreground"
+                  ? "bg-primary text-primary-foreground shadow-lg"
                   : "bg-muted text-muted-foreground hover:text-foreground hover:bg-muted/80"
               )}
             >
-              <tab.icon className="h-4 w-4" />
-              {tab.label}
+              <tab.icon className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+              <span className="hidden sm:inline">{tab.label}</span>
+              <span className="sm:hidden">{tab.label.split(" ")[0]}</span>
             </button>
           ))}
         </motion.div>
@@ -672,42 +674,42 @@ const MyCollege = () => {
           transition={{ duration: 0.3 }}
         >
           {activeTab === "events" && (
-            <div className="grid gap-4">
+            <div className="grid gap-3 sm:gap-4">
               {EVENTS.map((event, index) => (
                 <motion.div
                   key={event.id}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.1 }}
-                  className="bg-card border border-border rounded-xl p-5 hover:border-primary/50 transition-colors"
+                  className="bg-card border border-border rounded-xl p-4 sm:p-5 hover:border-primary/50 transition-colors"
                 >
-                  <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-                    <div className="flex-1">
+                  <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 sm:gap-4">
+                    <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-2">
-                        <span className="px-2.5 py-1 text-xs font-medium bg-primary/10 text-primary rounded-full">
+                        <span className="px-2 sm:px-2.5 py-0.5 sm:py-1 text-[10px] sm:text-xs font-medium bg-primary/10 text-primary rounded-full">
                           {event.type}
                         </span>
                         {event.isLive && (
-                          <span className="px-2.5 py-1 text-xs font-medium bg-emerald-500/10 text-emerald-500 rounded-full flex items-center gap-1">
+                          <span className="px-2 sm:px-2.5 py-0.5 sm:py-1 text-[10px] sm:text-xs font-medium bg-emerald-500/10 text-emerald-500 rounded-full flex items-center gap-1">
                             <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" />
                             Live
                           </span>
                         )}
                       </div>
-                      <h3 className="text-lg font-semibold text-foreground">{event.title}</h3>
-                      <p className="text-sm text-muted-foreground mt-1">{event.description}</p>
-                      <div className="flex items-center gap-4 mt-3 text-sm text-muted-foreground">
+                      <h3 className="text-base sm:text-lg font-semibold text-foreground truncate">{event.title}</h3>
+                      <p className="text-xs sm:text-sm text-muted-foreground mt-1 line-clamp-2">{event.description}</p>
+                      <div className="flex flex-wrap items-center gap-3 sm:gap-4 mt-2 sm:mt-3 text-xs sm:text-sm text-muted-foreground">
                         <span className="flex items-center gap-1.5">
-                          <Calendar className="h-4 w-4" />
+                          <Calendar className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                           {event.date}
                         </span>
                         <span className="flex items-center gap-1.5">
-                          <MapPin className="h-4 w-4" />
+                          <MapPin className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                           {event.location}
                         </span>
                       </div>
                     </div>
-                    <Button onClick={() => setSelectedEvent(event)}>View Details</Button>
+                    <Button size="sm" className="self-start lg:self-center" onClick={() => setSelectedEvent(event)}>View Details</Button>
                   </div>
                 </motion.div>
               ))}
@@ -986,18 +988,18 @@ const MyCollege = () => {
               </motion.div>
 
               {/* Time Filter Tabs */}
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1.5 sm:gap-2 overflow-x-auto pb-1 scrollbar-none -mx-1 px-1">
                 {[
                   { id: "all" as TimeFilter, label: "All" },
                   { id: "today" as TimeFilter, label: "Today" },
-                  { id: "week" as TimeFilter, label: "This Week" },
-                  { id: "month" as TimeFilter, label: "This Month" },
+                  { id: "week" as TimeFilter, label: "Week" },
+                  { id: "month" as TimeFilter, label: "Month" },
                 ].map((filter) => (
                   <button
                     key={filter.id}
                     onClick={() => setTimeFilter(filter.id)}
                     className={cn(
-                      "px-3 py-1.5 text-sm font-medium rounded-lg transition-all",
+                      "px-2.5 sm:px-3 py-1 sm:py-1.5 text-xs sm:text-sm font-medium rounded-lg transition-all whitespace-nowrap",
                       timeFilter === filter.id
                         ? "bg-primary text-primary-foreground"
                         : "bg-muted text-muted-foreground hover:bg-muted/80"

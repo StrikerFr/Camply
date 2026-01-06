@@ -327,15 +327,15 @@ const Leaderboard = () => {
 
   return (
     <DashboardLayout>
-      <div className="max-w-5xl mx-auto space-y-6">
+      <div className="max-w-5xl mx-auto space-y-4 sm:space-y-6">
         {/* Header */}
         <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} className="text-center">
           <div className="inline-flex items-center gap-2 text-primary mb-2">
-            <Sparkles className="h-5 w-5" />
-            <span className="text-sm font-medium">Live Rankings</span>
+            <Sparkles className="h-4 w-4 sm:h-5 sm:w-5" />
+            <span className="text-xs sm:text-sm font-medium">Live Rankings</span>
           </div>
-          <h1 className="text-2xl lg:text-3xl font-display font-bold text-foreground mb-2">Campus Leaderboard</h1>
-          <p className="text-muted-foreground">See how you stack up against other students</p>
+          <h1 className="text-xl sm:text-2xl lg:text-3xl font-display font-bold text-foreground mb-1.5 sm:mb-2">Campus Leaderboard</h1>
+          <p className="text-sm sm:text-base text-muted-foreground">See how you stack up against other students</p>
         </motion.div>
 
         {/* Your Rank Card */}
@@ -344,24 +344,24 @@ const Leaderboard = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.08 }}
           whileHover={{ scale: 1.01 }}
-          className="relative overflow-hidden rounded-2xl bg-card border border-border p-6 shadow-sm"
+          className="relative overflow-hidden rounded-xl sm:rounded-2xl bg-card border border-border p-4 sm:p-6 shadow-sm"
         >
-          <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-bl from-primary/10 to-transparent rounded-full blur-[60px]" />
-          <div className="absolute bottom-0 left-0 w-32 h-32 bg-gradient-to-tr from-accent/10 to-transparent rounded-full blur-[40px]" />
+          <div className="absolute top-0 right-0 w-32 sm:w-40 h-32 sm:h-40 bg-gradient-to-bl from-primary/10 to-transparent rounded-full blur-[60px]" />
+          <div className="absolute bottom-0 left-0 w-24 sm:w-32 h-24 sm:h-32 bg-gradient-to-tr from-accent/10 to-transparent rounded-full blur-[40px]" />
 
-          <div className="relative z-10 flex items-center justify-between gap-6">
-            <div className="flex items-center gap-4 min-w-0">
+          <div className="relative z-10 flex items-center justify-between gap-4 sm:gap-6">
+            <div className="flex items-center gap-3 sm:gap-4 min-w-0">
               <motion.div
-                className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary to-accent flex items-center justify-center text-2xl font-bold text-primary-foreground shadow-lg"
+                className="w-12 h-12 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl bg-gradient-to-br from-primary to-accent flex items-center justify-center text-lg sm:text-2xl font-bold text-primary-foreground shadow-lg"
                 whileHover={{ rotate: [0, -5, 5, 0] }}
               >
                 {me?.avatar_initial ?? "Y"}
               </motion.div>
               <div className="min-w-0">
-                <p className="text-sm text-muted-foreground">Your Rank</p>
-                <div className="flex items-center gap-3 flex-wrap">
+                <p className="text-xs sm:text-sm text-muted-foreground">Your Rank</p>
+                <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
                   <motion.span
-                    className="text-4xl font-display font-bold text-foreground"
+                    className="text-2xl sm:text-4xl font-display font-bold text-foreground"
                     key={me?.rank}
                     initial={{ scale: 1.2, color: "hsl(var(--primary))" }}
                     animate={{ scale: 1, color: "hsl(var(--foreground))" }}
@@ -370,22 +370,22 @@ const Leaderboard = () => {
                     {me ? `#${me.rank}` : "—"}
                   </motion.span>
                   <span className="inline-flex items-center gap-1 text-primary">
-                    <TrendingUp className="h-4 w-4" />
-                    <span className="text-sm font-medium">Active</span>
+                    <TrendingUp className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                    <span className="text-xs sm:text-sm font-medium">Active</span>
                   </span>
                 </div>
-                <p className="text-sm text-muted-foreground truncate">
+                <p className="text-xs sm:text-sm text-muted-foreground truncate hidden sm:block">
                   {me?.full_name ?? "You"} • {activeCategory} • {activeTime}
                 </p>
               </div>
             </div>
 
             <div className="text-right shrink-0">
-              <p className="text-sm text-muted-foreground">Points</p>
-              <div className="flex items-center justify-end gap-2">
-                <Zap className="h-5 w-5 text-primary" />
+              <p className="text-xs sm:text-sm text-muted-foreground">Points</p>
+              <div className="flex items-center justify-end gap-1.5 sm:gap-2">
+                <Zap className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
                 <motion.span
-                  className="text-3xl font-display font-bold text-foreground"
+                  className="text-xl sm:text-3xl font-display font-bold text-foreground"
                   key={me?.display_points}
                   initial={{ scale: 1.1 }}
                   animate={{ scale: 1 }}
@@ -402,9 +402,9 @@ const Leaderboard = () => {
           initial={{ opacity: 0, y: 14 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.12 }}
-          className="flex flex-col sm:flex-row gap-4"
+          className="flex flex-col sm:flex-row gap-3 sm:gap-4"
         >
-          <div className="flex gap-2 overflow-x-auto pb-1">
+          <div className="flex gap-1.5 sm:gap-2 overflow-x-auto pb-1 scrollbar-none -mx-1 px-1">
             {timeFilters.map((filter) => (
               <motion.button
                 key={filter}
@@ -412,7 +412,7 @@ const Leaderboard = () => {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 className={cn(
-                  "px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all",
+                  "px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm font-medium whitespace-nowrap transition-all",
                   activeTime === filter
                     ? "bg-primary text-primary-foreground shadow-md"
                     : "bg-secondary/50 text-muted-foreground hover:bg-secondary"
@@ -423,7 +423,7 @@ const Leaderboard = () => {
             ))}
           </div>
 
-          <div className="flex gap-2 overflow-x-auto pb-1 sm:ml-auto">
+          <div className="flex gap-1.5 sm:gap-2 overflow-x-auto pb-1 sm:ml-auto scrollbar-none -mx-1 px-1">
             {categoryFilters.map((filter) => (
               <motion.button
                 key={filter}
@@ -431,7 +431,7 @@ const Leaderboard = () => {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 className={cn(
-                  "px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all",
+                  "px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm font-medium whitespace-nowrap transition-all",
                   activeCategory === filter
                     ? "bg-secondary text-foreground shadow-sm"
                     : "text-muted-foreground hover:text-foreground"
@@ -443,7 +443,7 @@ const Leaderboard = () => {
           </div>
         </motion.div>
 
-        {/* Top 3 Podium */}
+        {/* Top 3 Podium - Hide on small mobile, show simplified on md+ */}
         <AnimatePresence mode="wait">
           {top3.length >= 3 && (
             <motion.div
@@ -451,7 +451,7 @@ const Leaderboard = () => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="grid grid-cols-3 gap-4 items-end pt-8 pb-4"
+              className="hidden sm:grid grid-cols-3 gap-2 sm:gap-4 items-end pt-4 sm:pt-8 pb-2 sm:pb-4"
             >
               <PodiumCard entry={top3[1]} position={2} isVisible={true} />
               <PodiumCard entry={top3[0]} position={1} isVisible={true} />
@@ -460,21 +460,24 @@ const Leaderboard = () => {
           )}
         </AnimatePresence>
 
-        {/* Leaderboard List */}
-        {rest.length > 0 && (
+        {/* Leaderboard List - Show top3 in list on mobile */}
+        {(rest.length > 0 || (top3.length > 0 && typeof window !== 'undefined')) && (
           <motion.div
             initial={{ opacity: 0, y: 14 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4 }}
-            className="bg-card border border-border rounded-2xl overflow-hidden shadow-sm"
+            className="bg-card border border-border rounded-xl sm:rounded-2xl overflow-hidden shadow-sm"
           >
             <LayoutGroup>
               <div className="divide-y divide-border">
+                {/* Mobile-only: Show top 3 in list format */}
                 <AnimatePresence mode="popLayout">
-                  {rest.map((user) => {
+                  {/* Show all entries on mobile (including top 3), only rest on desktop */}
+                  {(typeof window !== 'undefined' && window.innerWidth < 640 ? ranked : rest).map((user) => {
                     const rankChange = user.pointsChange || 0;
                     const isMovingUp = rankChange > 0;
                     const isMovingDown = rankChange < 0;
+                    const isTop3 = user.rank <= 3;
                     
                     return (
                       <motion.div
@@ -496,15 +499,21 @@ const Leaderboard = () => {
                           backgroundColor: { duration: 0.5 }
                         }}
                         whileHover={{ backgroundColor: "hsl(var(--muted))" }}
-                        className="flex items-center gap-4 p-4 transition-colors cursor-pointer relative"
+                        className={cn(
+                          "flex items-center gap-3 sm:gap-4 p-3 sm:p-4 transition-colors cursor-pointer relative",
+                          isTop3 && "sm:hidden"
+                        )}
                       >
                         {/* Rank with change indicator */}
-                        <div className="w-10 flex items-center justify-center gap-1">
+                        <div className="w-8 sm:w-10 flex items-center justify-center gap-0.5 sm:gap-1">
                           <motion.span 
-                            className="font-semibold text-muted-foreground"
+                            className={cn(
+                              "font-semibold text-sm sm:text-base",
+                              isTop3 ? "text-primary" : "text-muted-foreground"
+                            )}
                             key={user.rank}
                             initial={{ scale: 1.3, color: "hsl(var(--primary))" }}
-                            animate={{ scale: 1, color: "hsl(var(--muted-foreground))" }}
+                            animate={{ scale: 1, color: isTop3 ? "hsl(var(--primary))" : "hsl(var(--muted-foreground))" }}
                             transition={{ duration: 0.3 }}
                           >
                             {user.rank}
@@ -517,7 +526,7 @@ const Leaderboard = () => {
                                 exit={{ opacity: 0, scale: 0 }}
                                 className={cn(
                                   "flex items-center text-xs font-medium",
-                                  isMovingUp ? "text-green-500" : "text-red-500"
+                                  isMovingUp ? "text-green-500" : "text-primary"
                                 )}
                               >
                                 {isMovingUp ? (
@@ -532,20 +541,20 @@ const Leaderboard = () => {
 
                         <motion.div
                           layout
-                          className="w-10 h-10 rounded-xl bg-secondary flex items-center justify-center text-sm font-bold text-secondary-foreground"
+                          className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-secondary flex items-center justify-center text-xs sm:text-sm font-bold text-secondary-foreground"
                           whileHover={{ scale: 1.1, rotate: 5 }}
                         >
                           {user.avatar_initial}
                         </motion.div>
 
                         <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2 min-w-0">
-                            <p className="font-medium text-foreground truncate">{user.full_name}</p>
+                          <div className="flex items-center gap-1.5 sm:gap-2 min-w-0">
+                            <p className="font-medium text-sm sm:text-base text-foreground truncate">{user.full_name}</p>
                             {user.id === ME_ID && (
                               <motion.span
                                 initial={{ scale: 0 }}
                                 animate={{ scale: 1 }}
-                                className="px-2 py-0.5 rounded-full text-xs font-medium bg-primary/10 text-primary"
+                                className="px-1.5 sm:px-2 py-0.5 rounded-full text-[10px] sm:text-xs font-medium bg-primary/10 text-primary"
                               >
                                 You
                               </motion.span>
@@ -560,7 +569,7 @@ const Leaderboard = () => {
                           <p className="text-xs text-muted-foreground">{user.primary_category}</p>
                         </div>
 
-                        <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-2 sm:gap-3">
                           <AnimatePresence mode="wait">
                             {isMovingUp ? (
                               <motion.div
@@ -568,7 +577,7 @@ const Leaderboard = () => {
                                 initial={{ scale: 0, rotate: -180 }}
                                 animate={{ scale: 1, rotate: 0 }}
                                 exit={{ scale: 0 }}
-                                className="flex items-center justify-center w-8 h-8 rounded-full bg-green-500/20"
+                                className="hidden sm:flex items-center justify-center w-8 h-8 rounded-full bg-green-500/20"
                               >
                                 <TrendingUp className="h-5 w-5 text-green-400" />
                               </motion.div>
@@ -578,14 +587,14 @@ const Leaderboard = () => {
                                 initial={{ scale: 0, rotate: 180 }}
                                 animate={{ scale: 1, rotate: 0 }}
                                 exit={{ scale: 0 }}
-                                className="flex items-center justify-center w-8 h-8 rounded-full bg-red-500/20"
+                                className="hidden sm:flex items-center justify-center w-8 h-8 rounded-full bg-primary/20"
                               >
-                                <TrendingDown className="h-5 w-5 text-red-400" />
+                                <TrendingDown className="h-5 w-5 text-primary" />
                               </motion.div>
                             ) : (
                               <motion.div
                                 key="neutral"
-                                className="flex items-center justify-center w-8 h-8 rounded-full bg-primary/10"
+                                className="hidden sm:flex items-center justify-center w-8 h-8 rounded-full bg-primary/10"
                               >
                                 <Zap className="h-4 w-4 text-primary" />
                               </motion.div>
@@ -624,7 +633,7 @@ const Leaderboard = () => {
                                 backgroundColor: "hsl(var(--secondary))"
                               }}
                               transition={{ duration: 1.2 }}
-                              className="relative px-3 py-1.5 rounded-lg"
+                              className="relative px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg"
                             >
                               <motion.span
                                 initial={{ 
@@ -636,7 +645,7 @@ const Leaderboard = () => {
                                   textShadow: "none"
                                 }}
                                 transition={{ duration: 1 }}
-                                className="font-bold text-lg"
+                                className="font-bold text-sm sm:text-lg"
                               >
                                 {user.display_points.toLocaleString()}
                               </motion.span>
@@ -658,12 +667,12 @@ const Leaderboard = () => {
             initial={{ opacity: 0, y: 14 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.16 }}
-            className="text-center py-12 bg-card border border-border rounded-2xl"
+            className="text-center py-8 sm:py-12 bg-card border border-border rounded-xl sm:rounded-2xl"
           >
-            <div className="text-6xl mb-4">🏆</div>
-            <h3 className="text-lg font-semibold text-foreground mb-2">No rankings yet</h3>
-            <p className="text-muted-foreground mb-6">Be the first to earn points and climb the leaderboard!</p>
-            <Button asChild>
+            <div className="text-4xl sm:text-6xl mb-3 sm:mb-4">🏆</div>
+            <h3 className="text-base sm:text-lg font-semibold text-foreground mb-1.5 sm:mb-2">No rankings yet</h3>
+            <p className="text-sm sm:text-base text-muted-foreground mb-4 sm:mb-6 px-4">Be the first to earn points and climb the leaderboard!</p>
+            <Button size="sm" asChild>
               <Link to="/opportunities">Browse Opportunities</Link>
             </Button>
           </motion.div>

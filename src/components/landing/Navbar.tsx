@@ -18,13 +18,13 @@ export const Navbar = () => {
   ];
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 glass border-b border-border/30">
-      <div className="container mx-auto px-6 py-4">
+    <nav className="fixed top-0 left-0 right-0 z-50 glass border-b border-border/30 safe-area-top">
+      <div className="container mx-auto px-4 sm:px-6 py-3 sm:py-4">
         <div className="flex items-center justify-between">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2 group">
-            <img src={logo} alt="Camply Logo" className="h-8 w-8 transition-transform group-hover:scale-110" />
-            <span className="text-2xl font-display font-bold text-foreground">
+            <img src={logo} alt="Camply Logo" className="h-7 w-7 sm:h-8 sm:w-8 transition-transform group-hover:scale-110" />
+            <span className="text-xl sm:text-2xl font-display font-bold text-foreground">
               Camply
             </span>
           </Link>
