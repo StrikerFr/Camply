@@ -19,7 +19,8 @@ import {
   Bell,
   MessageSquare,
   Send,
-  User
+  User,
+  ThumbsUp
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -349,8 +350,11 @@ interface Review {
   category: string;
   created_at: string;
   parent_id: string | null;
+  likes: number;
   replies?: Review[];
 }
+
+type TimeFilter = "all" | "today" | "week" | "month";
 
 const MyCollege = () => {
   const [activeTab, setActiveTab] = useState("events");
@@ -368,21 +372,75 @@ const MyCollege = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [replyingTo, setReplyingTo] = useState<string | null>(null);
   const [replyContent, setReplyContent] = useState("");
+  const [timeFilter, setTimeFilter] = useState<TimeFilter>("all");
+  const [likedReviews, setLikedReviews] = useState<Set<string>>(new Set());
+
+  // Generate or get device ID for anonymous like tracking
+  const getDeviceId = () => {
+    let deviceId = localStorage.getItem("anonymous_device_id");
+    if (!deviceId) {
+      deviceId = crypto.randomUUID();
+      localStorage.setItem("anonymous_device_id", deviceId);
+    }
+    return deviceId;
+  };
 
   // Fetch reviews
   useEffect(() => {
     if (activeTab === "reviews") {
       fetchReviews();
+      fetchLikedReviews();
     }
-  }, [activeTab]);
+  }, [activeTab, timeFilter]);
+
+  const getTimeFilterDate = () => {
+    const now = new Date();
+    switch (timeFilter) {
+      case "today":
+        const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        return today.toISOString();
+      case "week":
+        const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+        return weekAgo.toISOString();
+      case "month":
+        const monthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+        return monthAgo.toISOString();
+      default:
+        return null;
+    }
+  };
+
+  const fetchLikedReviews = async () => {
+    const deviceId = getDeviceId();
+    try {
+      const { data } = await supabase
+        .from("review_likes")
+        .select("review_id")
+        .eq("device_id", deviceId);
+      
+      if (data) {
+        setLikedReviews(new Set(data.map(item => item.review_id)));
+      }
+    } catch (error) {
+      console.error("Error fetching liked reviews:", error);
+    }
+  };
 
   const fetchReviews = async () => {
     setIsLoadingReviews(true);
     try {
-      const { data, error } = await supabase
+      let query = supabase
         .from("college_reviews")
         .select("*")
-        .is("parent_id", null)
+        .is("parent_id", null);
+      
+      const filterDate = getTimeFilterDate();
+      if (filterDate) {
+        query = query.gte("created_at", filterDate);
+      }
+      
+      const { data, error } = await query
+        .order("likes", { ascending: false })
         .order("created_at", { ascending: false })
         .limit(50);
       
@@ -406,6 +464,56 @@ const MyCollege = () => {
       toast.error("Failed to load reviews");
     } finally {
       setIsLoadingReviews(false);
+    }
+  };
+
+  const handleLikeReview = async (reviewId: string) => {
+    const deviceId = getDeviceId();
+    const isLiked = likedReviews.has(reviewId);
+    
+    try {
+      if (isLiked) {
+        // Unlike
+        await supabase
+          .from("review_likes")
+          .delete()
+          .eq("review_id", reviewId)
+          .eq("device_id", deviceId);
+        
+        await supabase
+          .from("college_reviews")
+          .update({ likes: Math.max(0, (reviews.find(r => r.id === reviewId)?.likes || 1) - 1) })
+          .eq("id", reviewId);
+        
+        setLikedReviews(prev => {
+          const newSet = new Set(prev);
+          newSet.delete(reviewId);
+          return newSet;
+        });
+        
+        setReviews(prev => prev.map(r => 
+          r.id === reviewId ? { ...r, likes: Math.max(0, r.likes - 1) } : r
+        ));
+      } else {
+        // Like
+        await supabase
+          .from("review_likes")
+          .insert({ review_id: reviewId, device_id: deviceId });
+        
+        await supabase
+          .from("college_reviews")
+          .update({ likes: (reviews.find(r => r.id === reviewId)?.likes || 0) + 1 })
+          .eq("id", reviewId);
+        
+        setLikedReviews(prev => new Set(prev).add(reviewId));
+        
+        setReviews(prev => prev.map(r => 
+          r.id === reviewId ? { ...r, likes: r.likes + 1 } : r
+        ));
+      }
+    } catch (error) {
+      console.error("Error toggling like:", error);
+      toast.error("Failed to update like");
     }
   };
 
@@ -877,6 +985,29 @@ const MyCollege = () => {
                 </p>
               </motion.div>
 
+              {/* Time Filter Tabs */}
+              <div className="flex items-center gap-2">
+                {[
+                  { id: "all" as TimeFilter, label: "All" },
+                  { id: "today" as TimeFilter, label: "Today" },
+                  { id: "week" as TimeFilter, label: "This Week" },
+                  { id: "month" as TimeFilter, label: "This Month" },
+                ].map((filter) => (
+                  <button
+                    key={filter.id}
+                    onClick={() => setTimeFilter(filter.id)}
+                    className={cn(
+                      "px-3 py-1.5 text-sm font-medium rounded-lg transition-all",
+                      timeFilter === filter.id
+                        ? "bg-primary text-primary-foreground"
+                        : "bg-muted text-muted-foreground hover:bg-muted/80"
+                    )}
+                  >
+                    {filter.label}
+                  </button>
+                ))}
+              </div>
+
               {/* Reviews List */}
               {isLoadingReviews ? (
                 <div className="space-y-4">
@@ -903,8 +1034,12 @@ const MyCollege = () => {
                   className="text-center py-12"
                 >
                   <MessageSquare className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                  <h3 className="text-lg font-semibold text-foreground mb-2">No reviews yet</h3>
-                  <p className="text-muted-foreground">Be the first to share your anonymous thoughts!</p>
+                  <h3 className="text-lg font-semibold text-foreground mb-2">
+                    {timeFilter === "all" ? "No reviews yet" : `No reviews ${timeFilter === "today" ? "today" : timeFilter === "week" ? "this week" : "this month"}`}
+                  </h3>
+                  <p className="text-muted-foreground">
+                    {timeFilter === "all" ? "Be the first to share your anonymous thoughts!" : "Try checking a different time period."}
+                  </p>
                 </motion.div>
               ) : (
                 <div className="space-y-4">
@@ -949,8 +1084,23 @@ const MyCollege = () => {
                         </div>
                       )}
                       
-                      {/* Reply Button */}
-                      <div className="flex items-center gap-3 pt-3 border-t border-border/50">
+                      {/* Like & Reply Buttons */}
+                      <div className="flex items-center gap-4 pt-3 border-t border-border/50">
+                        <button
+                          onClick={() => handleLikeReview(review.id)}
+                          className={cn(
+                            "text-xs transition-colors flex items-center gap-1.5",
+                            likedReviews.has(review.id)
+                              ? "text-primary"
+                              : "text-muted-foreground hover:text-primary"
+                          )}
+                        >
+                          <ThumbsUp className={cn(
+                            "h-3.5 w-3.5",
+                            likedReviews.has(review.id) && "fill-primary"
+                          )} />
+                          <span>{review.likes > 0 ? review.likes : ""} {review.likes === 1 ? "Like" : review.likes > 1 ? "Likes" : "Like"}</span>
+                        </button>
                         <button
                           onClick={() => setReplyingTo(replyingTo === review.id ? null : review.id)}
                           className="text-xs text-muted-foreground hover:text-primary transition-colors flex items-center gap-1"

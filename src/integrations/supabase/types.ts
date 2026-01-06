@@ -22,6 +22,7 @@ export type Database = {
           created_at: string
           id: string
           is_approved: boolean | null
+          likes: number
           parent_id: string | null
           rating: number | null
         }
@@ -32,6 +33,7 @@ export type Database = {
           created_at?: string
           id?: string
           is_approved?: boolean | null
+          likes?: number
           parent_id?: string | null
           rating?: number | null
         }
@@ -42,6 +44,7 @@ export type Database = {
           created_at?: string
           id?: string
           is_approved?: boolean | null
+          likes?: number
           parent_id?: string | null
           rating?: number | null
         }
@@ -49,6 +52,35 @@ export type Database = {
           {
             foreignKeyName: "college_reviews_parent_id_fkey"
             columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "college_reviews"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      review_likes: {
+        Row: {
+          created_at: string
+          device_id: string
+          id: string
+          review_id: string
+        }
+        Insert: {
+          created_at?: string
+          device_id: string
+          id?: string
+          review_id: string
+        }
+        Update: {
+          created_at?: string
+          device_id?: string
+          id?: string
+          review_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "review_likes_review_id_fkey"
+            columns: ["review_id"]
             isOneToOne: false
             referencedRelation: "college_reviews"
             referencedColumns: ["id"]
