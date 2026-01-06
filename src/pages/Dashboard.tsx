@@ -1,7 +1,7 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect, useRef } from "react";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
-import { Trophy, Calendar, Users, TrendingUp, ArrowRight, Clock, MapPin, Zap, Target, ArrowUp, Check, ChevronRight, Star, Award, Code, Palette, Briefcase, Sparkles, MessageSquare, Bot, Send, ChevronLeft, SlidersHorizontal, Mic, Upload, MicOff, Image, Save } from "lucide-react";
+import { Trophy, Calendar, Users, TrendingUp, ArrowRight, Clock, MapPin, Zap, Target, ArrowUp, Check, ChevronRight, Star, Award, Code, Palette, Briefcase, Sparkles, MessageSquare, Bot, Send, ChevronLeft, SlidersHorizontal, Mic, Upload, MicOff, Image, Save, Pin, MessageCircle } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import Autoplay from "embla-carousel-autoplay";
@@ -1019,37 +1019,75 @@ const Dashboard = () => {
               </div>
             </div>
 
-            {/* Quick Actions */}
+            {/* Connect - Pinned Contacts */}
             <div className="bg-card border border-border rounded-xl p-5">
-              <div className="flex items-center gap-2.5 mb-4">
-                <Sparkles className="h-4 w-4 text-primary" />
-                <h3 className="font-semibold text-foreground">Quick Actions</h3>
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2.5">
+                  <Pin className="h-4 w-4 text-primary" />
+                  <h3 className="font-semibold text-foreground">Connect</h3>
+                </div>
+                <Link to="/teams" className="text-xs text-primary hover:underline">
+                  View all
+                </Link>
               </div>
               <div className="space-y-2.5">
+                {/* Pinned contacts */}
                 <Link to="/teams" className="block">
-                  <motion.div whileHover={{
-                  scale: 1.01
-                }} whileTap={{
-                  scale: 0.99
-                }}>
-                    <Button variant="outline" size="sm" className="w-full justify-start h-10 text-sm border-border hover:bg-muted hover:border-border/60 text-foreground transition-all duration-200">
-                      <Users className="h-4 w-4 mr-2.5 text-muted-foreground" />
-                      Find Teammates
-                    </Button>
+                  <motion.div whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.99 }} className="flex items-center gap-3 p-2.5 rounded-lg bg-muted/50 hover:bg-muted transition-all duration-200 cursor-pointer">
+                    <div className="relative">
+                      <div className="w-9 h-9 rounded-full bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center text-sm font-bold text-primary-foreground">
+                        S
+                      </div>
+                      <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-500 rounded-full border-2 border-card" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-foreground truncate">Sarah Chen</p>
+                      <p className="text-xs text-muted-foreground truncate">Active now</p>
+                    </div>
+                    <MessageCircle className="h-4 w-4 text-muted-foreground" />
                   </motion.div>
                 </Link>
-                <Link to="/profile" className="block">
-                  <motion.div whileHover={{
-                  scale: 1.01
-                }} whileTap={{
-                  scale: 0.99
-                }}>
-                    <Button variant="outline" size="sm" className="w-full justify-start h-10 text-sm border-border hover:bg-muted hover:border-border/60 text-foreground transition-all duration-200">
-                      <Award className="h-4 w-4 mr-2.5 text-muted-foreground" />
-                      View Profile
-                    </Button>
+                <Link to="/teams" className="block">
+                  <motion.div whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.99 }} className="flex items-center gap-3 p-2.5 rounded-lg bg-muted/50 hover:bg-muted transition-all duration-200 cursor-pointer">
+                    <div className="relative">
+                      <div className="w-9 h-9 rounded-full bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center text-sm font-bold text-primary-foreground">
+                        A
+                      </div>
+                      <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-500 rounded-full border-2 border-card" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-foreground truncate">Alex Rivera</p>
+                      <p className="text-xs text-muted-foreground truncate">1h ago</p>
+                    </div>
+                    <MessageCircle className="h-4 w-4 text-muted-foreground" />
                   </motion.div>
                 </Link>
+              </div>
+              
+              {/* Quick Actions */}
+              <div className="mt-4 pt-4 border-t border-border/50">
+                <div className="flex items-center gap-2.5 mb-3">
+                  <Sparkles className="h-4 w-4 text-primary" />
+                  <h4 className="text-sm font-medium text-foreground">Quick Actions</h4>
+                </div>
+                <div className="space-y-2">
+                  <Link to="/teams?tab=find" className="block">
+                    <motion.div whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.99 }}>
+                      <Button variant="outline" size="sm" className="w-full justify-start h-9 text-sm border-border hover:bg-muted hover:border-border/60 text-foreground transition-all duration-200">
+                        <Users className="h-4 w-4 mr-2.5 text-muted-foreground" />
+                        Find Teammates
+                      </Button>
+                    </motion.div>
+                  </Link>
+                  <Link to="/profile" className="block">
+                    <motion.div whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.99 }}>
+                      <Button variant="outline" size="sm" className="w-full justify-start h-9 text-sm border-border hover:bg-muted hover:border-border/60 text-foreground transition-all duration-200">
+                        <Award className="h-4 w-4 mr-2.5 text-muted-foreground" />
+                        View Profile
+                      </Button>
+                    </motion.div>
+                  </Link>
+                </div>
               </div>
             </div>
           </motion.div>
