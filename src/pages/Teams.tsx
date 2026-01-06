@@ -20,7 +20,9 @@ import {
   MoreVertical,
   Smile,
   Paperclip,
-  ChevronLeft
+  ChevronLeft,
+  Pin,
+  PinOff
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -183,6 +185,7 @@ const Teams = () => {
   const [selectedConversation, setSelectedConversation] = useState<typeof FAKE_CONVERSATIONS[0] | null>(null);
   const [messageInput, setMessageInput] = useState("");
   const [conversations, setConversations] = useState(FAKE_CONVERSATIONS);
+  const [pinnedContacts, setPinnedContacts] = useState<string[]>(["1", "2"]); // Default pinned: Sarah & Alex
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const { data: myTeams, isLoading: teamsLoading } = useMyTeams();
@@ -251,6 +254,25 @@ const Teams = () => {
 
     setMessageInput("");
   };
+
+  const handlePinContact = (convId: string, convName: string) => {
+    if (pinnedContacts.includes(convId)) {
+      setPinnedContacts(prev => prev.filter(id => id !== convId));
+      toast.info(`Unpinned ${convName}`);
+    } else {
+      setPinnedContacts(prev => [...prev, convId]);
+      toast.success(`Pinned ${convName} to Dashboard!`);
+    }
+  };
+
+  // Sort conversations: pinned first
+  const sortedConversations = [...filteredConversations].sort((a, b) => {
+    const aIsPinned = pinnedContacts.includes(a.id);
+    const bIsPinned = pinnedContacts.includes(b.id);
+    if (aIsPinned && !bIsPinned) return -1;
+    if (!aIsPinned && bIsPinned) return 1;
+    return 0;
+  });
 
   return (
     <DashboardLayout>
@@ -352,55 +374,88 @@ const Teams = () => {
                 {/* Conversation List */}
                 <ScrollArea className="flex-1">
                   <div className="p-3 space-y-1">
-                    {filteredConversations.length > 0 ? (
+                    {sortedConversations.length > 0 ? (
                       <AnimatePresence>
-                        {filteredConversations.map((conv, index) => (
-                          <motion.button
-                            key={conv.id}
-                            initial={{ opacity: 0, x: -20 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            transition={{ delay: index * 0.05 }}
-                            onClick={() => setSelectedConversation(conv)}
-                            className={cn(
-                              "w-full flex items-center gap-3 p-3.5 rounded-xl transition-all duration-300 text-left group",
-                              selectedConversation?.id === conv.id 
-                                ? "bg-primary/10 border border-primary/20 shadow-sm" 
-                                : "hover:bg-muted/70 border border-transparent"
-                            )}
-                          >
-                            <div className="relative shrink-0">
-                              <div className={cn(
-                                "w-12 h-12 rounded-full flex items-center justify-center text-base font-bold text-primary-foreground transition-transform duration-300 group-hover:scale-105",
-                                "bg-gradient-to-br from-primary via-primary to-primary/80 shadow-lg shadow-primary/20"
-                              )}>
-                                {conv.name.charAt(0)}
-                              </div>
-                              {conv.online && (
-                                <motion.div 
-                                  initial={{ scale: 0 }}
-                                  animate={{ scale: 1 }}
-                                  className="absolute -bottom-0.5 -right-0.5 w-4 h-4 bg-emerald-500 rounded-full border-[3px] border-card shadow-lg"
-                                />
+                        {sortedConversations.map((conv, index) => {
+                          const isPinned = pinnedContacts.includes(conv.id);
+                          return (
+                            <motion.div
+                              key={conv.id}
+                              initial={{ opacity: 0, x: -20 }}
+                              animate={{ opacity: 1, x: 0 }}
+                              transition={{ delay: index * 0.05 }}
+                              className={cn(
+                                "w-full flex items-center gap-3 p-3.5 rounded-xl transition-all duration-300 text-left group relative",
+                                selectedConversation?.id === conv.id 
+                                  ? "bg-primary/10 border border-primary/20 shadow-sm" 
+                                  : "hover:bg-muted/70 border border-transparent"
                               )}
-                            </div>
-                            <div className="flex-1 min-w-0 overflow-hidden">
-                              <div className="flex items-center justify-between gap-3">
-                                <span className="font-semibold text-sm text-foreground truncate">{conv.name}</span>
-                                <span className="text-[11px] text-muted-foreground whitespace-nowrap shrink-0">{conv.time}</span>
-                              </div>
-                              <p className="text-[13px] text-muted-foreground truncate mt-1 pr-2">{conv.lastMessage}</p>
-                            </div>
-                            {conv.unread > 0 && (
-                              <motion.div 
-                                initial={{ scale: 0 }}
-                                animate={{ scale: 1 }}
-                                className="w-6 h-6 rounded-full bg-primary flex items-center justify-center text-[11px] font-bold text-primary-foreground shadow-lg shadow-primary/30 shrink-0"
+                            >
+                              {/* Pin indicator */}
+                              {isPinned && (
+                                <div className="absolute -top-1 -left-1 w-5 h-5 bg-primary rounded-full flex items-center justify-center">
+                                  <Pin className="h-3 w-3 text-primary-foreground" />
+                                </div>
+                              )}
+                              
+                              <button
+                                onClick={() => setSelectedConversation(conv)}
+                                className="flex items-center gap-3 flex-1 min-w-0"
                               >
-                                {conv.unread}
-                              </motion.div>
-                            )}
-                          </motion.button>
-                        ))}
+                                <div className="relative shrink-0">
+                                  <div className={cn(
+                                    "w-12 h-12 rounded-full flex items-center justify-center text-base font-bold text-primary-foreground transition-transform duration-300 group-hover:scale-105",
+                                    "bg-gradient-to-br from-primary via-primary to-primary/80 shadow-lg shadow-primary/20"
+                                  )}>
+                                    {conv.name.charAt(0)}
+                                  </div>
+                                  {conv.online && (
+                                    <motion.div 
+                                      initial={{ scale: 0 }}
+                                      animate={{ scale: 1 }}
+                                      className="absolute -bottom-0.5 -right-0.5 w-4 h-4 bg-emerald-500 rounded-full border-[3px] border-card shadow-lg"
+                                    />
+                                  )}
+                                </div>
+                                <div className="flex-1 min-w-0 overflow-hidden">
+                                  <div className="flex items-center justify-between gap-3">
+                                    <span className="font-semibold text-sm text-foreground truncate">{conv.name}</span>
+                                    <span className="text-[11px] text-muted-foreground whitespace-nowrap shrink-0">{conv.time}</span>
+                                  </div>
+                                  <p className="text-[13px] text-muted-foreground truncate mt-1 pr-2">{conv.lastMessage}</p>
+                                </div>
+                              </button>
+                              
+                              {/* Pin button and unread badge */}
+                              <div className="flex items-center gap-2 shrink-0">
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handlePinContact(conv.id, conv.name);
+                                  }}
+                                  className={cn(
+                                    "p-1.5 rounded-lg transition-all duration-200 opacity-0 group-hover:opacity-100",
+                                    isPinned 
+                                      ? "bg-primary/20 text-primary hover:bg-primary/30" 
+                                      : "bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground"
+                                  )}
+                                  title={isPinned ? "Unpin from Dashboard" : "Pin to Dashboard"}
+                                >
+                                  {isPinned ? <PinOff className="h-4 w-4" /> : <Pin className="h-4 w-4" />}
+                                </button>
+                                {conv.unread > 0 && (
+                                  <motion.div 
+                                    initial={{ scale: 0 }}
+                                    animate={{ scale: 1 }}
+                                    className="w-6 h-6 rounded-full bg-primary flex items-center justify-center text-[11px] font-bold text-primary-foreground shadow-lg shadow-primary/30"
+                                  >
+                                    {conv.unread}
+                                  </motion.div>
+                                )}
+                              </div>
+                            </motion.div>
+                          );
+                        })}
                       </AnimatePresence>
                     ) : (
                       <motion.div 
