@@ -27,7 +27,7 @@ export const HeroSection = () => {
   }, [titleNumber, titles]);
 
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-20">
+    <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-16 sm:pt-20 px-4 sm:px-6">
       {/* Shader Animation Background */}
       <div className="absolute inset-0 z-0">
         <ShaderAnimation />
@@ -65,17 +65,17 @@ export const HeroSection = () => {
         />
       </div>
 
-      <div className="container mx-auto px-6 relative z-10 pointer-events-auto">
+      <div className="container mx-auto relative z-10 pointer-events-auto">
         <div className="max-w-4xl mx-auto text-center">
           {/* Badge */}
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
-            className="inline-flex items-center gap-2 glass rounded-full px-4 py-2 mb-8"
+            className="inline-flex items-center gap-2 glass rounded-full px-3 sm:px-4 py-1.5 sm:py-2 mb-6 sm:mb-8"
           >
-            <Sparkles className="h-4 w-4 text-primary" />
-            <span className="text-sm text-muted-foreground">
+            <Sparkles className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-primary" />
+            <span className="text-xs sm:text-sm text-muted-foreground">
               The future of campus opportunities
             </span>
           </motion.div>
@@ -85,14 +85,14 @@ export const HeroSection = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.1 }}
-            className="text-5xl md:text-7xl lg:text-8xl font-display font-bold mb-6"
+            className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-display font-bold mb-4 sm:mb-6"
           >
-            <span className="text-foreground block mb-4">Camply Means</span>
+            <span className="text-foreground block mb-2 sm:mb-4">Camply Means</span>
             <span className="relative flex w-full justify-center text-center min-h-[1.85em] py-[0.2em] overflow-visible">
               {titles.map((title, index) => (
                 <motion.span
                   key={index}
-                  className="absolute inset-x-0 top-0 text-gradient leading-[1.12] transform-gpu"
+                  className="absolute inset-x-0 top-0 text-gradient leading-[1.12] transform-gpu text-3xl sm:text-5xl md:text-7xl lg:text-8xl"
                   initial={{ opacity: 0, y: "-1.0em" }}
                   transition={{
                     y: { type: "spring", stiffness: 90, damping: 18 },
@@ -122,7 +122,7 @@ export const HeroSection = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
-            className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-10"
+            className="text-sm sm:text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-8 sm:mb-10 px-2"
           >
             Camply is the first college-focused platform that centralizes all campus opportunities — 
             events, hackathons, competitions — with AI-powered discovery and verified reputation building.
@@ -133,10 +133,10 @@ export const HeroSection = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.3 }}
-            className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16"
+            className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 mb-12 sm:mb-16"
           >
-            <Link to="/signup">
-              <Button variant="hero" size="xl" className="group [&_svg]:size-5">
+            <Link to="/signup" className="w-full sm:w-auto">
+              <Button variant="hero" size="lg" className="group [&_svg]:size-4 sm:[&_svg]:size-5 w-full sm:w-auto">
                 Get Started Free
                 <span className="arrow-premium">
                   <ArrowRight className="arrow-icon" />
@@ -144,8 +144,8 @@ export const HeroSection = () => {
                 </span>
               </Button>
             </Link>
-            <Link to="/login">
-              <Button variant="hero-outline" size="xl">
+            <Link to="/login" className="w-full sm:w-auto">
+              <Button variant="hero-outline" size="lg" className="w-full sm:w-auto">
                 Login to Dashboard
               </Button>
             </Link>
@@ -156,40 +156,40 @@ export const HeroSection = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.4 }}
-            className="grid grid-cols-3 gap-8 max-w-2xl mx-auto"
+            className="grid grid-cols-3 gap-4 sm:gap-8 max-w-2xl mx-auto"
           >
             <div className="text-center group cursor-pointer transition-all duration-300 hover:scale-105">
-              <div className="flex items-center justify-center gap-2 mb-2 transition-all duration-300 group-hover:drop-shadow-[0_0_12px_hsl(var(--primary)/0.6)]">
-                <Trophy className="h-5 w-5 text-primary transition-transform duration-300 group-hover:scale-110 group-hover:rotate-12" />
+              <div className="flex items-center justify-center gap-1.5 sm:gap-2 mb-1 sm:mb-2 transition-all duration-300 group-hover:drop-shadow-[0_0_12px_hsl(var(--primary)/0.6)]">
+                <Trophy className="h-4 w-4 sm:h-5 sm:w-5 text-primary transition-transform duration-300 group-hover:scale-110 group-hover:rotate-12" />
                 <AnimatedCounter 
                   target={50} 
                   suffix="+" 
-                  className="text-3xl md:text-4xl font-display font-bold text-foreground transition-colors duration-300 group-hover:text-primary"
+                  className="text-2xl sm:text-3xl md:text-4xl font-display font-bold text-foreground transition-colors duration-300 group-hover:text-primary"
                 />
               </div>
-              <p className="text-sm text-muted-foreground transition-colors duration-300 group-hover:text-foreground">Events Monthly</p>
+              <p className="text-xs sm:text-sm text-muted-foreground transition-colors duration-300 group-hover:text-foreground">Events Monthly</p>
             </div>
             <div className="text-center group cursor-pointer transition-all duration-300 hover:scale-105">
-              <div className="flex items-center justify-center gap-2 mb-2 transition-all duration-300 group-hover:drop-shadow-[0_0_12px_hsl(var(--primary)/0.6)]">
-                <Users className="h-5 w-5 text-primary transition-transform duration-300 group-hover:scale-110 group-hover:rotate-12" />
+              <div className="flex items-center justify-center gap-1.5 sm:gap-2 mb-1 sm:mb-2 transition-all duration-300 group-hover:drop-shadow-[0_0_12px_hsl(var(--primary)/0.6)]">
+                <Users className="h-4 w-4 sm:h-5 sm:w-5 text-primary transition-transform duration-300 group-hover:scale-110 group-hover:rotate-12" />
                 <AnimatedCounter 
                   target={10000} 
                   suffix="+" 
-                  className="text-3xl md:text-4xl font-display font-bold text-foreground transition-colors duration-300 group-hover:text-primary"
+                  className="text-2xl sm:text-3xl md:text-4xl font-display font-bold text-foreground transition-colors duration-300 group-hover:text-primary"
                 />
               </div>
-              <p className="text-sm text-muted-foreground transition-colors duration-300 group-hover:text-foreground">Active Students</p>
+              <p className="text-xs sm:text-sm text-muted-foreground transition-colors duration-300 group-hover:text-foreground">Active Students</p>
             </div>
             <div className="text-center group cursor-pointer transition-all duration-300 hover:scale-105">
-              <div className="flex items-center justify-center gap-2 mb-2 transition-all duration-300 group-hover:drop-shadow-[0_0_12px_hsl(var(--primary)/0.6)]">
-                <Sparkles className="h-5 w-5 text-primary transition-transform duration-300 group-hover:scale-110 group-hover:rotate-12" />
+              <div className="flex items-center justify-center gap-1.5 sm:gap-2 mb-1 sm:mb-2 transition-all duration-300 group-hover:drop-shadow-[0_0_12px_hsl(var(--primary)/0.6)]">
+                <Sparkles className="h-4 w-4 sm:h-5 sm:w-5 text-primary transition-transform duration-300 group-hover:scale-110 group-hover:rotate-12" />
                 <AnimatedCounter 
                   target={100} 
                   suffix="+" 
-                  className="text-3xl md:text-4xl font-display font-bold text-foreground transition-colors duration-300 group-hover:text-primary"
+                  className="text-2xl sm:text-3xl md:text-4xl font-display font-bold text-foreground transition-colors duration-300 group-hover:text-primary"
                 />
               </div>
-              <p className="text-sm text-muted-foreground transition-colors duration-300 group-hover:text-foreground">Colleges</p>
+              <p className="text-xs sm:text-sm text-muted-foreground transition-colors duration-300 group-hover:text-foreground">Colleges</p>
             </div>
           </motion.div>
         </div>

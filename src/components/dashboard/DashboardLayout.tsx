@@ -123,26 +123,26 @@ export const DashboardLayout = ({ children }: DashboardLayoutProps) => {
             </nav>
           </div>
 
-          {/* Center: Search */}
-          <div className="hidden md:flex flex-1 max-w-md mx-6">
+          {/* Center: Search - Hidden on mobile, shown on tablet+ */}
+          <div className="hidden md:flex flex-1 max-w-md mx-4 lg:mx-6">
             <div className="relative w-full">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
                 placeholder="Search opportunities..."
-                className="pl-10 h-10 bg-muted border-0 focus-visible:ring-1 focus-visible:ring-border rounded-lg text-sm"
+                className="pl-10 h-10 bg-muted border-0 focus-visible:ring-1 focus-visible:ring-ring rounded-lg text-sm"
               />
             </div>
           </div>
 
           {/* Right: Actions */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1 sm:gap-2">
             <div className="hidden sm:block">
               <ToggleTheme />
             </div>
             
-            <Button variant="ghost" size="sm" className="relative h-10 w-10 p-0 hover:bg-muted">
-              <Bell className="h-5 w-5" />
-              <span className="absolute top-2 right-2 w-2 h-2 bg-primary rounded-full" />
+            <Button variant="ghost" size="sm" className="relative h-9 w-9 sm:h-10 sm:w-10 p-0 hover:bg-muted">
+              <Bell className="h-4 w-4 sm:h-5 sm:w-5" />
+              <span className="absolute top-1.5 right-1.5 sm:top-2 sm:right-2 w-2 h-2 bg-primary rounded-full" />
             </Button>
 
             {/* Profile Button - Direct to Profile */}
@@ -150,9 +150,9 @@ export const DashboardLayout = ({ children }: DashboardLayoutProps) => {
               <TooltipTrigger asChild>
                 <Link
                   to="/profile"
-                  className="flex items-center p-1.5 rounded-lg hover:bg-muted transition-colors"
+                  className="flex items-center p-1 sm:p-1.5 rounded-lg hover:bg-muted transition-colors"
                 >
-                  <div className="w-8 h-8 rounded-full bg-foreground flex items-center justify-center text-sm font-semibold text-background">
+                  <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-primary flex items-center justify-center text-xs sm:text-sm font-semibold text-primary-foreground">
                     {profile?.full_name?.charAt(0) || user?.email?.charAt(0) || "U"}
                   </div>
                 </Link>
@@ -162,7 +162,7 @@ export const DashboardLayout = ({ children }: DashboardLayoutProps) => {
               </TooltipContent>
             </Tooltip>
 
-            {/* Mobile Menu Button */}
+            {/* Mobile Menu Button - for external links dropdown */}
             <Button
               variant="ghost"
               size="sm"
@@ -229,10 +229,33 @@ export const DashboardLayout = ({ children }: DashboardLayoutProps) => {
       </header>
 
       {/* Main Content */}
-      <main className="container px-4 py-5 lg:py-6">
+      <main className="container px-3 sm:px-4 py-4 sm:py-5 lg:py-6 pb-20 sm:pb-6">
         {children}
       </main>
 
+      {/* Mobile Bottom Navigation */}
+      <nav className="fixed bottom-0 left-0 right-0 z-50 lg:hidden bg-background/95 backdrop-blur-md border-t border-border safe-area-bottom">
+        <div className="flex items-center justify-around h-16 px-2">
+          {navItems.slice(0, 5).map((item) => {
+            const isActive = location.pathname === item.href;
+            return (
+              <Link
+                key={item.href}
+                to={item.href}
+                className={cn(
+                  "flex flex-col items-center justify-center gap-1 py-2 px-3 rounded-lg transition-all min-w-[60px]",
+                  isActive
+                    ? "text-primary"
+                    : "text-muted-foreground"
+                )}
+              >
+                <item.icon className={cn("h-5 w-5", isActive && "drop-shadow-[0_0_8px_hsl(var(--primary)/0.5)]")} />
+                <span className="text-[10px] font-medium">{item.label}</span>
+              </Link>
+            );
+          })}
+        </div>
+      </nav>
     </div>
   );
 };

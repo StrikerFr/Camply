@@ -594,7 +594,7 @@ const Dashboard = () => {
     isChanging: recentChange?.stat === "rank"
   }];
   return <DashboardLayout>
-      <div className="max-w-7xl mx-auto space-y-10">
+      <div className="max-w-7xl mx-auto space-y-6 sm:space-y-8 lg:space-y-10">
         {/* Welcome Header */}
         <motion.div initial={{
         opacity: 0,
@@ -605,12 +605,12 @@ const Dashboard = () => {
       }} transition={{
         duration: 0.5,
         ease: "easeOut"
-      }} className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      }} className="flex flex-col gap-2">
           <div>
-            <h1 className="text-3xl lg:text-4xl font-display font-bold text-foreground tracking-tight leading-tight">
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-display font-bold text-foreground tracking-tight leading-tight">
               Welcome back, {firstName}
             </h1>
-            <p className="text-muted-foreground mt-1.5 text-base leading-relaxed">
+            <p className="text-muted-foreground mt-1 sm:mt-1.5 text-sm sm:text-base leading-relaxed">
               Here's what's happening with your campus journey
             </p>
           </div>
@@ -630,18 +630,18 @@ const Dashboard = () => {
         delay: 0.15,
         duration: 0.5
       }}>
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-3">
-              <div className="p-2.5 rounded-lg bg-primary/10">
-                <Sparkles className="h-4 w-4 text-primary" />
+          <div className="flex items-center justify-between mb-3 sm:mb-4">
+            <div className="flex items-center gap-2 sm:gap-3">
+              <div className="p-2 sm:p-2.5 rounded-lg bg-primary/10">
+                <Sparkles className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-primary" />
               </div>
               <div>
-                <h2 className="font-semibold text-foreground text-lg tracking-tight">Suggested for You</h2>
-                <p className="text-sm text-muted-foreground">Based on your interests</p>
+                <h2 className="font-semibold text-foreground text-base sm:text-lg tracking-tight">Suggested for You</h2>
+                <p className="text-xs sm:text-sm text-muted-foreground hidden sm:block">Based on your interests</p>
               </div>
             </div>
-            <Link to="/opportunities" className="text-sm text-primary hover:text-primary/80 transition-colors flex items-center gap-1">
-              View all <ChevronRight className="h-4 w-4" />
+            <Link to="/opportunities" className="text-xs sm:text-sm text-primary hover:text-primary/80 transition-colors flex items-center gap-1">
+              View all <ChevronRight className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
             </Link>
           </div>
 
@@ -664,8 +664,8 @@ const Dashboard = () => {
             stopOnMouseEnter: true,
             playOnInit: true
           })]} className="w-full cursor-grab active:cursor-grabbing select-none">
-            <CarouselContent className="-ml-4 py-4">
-              {[...FAKE_OPPORTUNITIES, ...FAKE_OPPORTUNITIES].map((opp, index) => <CarouselItem key={`${opp.id}-${index}`} className="pl-4 basis-[80%] sm:basis-[45%] lg:basis-[32%]">
+            <CarouselContent className="-ml-3 sm:-ml-4 py-3 sm:py-4">
+              {[...FAKE_OPPORTUNITIES, ...FAKE_OPPORTUNITIES].map((opp, index) => <CarouselItem key={`${opp.id}-${index}`} className="pl-3 sm:pl-4 basis-[85%] sm:basis-[45%] lg:basis-[32%]">
                   <motion.div initial={{
                   opacity: 0,
                   y: 30,
@@ -686,9 +686,9 @@ const Dashboard = () => {
                     stiffness: 400,
                     damping: 25
                   }
-                }} className="group bg-card/60 backdrop-blur-md border border-border/40 rounded-2xl p-5 cursor-pointer h-full select-none relative overflow-hidden" onClick={() => navigate("/opportunities")}>
+                }} className="group bg-card/60 backdrop-blur-md border border-border/40 rounded-xl sm:rounded-2xl p-4 sm:p-5 cursor-pointer h-full select-none relative overflow-hidden" onClick={() => navigate("/opportunities")}>
                     {/* Animated border glow */}
-                    <motion.div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 pointer-events-none" initial={false} transition={{
+                    <motion.div className="absolute inset-0 rounded-xl sm:rounded-2xl opacity-0 group-hover:opacity-100 pointer-events-none" initial={false} transition={{
                     duration: 0.4,
                     ease: "easeOut"
                   }} style={{
@@ -697,10 +697,10 @@ const Dashboard = () => {
                   }} />
                     
                     {/* Inner glow effect */}
-                    <div className="absolute -inset-px rounded-2xl opacity-0 group-hover:opacity-100 transition-all duration-500 bg-gradient-to-br from-primary/20 via-transparent to-primary/10 blur-sm pointer-events-none" />
+                    <div className="absolute -inset-px rounded-xl sm:rounded-2xl opacity-0 group-hover:opacity-100 transition-all duration-500 bg-gradient-to-br from-primary/20 via-transparent to-primary/10 blur-sm pointer-events-none" />
                     
                     {/* Category Badge & Featured */}
-                    <div className="relative flex items-center justify-between mb-4">
+                    <div className="relative flex items-center justify-between mb-3 sm:mb-4">
                       <motion.div whileHover={{
                       scale: 1.08
                     }} transition={{
@@ -724,18 +724,18 @@ const Dashboard = () => {
                     </div>
 
                     {/* Title */}
-                    <h3 className="relative font-semibold text-foreground text-base mb-3 line-clamp-2 group-hover:text-primary transition-colors duration-400">
+                    <h3 className="relative font-semibold text-foreground text-sm sm:text-base mb-2 sm:mb-3 line-clamp-2 group-hover:text-primary transition-colors duration-400">
                       {opp.title}
                     </h3>
 
                     {/* Details */}
-                    <div className="relative space-y-2.5 mb-4">
+                    <div className="relative space-y-1.5 sm:space-y-2.5 mb-3 sm:mb-4">
                       <div className="flex items-center gap-2 text-muted-foreground text-xs group-hover:text-muted-foreground/90 transition-colors duration-300">
-                        <Clock className="h-3.5 w-3.5 group-hover:text-primary/70 transition-colors duration-300" />
+                        <Clock className="h-3 w-3 sm:h-3.5 sm:w-3.5 group-hover:text-primary/70 transition-colors duration-300" />
                         <span>{opp.registration_deadline}</span>
                       </div>
                       <div className="flex items-center gap-2 text-muted-foreground text-xs group-hover:text-muted-foreground/90 transition-colors duration-300">
-                        <MapPin className="h-3.5 w-3.5 group-hover:text-primary/70 transition-colors duration-300" />
+                        <MapPin className="h-3 w-3 sm:h-3.5 sm:w-3.5 group-hover:text-primary/70 transition-colors duration-300" />
                         <span>{opp.location}</span>
                       </div>
                     </div>
@@ -772,7 +772,7 @@ const Dashboard = () => {
           </div>
         </motion.div>
 
-        <div className="grid lg:grid-cols-3 gap-6 lg:gap-8">
+        <div className="grid lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
           {/* AI Chat Section - Takes 2 columns */}
           <motion.div initial={{
           opacity: 0,
@@ -785,14 +785,14 @@ const Dashboard = () => {
           duration: 0.5
         }} className="lg:col-span-2">
             {/* AI Chat Section Header */}
-            <div className="flex items-center justify-between mb-5">
-              <div className="flex items-center gap-3">
-                <div className="p-2 rounded-lg bg-primary/10 overflow-hidden">
-                  <img src={logo} alt="Camply" className="h-6 w-6 object-contain" />
+            <div className="flex items-center justify-between mb-4 sm:mb-5">
+              <div className="flex items-center gap-2 sm:gap-3">
+                <div className="p-1.5 sm:p-2 rounded-lg bg-primary/10 overflow-hidden">
+                  <img src={logo} alt="Camply" className="h-5 w-5 sm:h-6 sm:w-6 object-contain" />
                 </div>
                 <div>
-                  <h2 className="font-semibold text-foreground text-lg tracking-tight">Alpha AI</h2>
-                  <p className="text-sm text-muted-foreground">by Camply</p>
+                  <h2 className="font-semibold text-foreground text-base sm:text-lg tracking-tight">Alpha AI</h2>
+                  <p className="text-xs sm:text-sm text-muted-foreground">by Camply</p>
                 </div>
               </div>
               
@@ -811,13 +811,13 @@ const Dashboard = () => {
               </div>
             </div>
 
-            {/* AI Chat Area - Aligned with My Projects section bottom */}
+            {/* AI Chat Area */}
             <div className="bg-card border border-border rounded-xl flex flex-col" style={{
-            minHeight: '560px',
+            minHeight: '400px',
             maxHeight: '560px'
           }}>
               {/* Chat Messages Area */}
-              <div ref={chatContainerRef} className="flex-1 p-4 overflow-y-auto space-y-3">
+              <div ref={chatContainerRef} className="flex-1 p-3 sm:p-4 overflow-y-auto space-y-3">
                 {/* Welcome message */}
                 {messages.length === 0 && <div className="flex gap-3">
                     <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0 overflow-hidden">
@@ -890,29 +890,29 @@ const Dashboard = () => {
               </div>
               
               {/* Chat Input */}
-              <div className="p-4 border-t border-border">
-                <input type="text" placeholder="Ask Alpha AI..." value={chatInput} onChange={e => setChatInput(e.target.value)} onKeyDown={handleKeyPress} disabled={isAiLoading} className="w-full bg-transparent border-none text-sm text-foreground placeholder:text-muted-foreground focus:outline-none mb-3" />
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <Button variant="outline" size="sm" className="h-8 gap-1.5 text-xs font-medium border-border hover:bg-muted/50" onClick={handleTalkToAlpha}>
-                      <Mic className="h-3.5 w-3.5" />
-                      Talk to Alpha
+              <div className="p-3 sm:p-4 border-t border-border">
+                <input type="text" placeholder="Ask Alpha AI..." value={chatInput} onChange={e => setChatInput(e.target.value)} onKeyDown={handleKeyPress} disabled={isAiLoading} className="w-full bg-transparent border-none text-sm text-foreground placeholder:text-muted-foreground focus:outline-none mb-2 sm:mb-3" />
+                <div className="flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-1.5 sm:gap-2">
+                    <Button variant="outline" size="sm" className="h-7 sm:h-8 gap-1 sm:gap-1.5 text-[10px] sm:text-xs font-medium border-border hover:bg-muted/50 px-2 sm:px-3" onClick={handleTalkToAlpha}>
+                      <Mic className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
+                      <span className="hidden sm:inline">Talk to Alpha</span>
                     </Button>
-                    <Button variant="outline" size="sm" className="h-8 gap-1.5 text-xs font-medium border-border hover:bg-muted/50" onClick={() => fileInputRef.current?.click()}>
-                      <Upload className="h-3.5 w-3.5" />
-                      Upload Image
+                    <Button variant="outline" size="sm" className="h-7 sm:h-8 gap-1 sm:gap-1.5 text-[10px] sm:text-xs font-medium border-border hover:bg-muted/50 px-2 sm:px-3" onClick={() => fileInputRef.current?.click()}>
+                      <Upload className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
+                      <span className="hidden sm:inline">Upload</span>
                     </Button>
                     <input ref={fileInputRef} type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
                   </div>
-                  <div className="flex items-center gap-2">
-                    <Button variant="ghost" size="icon" className={cn("h-8 w-8 transition-all", isListening ? "text-red-500 hover:text-red-400 bg-red-500/10 animate-pulse" : "text-muted-foreground hover:text-foreground")} onClick={handleMicClick}>
-                      {isListening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
+                  <div className="flex items-center gap-1.5 sm:gap-2">
+                    <Button variant="ghost" size="icon" className={cn("h-7 w-7 sm:h-8 sm:w-8 transition-all", isListening ? "text-primary hover:text-primary/80 bg-primary/10 animate-pulse" : "text-muted-foreground hover:text-foreground")} onClick={handleMicClick}>
+                      {isListening ? <MicOff className="h-3.5 w-3.5 sm:h-4 sm:w-4" /> : <Mic className="h-3.5 w-3.5 sm:h-4 sm:w-4" />}
                     </Button>
-                    <Button variant="ghost" size="icon" className="h-8 w-8 text-amber-500 hover:text-amber-400 hover:bg-amber-500/10" onClick={handleEnhancePrompt} disabled={isAiLoading || !chatInput.trim()} title="Enhance prompt">
-                      <Sparkles className="h-4 w-4" />
+                    <Button variant="ghost" size="icon" className="h-7 w-7 sm:h-8 sm:w-8 text-primary hover:text-primary/80 hover:bg-primary/10" onClick={handleEnhancePrompt} disabled={isAiLoading || !chatInput.trim()} title="Enhance prompt">
+                      <Sparkles className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                     </Button>
-                    <Button size="icon" className="h-8 w-8 bg-gradient-to-r from-cyan-500 to-primary hover:opacity-90" onClick={handleSendMessage} disabled={isAiLoading || !chatInput.trim() && !uploadedImage}>
-                      <Send className="h-4 w-4" />
+                    <Button size="icon" className="h-7 w-7 sm:h-8 sm:w-8 bg-primary hover:bg-primary/90" onClick={handleSendMessage} disabled={isAiLoading || !chatInput.trim() && !uploadedImage}>
+                      <Send className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                     </Button>
                   </div>
                 </div>
@@ -920,7 +920,7 @@ const Dashboard = () => {
             </div>
           </motion.div>
 
-          {/* Sidebar */}
+          {/* Sidebar - Hidden on mobile, shown on lg */}
           <motion.div initial={{
           opacity: 0,
           y: 20
@@ -930,10 +930,10 @@ const Dashboard = () => {
         }} transition={{
           delay: 0.35,
           duration: 0.5
-        }} className="space-y-6">
+        }} className="hidden lg:block space-y-6">
             {/* Trending News */}
             <div className="bg-card border border-border rounded-xl overflow-hidden">
-              <div className="flex items-center justify-between px-5 py-4 border-b border-border">
+              <div className="flex items-center justify-between px-4 sm:px-5 py-3 sm:py-4 border-b border-border">
                 <div className="flex items-center gap-2.5">
                   <TrendingUp className="h-4 w-4 text-primary" />
                   <span className="font-semibold text-foreground">Trending News</span>
