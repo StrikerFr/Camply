@@ -45,7 +45,7 @@ Camply uses AI to enhance the student experience:
 ## 🎯 Why Camply is Different
 
 Unlike generic opportunity platforms, Camply is built **college-first**, not global-first.  
-Each campus has its own ecosystem, reputation system, and community—making participation fair, relevant, and meaningful.
+Each campus has its own ecosystem, reputation system, and community making participation fair, relevant, and meaningful.
 
 ## 🚀 Getting Started
 
