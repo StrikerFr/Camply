@@ -413,13 +413,14 @@ const MyCollege = () => {
   const fetchLikedReviews = async () => {
     const deviceId = getDeviceId();
     try {
-      const { data } = await supabase
-        .from("review_likes")
-        .select("review_id")
-        .eq("device_id", deviceId);
+      // Use secure RPC function to get liked reviews without exposing device_ids
+      const { data, error } = await supabase
+        .rpc("get_liked_reviews", { p_device_id: deviceId });
+      
+      if (error) throw error;
       
       if (data) {
-        setLikedReviews(new Set(data.map(item => item.review_id)));
+        setLikedReviews(new Set(data as string[]));
       }
     } catch (error) {
       console.error("Error fetching liked reviews:", error);

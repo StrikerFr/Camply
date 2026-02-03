@@ -92,7 +92,11 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      check_review_liked: {
+        Args: { p_device_id: string; p_review_id: string }
+        Returns: boolean
+      }
+      get_liked_reviews: { Args: { p_device_id: string }; Returns: string[] }
     }
     Enums: {
       [_ in never]: never
