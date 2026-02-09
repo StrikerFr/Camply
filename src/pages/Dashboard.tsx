@@ -828,15 +828,15 @@ const Dashboard = () => {
                     </div>
                     <div className="bg-muted/50 rounded-xl rounded-tl-none p-4 max-w-[80%] space-y-2">
                       <p className="text-sm font-medium text-foreground">
-                        {genZMode ? "yo, i'm alpha ⚡" : "Hi, I'm Alpha AI"}
+                        {genZMode ? "hey, it's alpha 🤙" : "Hi, I'm Alpha AI"}
                       </p>
                       <p className="text-sm text-muted-foreground leading-relaxed">
                         {genZMode 
-                          ? "your campus AI that actually gets it. events, opportunities, points — whatever you need, i'm on it 🎯" 
+                          ? "think of me as that one friend who knows everything about campus — events, opps, points, collabs, all of it. lowkey your unfair advantage 😏" 
                           : "Your smart campus assistant by Camply. I can help you discover events, find opportunities, track your points, and much more."}
                       </p>
                       <p className="text-xs text-muted-foreground/70 pt-1">
-                        {genZMode ? "drop your question below, let's go 🚀" : "Type your question below to get started."}
+                        {genZMode ? "go ahead, ask me anything 👇" : "Type your question below to get started."}
                       </p>
                     </div>
                   </div>}
