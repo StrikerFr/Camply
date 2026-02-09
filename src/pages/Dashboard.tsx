@@ -324,6 +324,7 @@ const Dashboard = () => {
   const [genZMode, setGenZMode] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isAiLoading, setIsAiLoading] = useState(false);
+  const [isEnhancing, setIsEnhancing] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const recognitionRef = useRef<any>(null);
   const chatContainerRef = useRef<HTMLDivElement>(null);
@@ -483,17 +484,11 @@ const Dashboard = () => {
       toast.error("Please enter a prompt to enhance");
       return;
     }
-    setIsAiLoading(true);
+    setIsEnhancing(true);
     try {
-      const {
-        data,
-        error
-      } = await supabase.functions.invoke('alpha-ai-chat', {
+      const { data, error } = await supabase.functions.invoke('alpha-ai-chat', {
         body: {
-          messages: [{
-            role: "user",
-            content: chatInput
-          }],
+          messages: [{ role: "user", content: chatInput }],
           genZMode: false,
           enhancePrompt: true
         }
@@ -505,7 +500,7 @@ const Dashboard = () => {
       console.error('Error enhancing prompt:', error);
       toast.error("Failed to enhance prompt");
     } finally {
-      setIsAiLoading(false);
+      setIsEnhancing(false);
     }
   };
 
@@ -908,7 +903,7 @@ const Dashboard = () => {
                     <Button variant="ghost" size="icon" className={cn("h-7 w-7 sm:h-8 sm:w-8 transition-all", isListening ? "text-primary hover:text-primary/80 bg-primary/10 animate-pulse" : "text-muted-foreground hover:text-foreground")} onClick={handleMicClick}>
                       {isListening ? <MicOff className="h-3.5 w-3.5 sm:h-4 sm:w-4" /> : <Mic className="h-3.5 w-3.5 sm:h-4 sm:w-4" />}
                     </Button>
-                    <Button variant="ghost" size="icon" className="h-7 w-7 sm:h-8 sm:w-8 text-primary hover:text-primary/80 hover:bg-primary/10" onClick={handleEnhancePrompt} disabled={isAiLoading || !chatInput.trim()} title="Enhance prompt">
+                    <Button variant="ghost" size="icon" className={cn("h-7 w-7 sm:h-8 sm:w-8 transition-all rounded-lg", isEnhancing ? "text-primary animate-pulse bg-primary/10" : "text-primary hover:text-primary/80 hover:bg-primary/10")} onClick={handleEnhancePrompt} disabled={isAiLoading || isEnhancing || !chatInput.trim()} title="Enhance prompt — fix grammar & rewrite for clarity">
                       <Sparkles className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                     </Button>
                     <Button size="icon" className="h-7 w-7 sm:h-8 sm:w-8 bg-primary hover:bg-primary/90" onClick={handleSendMessage} disabled={isAiLoading || !chatInput.trim() && !uploadedImage}>
