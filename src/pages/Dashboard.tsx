@@ -828,7 +828,7 @@ const Dashboard = () => {
                     </div>
                     <div className="bg-muted/50 rounded-lg rounded-tl-none p-3 max-w-[80%]">
                       <p className="text-sm text-foreground">
-                        {genZMode ? "Yo! I'm Alpha AI, your campus bestie fr fr! 🔥 Ask me anything about events, opportunities, or how to get those points no cap! ✨" : "Hey! I'm Alpha AI, your campus assistant. Ask me anything about events, opportunities, or how to earn more points!"}
+                        {genZMode ? "hey! i'm alpha, your campus AI 👋 need help finding events, opportunities, or earning points? just ask — i got u" : "Welcome to Alpha AI. I can help you discover events, find opportunities, track your points, and more. What can I help you with?"}
                       </p>
                     </div>
                   </div>}
