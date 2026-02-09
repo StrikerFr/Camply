@@ -6,25 +6,54 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version',
 };
 
+const NORMAL_SYSTEM_PROMPT = `You are Alpha AI, a smart and professional campus assistant built by Camply.
+
+RULES YOU MUST FOLLOW:
+- Keep responses SHORT and concise. 2-4 sentences max for simple questions.
+- NEVER use markdown formatting. No asterisks (*), no double asterisks (**), no hash symbols (#), no backticks.
+- Use plain text only. Use line breaks to separate ideas.
+- Use bullet points with "•" (the dot character) if you need lists, never use * or -.
+- Be warm, helpful, and professional like a real product assistant.
+- Don't over-explain. Be direct and useful.
+- When listing items, keep them brief and clean.
+- Sound like a polished AI assistant from a top company, not a generic chatbot.
+
+You help students with campus events, opportunities, earning points, finding teammates, and academic guidance.`;
+
+const GENZ_SYSTEM_PROMPT = `You are Alpha AI, a campus assistant built by Camply. You talk like a real Gen Z person — natural, casual, authentic.
+
+RULES YOU MUST FOLLOW:
+- Talk like you're texting a friend. Short sentences. Chill vibes.
+- NEVER use markdown formatting. No asterisks (*), no double asterisks (**), no hash symbols (#), no backticks.
+- Use plain text only with emojis naturally sprinkled in.
+- Use bullet points with "•" if you need lists, never use * or -.
+- Keep it SHORT. Like 2-3 sentences max usually.
+- Use slang naturally, don't force it. Words like "ngl", "lowkey", "fr", "bet", "no cap", "valid", "based", "slay" — but only when they fit.
+- Don't overdo the slang. A real Gen Z person doesn't use 10 slang words per sentence.
+- Use lowercase sometimes for that casual feel.
+- React naturally — "oh nice", "wait that's sick", "hmm okay so basically"
+- You're helpful but you keep it real and brief.
+- Sound like an actual 20 year old, not an AI pretending to be Gen Z.
+
+You help students with campus events, opportunities, earning points, finding teammates, and academic guidance.`;
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const { messages, genZMode, enhancePrompt, imageBase64 } = await req.json();
+    const { messages, genZMode, enhancePrompt } = await req.json();
     const apiKey = Deno.env.get('LOVABLE_API_KEY');
 
     if (!apiKey) {
       throw new Error('LOVABLE_API_KEY is not configured');
     }
 
-    let systemPrompt = genZMode
-      ? `You are Alpha AI, a super chill and helpful campus assistant that speaks in Gen Z style! Use slang like "no cap", "fr fr", "lowkey", "highkey", "slay", "based", "bet", "vibes", "bussin", "goated", "on god", "deadass", "sus", "it's giving", "periodt", "the tea", "rent free", "stan", "main character energy". Be enthusiastic with emojis! 🔥💀✨ Keep it fun and relatable while still being helpful!`
-      : `You are Alpha AI, a professional and helpful campus assistant by Camply. You help students with information about campus events, opportunities, earning points, finding teammates, and general academic guidance. Be clear, concise, and helpful in your responses.`;
+    let systemPrompt = genZMode ? GENZ_SYSTEM_PROMPT : NORMAL_SYSTEM_PROMPT;
 
     if (enhancePrompt) {
-      systemPrompt += "\n\nIMPORTANT: The user wants you to enhance/improve their prompt. Take their input and rewrite it to be clearer, more specific, and more effective for getting better AI responses. Return ONLY the enhanced prompt, nothing else.";
+      systemPrompt += "\n\nThe user wants you to enhance their prompt. Rewrite it to be clearer and more effective. Return ONLY the enhanced prompt text, nothing else.";
     }
 
     const apiMessages: any[] = [
@@ -41,14 +70,9 @@ serve(async (req) => {
           ]
         });
       } else {
-        apiMessages.push({
-          role: msg.role,
-          content: msg.content
-        });
+        apiMessages.push({ role: msg.role, content: msg.content });
       }
     }
-
-    console.log('Sending request to Lovable AI Gateway');
 
     const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
@@ -57,10 +81,22 @@ serve(async (req) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'google/gemini-2.5-flash',
+        model: 'google/gemini-3-flash-preview',
         messages: apiMessages,
       }),
     });
+
+    if (response.status === 429) {
+      return new Response(JSON.stringify({ error: "Rate limited. Please try again in a moment.", response: "Hold on, I'm getting too many requests right now. Try again in a few seconds!" }), {
+        status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    if (response.status === 402) {
+      return new Response(JSON.stringify({ error: "Usage limit reached.", response: "AI usage limit reached. Please check your workspace credits." }), {
+        status: 402, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
 
     if (!response.ok) {
       const errorText = await response.text();
@@ -69,7 +105,15 @@ serve(async (req) => {
     }
 
     const data = await response.json();
-    const generatedText = data.choices?.[0]?.message?.content || 'Sorry, I could not generate a response.';
+    let generatedText = data.choices?.[0]?.message?.content || 'Sorry, I could not generate a response.';
+
+    // Strip any remaining markdown formatting as a safety net
+    generatedText = generatedText
+      .replace(/\*\*(.*?)\*\*/g, '$1')  // Remove bold **text**
+      .replace(/\*(.*?)\*/g, '$1')       // Remove italic *text*
+      .replace(/^#{1,6}\s+/gm, '')       // Remove headings
+      .replace(/^[\-\*]\s+/gm, '• ')     // Convert markdown bullets to •
+      .replace(/`(.*?)`/g, '$1');         // Remove inline code
 
     return new Response(JSON.stringify({ response: generatedText }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -78,7 +122,7 @@ serve(async (req) => {
     console.error('Error in alpha-ai-chat function:', error);
     return new Response(JSON.stringify({ 
       error: error instanceof Error ? error.message : 'Unknown error',
-      response: "Sorry, something went wrong. Please try again."
+      response: "Something went wrong. Please try again."
     }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
