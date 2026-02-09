@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import logo from "@/assets/logo.png";
+import ReactMarkdown from "react-markdown";
 
 interface ChatMessage {
   id: string;
@@ -586,7 +587,9 @@ const AlphaAI = () => {
                               : 'bg-muted/80 backdrop-blur-sm text-foreground rounded-bl-md border border-border/50 hover:bg-muted'
                           }`}
                         >
-                          <p className="text-sm whitespace-pre-wrap leading-relaxed">{message.content}</p>
+                          <div className="text-sm leading-relaxed prose prose-sm dark:prose-invert prose-p:my-1 prose-ul:my-1 prose-ol:my-1 prose-li:my-0.5 prose-headings:my-2 prose-headings:font-semibold max-w-none">
+                            <ReactMarkdown>{message.content}</ReactMarkdown>
+                          </div>
                         </div>
                         <p className={`text-xs text-muted-foreground mt-1.5 opacity-0 group-hover:opacity-100 transition-opacity duration-200 ${message.role === 'user' ? 'text-right' : ''}`}>
                           {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
