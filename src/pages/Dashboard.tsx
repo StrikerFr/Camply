@@ -775,7 +775,7 @@ const Dashboard = () => {
           </div>
         </motion.div>
 
-        <div className="grid lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
           {/* AI Chat Section - Takes 2 columns */}
           <motion.div initial={{
           opacity: 0,
@@ -945,7 +945,7 @@ const Dashboard = () => {
             </div>
           </motion.div>
 
-          {/* Sidebar - Hidden on mobile, shown on lg */}
+          {/* Sidebar - Shown on all screens */}
           <motion.div initial={{
           opacity: 0,
           y: 20
@@ -955,7 +955,7 @@ const Dashboard = () => {
         }} transition={{
           delay: 0.35,
           duration: 0.5
-        }} className="hidden lg:block space-y-6">
+        }} className="space-y-4 sm:space-y-6">
             {/* Trending News */}
             <div className="bg-card border border-border rounded-xl overflow-hidden">
               <div className="flex items-center justify-between px-4 sm:px-5 py-3 sm:py-4 border-b border-border">

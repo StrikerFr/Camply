@@ -328,13 +328,13 @@ const AlphaAI = () => {
 
   return (
     <DashboardLayout>
-      <div className="h-[calc(100vh-120px)] flex gap-4">
-        {/* Sidebar - Chat History */}
+      <div className="h-[calc(100vh-180px)] lg:h-[calc(100vh-120px)] flex flex-col lg:flex-row gap-4">
+        {/* Sidebar - Chat History (hidden on mobile, shown on lg+) */}
         <motion.div
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.3 }}
-          className="w-72 bg-gradient-to-b from-white/5 to-white/[0.02] backdrop-blur-xl border border-white/10 rounded-2xl flex flex-col overflow-hidden shrink-0"
+          className="hidden lg:flex w-72 bg-gradient-to-b from-white/5 to-white/[0.02] backdrop-blur-xl border border-white/10 rounded-2xl flex-col overflow-hidden shrink-0"
         >
           {/* Sidebar Header */}
           <div className="p-4 border-b border-white/10">
@@ -416,44 +416,42 @@ const AlphaAI = () => {
           className="flex-1 flex flex-col bg-card border border-border rounded-2xl overflow-hidden"
         >
           {/* Chat Header */}
-          <div className="flex items-center justify-between px-5 py-4 border-b border-border bg-muted/30">
-            <div className="flex items-center gap-3">
+          <div className="flex items-center justify-between px-3 sm:px-5 py-3 sm:py-4 border-b border-border bg-muted/30">
+            <div className="flex items-center gap-2 sm:gap-3">
               <div className="relative">
-                <img src={logo} alt="Alpha AI" className="w-10 h-10 rounded-xl" />
-                <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-500 rounded-full border-2 border-card" />
+                <img src={logo} alt="Alpha AI" className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl" />
+                <div className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 sm:w-3 sm:h-3 bg-emerald-500 rounded-full border-2 border-card" />
               </div>
               <div>
-                <h3 className="font-semibold text-foreground text-base">Alpha AI</h3>
-                <p className="text-xs text-muted-foreground">Online • Ready to help</p>
+                <h3 className="font-semibold text-foreground text-sm sm:text-base">Alpha AI</h3>
+                <p className="text-[10px] sm:text-xs text-muted-foreground">Online • Ready to help</p>
               </div>
             </div>
-            <div className="flex items-center gap-4">
-              <div className="flex items-center gap-2">
-                <span className="text-xs text-muted-foreground">Gen Z Mode</span>
+            <div className="flex items-center gap-2 sm:gap-4">
+              <div className="flex items-center gap-1.5 sm:gap-2">
+                <span className="text-[10px] sm:text-xs text-muted-foreground hidden sm:inline">Gen Z Mode</span>
                 <Switch
                   checked={genZMode}
                   onCheckedChange={setGenZMode}
-                  className="data-[state=checked]:bg-primary"
+                  className="data-[state=checked]:bg-primary scale-90 sm:scale-100"
                 />
               </div>
-              <div className="flex items-center gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={handleClearChat}
-                  className="gap-2"
-                >
-                  <Trash2 className="h-4 w-4" />
-                  Clear
-                </Button>
-              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleClearChat}
+                className="gap-1.5 h-7 sm:h-8 text-xs px-2 sm:px-3"
+              >
+                <Trash2 className="h-3.5 w-3.5" />
+                <span className="hidden sm:inline">Clear</span>
+              </Button>
             </div>
           </div>
 
           {/* Messages */}
           <div
             ref={chatContainerRef}
-            className="flex-1 overflow-y-auto p-6 space-y-4 relative"
+            className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4 relative"
           >
             {/* Subtle background gradient */}
             <div className="absolute inset-0 bg-gradient-to-b from-transparent via-primary/[0.02] to-transparent pointer-events-none" />
@@ -466,7 +464,7 @@ const AlphaAI = () => {
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.95 }}
                   transition={{ duration: 0.4, ease: "easeOut" }}
-                  className="flex flex-col items-center justify-center h-full text-center relative z-10"
+                  className="flex flex-col items-center justify-center h-full text-center relative z-10 px-4"
                 >
                   {/* Animated Bot Icon */}
                   <motion.div 
@@ -476,13 +474,13 @@ const AlphaAI = () => {
                     transition={{ duration: 0.5, delay: 0.1 }}
                   >
                     <motion.div 
-                      className="w-28 h-28 rounded-3xl bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center border border-primary/20 shadow-lg shadow-primary/10"
+                      className="w-20 h-20 sm:w-28 sm:h-28 rounded-3xl bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center border border-primary/20 shadow-lg shadow-primary/10"
                       animate={{ 
                         boxShadow: ["0 10px 40px -10px rgba(220, 38, 38, 0.1)", "0 10px 40px -10px rgba(220, 38, 38, 0.3)", "0 10px 40px -10px rgba(220, 38, 38, 0.1)"]
                       }}
                       transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
                     >
-                      <Bot className="h-14 w-14 text-primary" />
+                      <Bot className="h-10 w-10 sm:h-14 sm:w-14 text-primary" />
                     </motion.div>
                     {/* Floating particles */}
                     <motion.div 
@@ -498,7 +496,7 @@ const AlphaAI = () => {
                   </motion.div>
 
                   <motion.h3 
-                    className="text-3xl font-bold text-foreground mb-4 bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text"
+                    className="text-xl sm:text-3xl font-bold text-foreground mb-3 sm:mb-4 bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text"
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.4, delay: 0.2 }}
@@ -507,7 +505,7 @@ const AlphaAI = () => {
                   </motion.h3>
                   
                   <motion.p 
-                    className="text-muted-foreground max-w-lg text-base leading-relaxed"
+                    className="text-muted-foreground max-w-lg text-sm sm:text-base leading-relaxed px-2"
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.4, delay: 0.3 }}
@@ -517,7 +515,7 @@ const AlphaAI = () => {
 
                   {/* Interactive Suggestion Cards */}
                   <motion.div 
-                    className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-10 w-full max-w-2xl"
+                    className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mt-6 sm:mt-10 w-full max-w-2xl px-2"
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.5, delay: 0.4 }}
@@ -531,15 +529,15 @@ const AlphaAI = () => {
                       <motion.button
                         key={suggestion.text}
                         onClick={() => setChatInput(suggestion.text)}
-                        className={`group relative flex items-center gap-4 p-4 rounded-2xl bg-gradient-to-br ${suggestion.color} border border-border/50 hover:border-primary/30 transition-all duration-300 text-left overflow-hidden`}
+                        className={`group relative flex items-center gap-3 sm:gap-4 p-3 sm:p-4 rounded-2xl bg-gradient-to-br ${suggestion.color} border border-border/50 hover:border-primary/30 transition-all duration-300 text-left overflow-hidden`}
                         whileHover={{ scale: 1.02, y: -2 }}
                         whileTap={{ scale: 0.98 }}
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.3, delay: 0.5 + index * 0.1 }}
                       >
-                        <div className={`shrink-0 w-10 h-10 rounded-xl bg-background/50 flex items-center justify-center ${suggestion.iconColor} group-hover:scale-110 transition-transform duration-300`}>
-                          <suggestion.icon className="h-5 w-5" />
+                        <div className={`shrink-0 w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-background/50 flex items-center justify-center ${suggestion.iconColor} group-hover:scale-110 transition-transform duration-300`}>
+                          <suggestion.icon className="h-4 w-4 sm:h-5 sm:w-5" />
                         </div>
                         <span className="text-sm font-medium text-foreground/90 group-hover:text-foreground transition-colors">
                           {suggestion.text}
@@ -553,7 +551,7 @@ const AlphaAI = () => {
 
                   {/* Quick tips */}
                   <motion.div 
-                    className="mt-8 flex items-center gap-2 text-xs text-muted-foreground/70"
+                    className="mt-6 sm:mt-8 flex items-center gap-2 text-xs text-muted-foreground/70"
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ duration: 0.4, delay: 0.8 }}
@@ -577,7 +575,7 @@ const AlphaAI = () => {
                       transition={{ duration: 0.3, delay: index === messages.length - 1 ? 0.1 : 0 }}
                       className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
                     >
-                      <div className={`max-w-[70%] group ${message.role === 'user' ? 'order-1' : 'order-2'}`}>
+                      <div className={`max-w-[85%] sm:max-w-[70%] group ${message.role === 'user' ? 'order-1' : 'order-2'}`}>
                         {message.image && (
                           <motion.img
                             src={message.image}
@@ -643,7 +641,7 @@ const AlphaAI = () => {
           </div>
 
           {/* Input Area */}
-          <div className="p-5 border-t border-border bg-gradient-to-t from-muted/30 to-transparent">
+          <div className="p-3 sm:p-5 border-t border-border bg-gradient-to-t from-muted/30 to-transparent">
             <AnimatePresence>
               {uploadedImage && (
                 <motion.div 
@@ -664,7 +662,7 @@ const AlphaAI = () => {
                 </motion.div>
               )}
             </AnimatePresence>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 sm:gap-3">
               <input
                 type="file"
                 ref={fileInputRef}
@@ -672,22 +670,22 @@ const AlphaAI = () => {
                 accept="image/*"
                 className="hidden"
               />
-              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className="hidden sm:block">
                 <Button
                   variant="ghost"
                   size="icon"
                   onClick={() => fileInputRef.current?.click()}
-                  className="shrink-0 h-11 w-11 hover:bg-primary/10 hover:text-primary transition-colors"
+                  className="shrink-0 h-10 w-10 sm:h-11 sm:w-11 hover:bg-primary/10 hover:text-primary transition-colors"
                 >
                   <Image className="h-5 w-5" />
                 </Button>
               </motion.div>
-              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className="hidden sm:block">
                 <Button
                   variant="ghost"
                   size="icon"
                   onClick={handleMicClick}
-                  className={`shrink-0 h-11 w-11 transition-all duration-300 ${isListening ? 'text-primary bg-primary/10 animate-pulse' : 'hover:bg-primary/10 hover:text-primary'}`}
+                  className={`shrink-0 h-10 w-10 sm:h-11 sm:w-11 transition-all duration-300 ${isListening ? 'text-primary bg-primary/10 animate-pulse' : 'hover:bg-primary/10 hover:text-primary'}`}
                 >
                   {isListening ? <MicOff className="h-5 w-5" /> : <Mic className="h-5 w-5" />}
                 </Button>
@@ -698,8 +696,8 @@ const AlphaAI = () => {
                   value={chatInput}
                   onChange={(e) => setChatInput(e.target.value)}
                   onKeyPress={handleKeyPress}
-                  placeholder="Ask Alpha AI anything..."
-                  className="w-full px-5 py-3.5 bg-background border border-border rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/50 text-base transition-all duration-300"
+                  placeholder="Ask Alpha AI..."
+                  className="w-full px-4 sm:px-5 py-3 sm:py-3.5 bg-background border border-border rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/50 text-sm sm:text-base transition-all duration-300"
                   disabled={isAiLoading}
                 />
                 <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-primary/20 to-primary/10 opacity-0 group-focus-within:opacity-100 -z-10 blur-xl transition-opacity duration-300" />
@@ -715,7 +713,7 @@ const AlphaAI = () => {
                   size="icon"
                   onClick={handleEnhancePrompt}
                   disabled={isAiLoading || isEnhancing || !chatInput.trim()}
-                  className={`shrink-0 h-11 w-11 hover:bg-amber-500/10 rounded-xl transition-all duration-300 ${isEnhancing ? 'text-amber-300 animate-pulse' : 'text-amber-400 hover:text-amber-300'}`}
+                  className={`shrink-0 h-10 w-10 sm:h-11 sm:w-11 hover:bg-amber-500/10 rounded-xl transition-all duration-300 ${isEnhancing ? 'text-amber-300 animate-pulse' : 'text-amber-400 hover:text-amber-300'}`}
                 >
                   <Sparkles className="h-5 w-5" />
                 </Button>
@@ -727,7 +725,7 @@ const AlphaAI = () => {
                 <Button
                   onClick={handleSendMessage}
                   disabled={isAiLoading || (!chatInput.trim() && !uploadedImage)}
-                  className="shrink-0 h-11 w-11 bg-gradient-to-br from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 shadow-lg shadow-primary/20"
+                  className="shrink-0 h-10 w-10 sm:h-11 sm:w-11 bg-gradient-to-br from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 shadow-lg shadow-primary/20"
                   size="icon"
                 >
                   <Send className="h-5 w-5" />
