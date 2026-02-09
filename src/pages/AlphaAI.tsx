@@ -281,6 +281,7 @@ const AlphaAI = () => {
       toast.error("Please enter a prompt to enhance");
       return;
     }
+    const originalText = chatInput;
     setIsEnhancing(true);
     try {
       const { data, error } = await supabase.functions.invoke('alpha-ai-chat', {
@@ -291,8 +292,14 @@ const AlphaAI = () => {
         }
       });
       if (error) throw error;
-      setChatInput(data.response || chatInput);
-      toast.success("Prompt enhanced! ✨");
+      const enhanced = data.response || chatInput;
+      setChatInput(enhanced);
+      if (enhanced !== originalText) {
+        toast.success("Prompt enhanced ✨", {
+          description: `"${originalText.length > 50 ? originalText.slice(0, 50) + '…' : originalText}" → "${enhanced.length > 50 ? enhanced.slice(0, 50) + '…' : enhanced}"`,
+          duration: 4000,
+        });
+      }
     } catch (error) {
       console.error('Error enhancing prompt:', error);
       toast.error("Failed to enhance prompt");
