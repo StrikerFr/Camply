@@ -822,13 +822,21 @@ const Dashboard = () => {
               {/* Chat Messages Area */}
               <div ref={chatContainerRef} className="flex-1 p-3 sm:p-4 overflow-y-auto space-y-3">
                 {/* Welcome message */}
-                {messages.length === 0 && <div className="flex gap-3">
-                    <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0 overflow-hidden">
+                {messages.length === 0 && <div className="flex gap-3 items-start">
+                    <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0 overflow-hidden mt-0.5">
                       <img src={logo} alt="Alpha AI" className="h-5 w-5 object-contain" />
                     </div>
-                    <div className="bg-muted/50 rounded-lg rounded-tl-none p-3 max-w-[80%]">
-                      <p className="text-sm text-foreground">
-                        {genZMode ? "hey! i'm alpha, your campus AI 👋 need help finding events, opportunities, or earning points? just ask — i got u" : "Welcome to Alpha AI. I can help you discover events, find opportunities, track your points, and more. What can I help you with?"}
+                    <div className="bg-muted/50 rounded-xl rounded-tl-none p-4 max-w-[80%] space-y-2">
+                      <p className="text-sm font-medium text-foreground">
+                        {genZMode ? "hey, i'm alpha 👋" : "Hi, I'm Alpha AI"}
+                      </p>
+                      <p className="text-sm text-muted-foreground leading-relaxed">
+                        {genZMode 
+                          ? "your campus AI assistant — i can help you find events, opportunities, track points, or just figure stuff out. ask me anything!" 
+                          : "Your smart campus assistant by Camply. I can help you discover events, find opportunities, track your points, and much more."}
+                      </p>
+                      <p className="text-xs text-muted-foreground/70 pt-1">
+                        {genZMode ? "just type below to get started ✌️" : "Type your question below to get started."}
                       </p>
                     </div>
                   </div>}
