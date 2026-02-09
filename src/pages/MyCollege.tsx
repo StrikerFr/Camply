@@ -605,7 +605,7 @@ const MyCollege = () => {
 
   return (
     <DashboardLayout>
-      <div className="max-w-7xl mx-auto space-y-5 sm:space-y-6 lg:space-y-8">
+      <div className="max-w-7xl mx-auto space-y-5 sm:space-y-6 lg:space-y-8 pb-16 lg:pb-0">
         {/* College Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -697,7 +697,7 @@ const MyCollege = () => {
                           </span>
                         )}
                       </div>
-                      <h3 className="text-base sm:text-lg font-semibold text-foreground truncate">{event.title}</h3>
+                      <h3 className="text-base sm:text-lg font-semibold text-foreground line-clamp-2">{event.title}</h3>
                       <p className="text-xs sm:text-sm text-muted-foreground mt-1 line-clamp-2">{event.description}</p>
                       <div className="flex flex-wrap items-center gap-3 sm:gap-4 mt-2 sm:mt-3 text-xs sm:text-sm text-muted-foreground">
                         <span className="flex items-center gap-1.5">

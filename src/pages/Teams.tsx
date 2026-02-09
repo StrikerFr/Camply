@@ -346,8 +346,8 @@ const Teams = () => {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="relative overflow-hidden rounded-2xl border border-border/50 bg-gradient-to-b from-card to-card/80 shadow-2xl shadow-black/10"
-            style={{ height: "calc(100vh - 240px)", minHeight: "560px" }}
+            className="relative overflow-hidden rounded-2xl border border-border/50 bg-gradient-to-b from-card to-card/80 shadow-2xl shadow-black/10 mb-16 lg:mb-0"
+            style={{ height: "calc(100vh - 240px)", minHeight: "460px" }}
           >
             {/* Subtle gradient overlay */}
             <div className="absolute inset-0 bg-gradient-to-br from-primary/[0.02] via-transparent to-transparent pointer-events-none" />
@@ -549,7 +549,7 @@ const Teams = () => {
                               )}
                               <div
                                 className={cn(
-                                  "max-w-[70%] px-4 py-3 shadow-sm",
+                                  "max-w-[75%] sm:max-w-[70%] px-4 py-3 shadow-sm",
                                   msg.sender === "me"
                                     ? "bg-gradient-to-br from-primary to-primary/90 text-primary-foreground rounded-2xl rounded-br-lg shadow-primary/20"
                                     : "bg-muted/80 backdrop-blur-sm text-foreground rounded-2xl rounded-bl-lg border border-border/50"
