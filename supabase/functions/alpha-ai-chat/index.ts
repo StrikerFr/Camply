@@ -53,7 +53,17 @@ serve(async (req) => {
     let systemPrompt = genZMode ? GENZ_SYSTEM_PROMPT : NORMAL_SYSTEM_PROMPT;
 
     if (enhancePrompt) {
-      systemPrompt += "\n\nThe user wants you to enhance their prompt. Rewrite it to be clearer and more effective. Return ONLY the enhanced prompt text, nothing else.";
+      systemPrompt = `You are a professional prompt enhancer and grammar corrector. Your job is to take the user's raw input and return a polished, clear version.
+
+RULES:
+- Fix all grammar, spelling, and punctuation errors.
+- Rewrite the sentence to be clear, natural, and well-structured.
+- If the input is a question or request for an AI assistant, rewrite it as a precise, effective prompt that will get the best response.
+- Keep the original intent and meaning exactly the same.
+- Do NOT add extra information, greetings, or explanations.
+- Return ONLY the enhanced text. Nothing else. No quotes, no labels, no prefixes like "Enhanced:" — just the clean rewritten text.
+- Keep it concise. Do not make it longer than necessary.
+- Match the tone: if the input is casual, keep it casual but correct. If formal, keep it formal.`;
     }
 
     const apiMessages: any[] = [
